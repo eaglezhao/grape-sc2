@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{7A47FBE0-8CDA-42CE-94B3-6D9B4F6B47EF}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Vestras.StarCraft2.Grape.Core</RootNamespace>
+    <AssemblyName>Vestras.StarCraft2.Grape.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CalithaLib">
+      <HintPath>..\Lib\CalithaLib.dll</HintPath>
+    </Reference>
+    <Reference Include="GoldParserEngine">
+      <HintPath>..\Lib\GoldParserEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Ast\GrapeArrayAccessExpression.cs" />
+    <Compile Include="Ast\GrapeBreakStatement.cs" />
+    <Compile Include="Ast\GrapeAddExpression.cs" />
+    <Compile Include="Ast\GrapeArrayCreationExpression.cs" />
+    <Compile Include="Ast\GrapeCallExpression.cs" />
+    <Compile Include="Ast\GrapeCaseStatement.cs" />
+    <Compile Include="Ast\GrapeCatchStatement.cs" />
+    <Compile Include="Ast\GrapeConditionalExpression.cs" />
+    <Compile Include="Ast\GrapeContinueStatement.cs" />
+    <Compile Include="Ast\GrapeDefaultStatement.cs" />
+    <Compile Include="Ast\GrapeFinallyStatement.cs" />
+    <Compile Include="Ast\GrapeForEachStatement.cs" />
+    <Compile Include="Ast\GrapeIdentifierExpression.cs" />
+    <Compile Include="Ast\GrapeExpression.cs" />
+    <Compile Include="Ast\GrapeIfStatement.cs" />
+    <Compile Include="Ast\GrapeInitStatement.cs" />
+    <Compile Include="Ast\GrapeLiteralExpression.cs" />
+    <Compile Include="Ast\GrapeMemberExpression.cs" />
+    <Compile Include="Ast\GrapeMultiplicationExpression.cs" />
+    <Compile Include="Ast\GrapeNonArrayCreationExpression.cs" />
+    <Compile Include="Ast\GrapeObjectCreationExpression.cs" />
+    <Compile Include="Ast\GrapeReturnStatement.cs" />
+    <Compile Include="Ast\GrapeSetExpression.cs" />
+    <Compile Include="Ast\GrapeShiftExpression.cs" />
+    <Compile Include="Ast\GrapeStatement.cs" />
+    <Compile Include="Ast\GrapeSwitchStatement.cs" />
+    <Compile Include="Ast\GrapeThrowStatement.cs" />
+    <Compile Include="Ast\GrapeTryStatement.cs" />
+    <Compile Include="Ast\GrapeTypecastExpression.cs" />
+    <Compile Include="Ast\GrapeUnaryExpression.cs" />
+    <Compile Include="Ast\GrapeWhileStatement.cs" />
+    <Compile Include="GrapeAst.cs" />
+    <Compile Include="Ast\GrapeBlock.cs" />
+    <Compile Include="GrapeClass.cs" />
+    <Compile Include="GrapeEntity.cs" />
+    <Compile Include="GrapeField.cs" />
+    <Compile Include="GrapeFunction.cs" />
+    <Compile Include="GrapeImportDeclaration.cs" />
+    <Compile Include="GrapePackageDeclaration.cs" />
+    <Compile Include="GrapeVariable.cs" />
+    <Compile Include="GrapeEntityWithBlock.cs" />
+    <Compile Include="Implementation\GrapeSkeletonParser.cs" />
+    <Compile Include="IGrapeParser.cs" />
+    <Compile Include="Implementation\GrapeParser.cs" />
+    <Compile Include="Implementation\GrapeParserConfiguration.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Implementation\grape.cgt" />
+    <None Include="Implementation\grape-sample.gp" />
+    <None Include="Implementation\grape.grm" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

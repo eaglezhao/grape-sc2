@@ -1,0 +1,395 @@
+"Name"     = 'Grape'
+"Version"  = '1.0'
+
+"Author"   = 'Theodor Storm Kristensen'
+"About"    = 'Grape is a programming language for the Blizzard Entertainment game "StarCraft 2"'
+           | 'It provides features such as object oriented programming, clean, readable syntax and more.'
+
+"Case Sensitive" = True
+"Start Symbol"   = <Start>
+
+! -------------------------------------------------
+! Character Sets
+! -------------------------------------------------
+
+{ID Head}      = {Letter} + [_]
+{ID Tail}      = {AlphaNumeric} + [_]
+{WS}           = {Whitespace} - {CR} - {LF}
+{String Chars} = {Printable} + {HT} - ["]
+{Hex Digit}    = {Digit} + [abcdef] + [ABCDEF]
+ 
+! -------------------------------------------------
+! Terminals
+! -------------------------------------------------
+
+! The following defines the Whitespace terminal using the {WS}
+! set - which excludes the carriage return and line feed 
+! characters
+
+Whitespace     = {WS}+
+NewLine        = {CR}{LF} | {CR} | {LF} Whitespace
+
+! The following defines generic terminal rules
+
+Identifier     = {ID Head} {ID Tail}*
+
+MemberName     = '.' {ID Head} {ID Tail}*
+
+DecimalLiteral = {Digit}+
+HexLiteral     = '0' [xX] {Hex Digit}+
+RealLiteral    = {Digit}* '.' {Digit}+
+
+StringLiteral  = '"' {String Chars}* '"'
+
+! -------------------------------------------------
+! Comments
+! -------------------------------------------------
+
+Comment Line = '//'
+Comment Start = '/*'
+Comment End = '*/'
+
+! -------------------------------------------------
+! Rules
+! -------------------------------------------------
+
+! The following rule defines a series of newline tokens.
+! Use this rule rather than the newline terminal.
+
+<NL> 
+    ::= NewLine <NL> 
+     |  NewLine
+
+<NL Or EOF>
+    ::= <NL>
+     |
+
+! <nl opt> removes blank lines before first statement
+
+<Start>
+    ::= <Package>       <Start>
+     |  <Import>        <Start>
+     |  <Type Decl Opt> <Start>
+     |
+
+! Shared rules
+
+<Objects>
+    ::= this
+     |  base
+
+<Valid ID>
+    ::= Identifier
+     |  <Objects>
+
+<Qualified ID>
+    ::= <Valid ID> <Member List>
+
+<Member List>
+    ::= <Member List> MemberName
+     |
+
+! Generic literals
+
+<Literal>
+    ::= true
+     |  false
+     |  DecimalLiteral
+     |  HexLiteral
+     |  RealLiteral
+     |  StringLiteral
+     |  null
+
+! Package/Import Clauses
+
+<Package>
+    ::= package <Qualified ID> <NL>
+
+<Import>
+    ::= import <Qualified ID> <NL>
+
+! Types
+
+<Type>
+    ::= <Non Array Type>
+     |  <Non Array Type> <Rank Specifiers>
+
+<Non Array Type>
+    ::= <Qualified ID>
+
+! Rank specifiers are used to define the dimensions of arrays
+
+<Rank Specifiers>
+    ::= <Rank Specifier>
+
+<Rank Specifier>
+    ::= '[' <Expression> ']'
+
+! The following rules are type of expressions or statements
+
+<Expression Opt>
+    ::= <Expression>
+     |
+
+<Expression>
+       ::= <Or Exp> '='   <Expression>
+        |  <Or Exp>
+
+<Or Exp>
+       ::= <Or Exp> '||' <And Exp>
+        |  <And Exp>
+
+<And Exp>
+       ::= <And Exp> '&&' <Logical Or Exp>
+        |  <Logical Or Exp>
+
+<Logical Or Exp>
+       ::= <Logical Or Exp> '|' <Logical Xor Exp>
+        |  <Logical Xor Exp>
+
+<Logical Xor Exp>
+       ::= <Logical Xor Exp> '^' <Logical And Exp>
+        |  <Logical And Exp>
+
+<Logical And Exp>
+       ::= <Logical And Exp> '&' <Equality Exp>
+        |  <Equality Exp>
+
+<Equality Exp>  
+       ::= <Equality Exp> '==' <Compare Exp>
+        |  <Equality Exp> '!=' <Compare Exp>
+        |  <Compare Exp>
+
+<Compare Exp>
+       ::= <Compare Exp> '<'  <Shift Exp>
+        |  <Compare Exp> '>'  <Shift Exp>
+        |  <Compare Exp> '<=' <Shift Exp>
+        |  <Compare Exp> '>=' <Shift Exp>
+        |  <Shift Exp>
+
+<Shift Exp>
+       ::= <Shift Exp> '<<' <Add Exp>
+        |  <Shift Exp> '>>' <Add Exp>
+        |  <Add Exp>
+
+<Add Exp>
+       ::= <Add Exp> '+' <Mult Exp>
+        |  <Add Exp> '-' <Mult Exp>
+        |  <Mult Exp>
+
+<Mult Exp>
+       ::= <Mult Exp> '*' <Typecast Exp>
+        |  <Mult Exp> '/' <Typecast Exp>
+        |  <Mult Exp> '%' <Typecast Exp>
+        |  <Typecast Exp>
+
+<Typecast Exp>
+    ::= <Unary Exp> as <Qualified ID>
+     |  <Unary Exp>
+
+<Unary Exp>  
+       ::= '-'  <Value>
+        |  '!'  <Value>
+        |  '~'  <Value>
+        |  <Value>
+
+<Local Var Decl>
+    ::= <Variable Declarator>
+
+<Statement Exp>
+    ::= <Qualified ID>                              <Method Calls>
+     |  <Qualified ID> '[' <Expression> ']'         <Method Calls>
+     |  <Qualified ID> '(' <Arg List Opt> ')'       <Method Calls>
+     |  <Qualified ID>                              <Method Calls> <Assign Tail>
+     |  <Qualified ID> '(' <Arg List Opt> ')'       <Method Calls> <Assign Tail>          
+     |  <Qualified ID> '[' <Expression> ']'         <Method Calls> <Assign Tail>
+     |  <Variable Declarator Base>
+
+<Assign Tail>
+    ::= '=' <Expression>
+
+<Method Calls>
+    ::= <Method Call> <Method Calls>
+     |
+
+<Method Call>
+    ::= MemberName
+     |  MemberName '(' <Arg List Opt> ')'
+     |  MemberName '[' <Expression> ']'
+
+<Value> 
+    ::= '(' <Expression> ')'
+     |  <Literal>
+     |  <Statement Exp>
+     |  new <Qualified ID> '(' <Arg List Opt> ')'
+     |  new <Qualified ID> '[' <Expression> ']'
+
+! Arguments
+
+<Arg List Opt>
+    ::= <Arg List>
+     |
+
+<Arg List>
+    ::= <Arg List> ',' <Argument>
+     |  <Argument>
+
+<Argument>
+    ::= <Expression>
+
+! Statements
+
+<Stm List>
+    ::= <Stm List> <Statement>
+     |  
+
+<Statement>
+    ::= <Local Var decl>
+     |  if <Expression> <NL> <Stm List> 'end' <NL>
+     |  if <Expression> <NL> <Stm List> else <NL> <Stm List> 'end' <NL>
+
+     |  foreach <Qualified ID> Identifier in <Expression> <NL> <Stm List> 'end' <NL>
+     |  foreach <Qualified ID> <Rank Specifiers> Identifier in <Expression> <NL> <Stm List> 'end' <NL>
+     |  while <Expression> <NL> <Stm List> 'end' <NL>
+     |  <Normal Stm>
+
+<Normal Stm>
+    ::= switch <Expression> <NL> <Switch Sections Opt> 'end' <NL>
+     |  try <NL> <Stm List> 'end' <NL> 
+     |  <Catch Clauses>
+     |  <Finally Clause Opt>
+     |  break <NL>
+     |  continue <NL>
+     |  return <Expression Opt> <NL>
+     |  throw <Expression Opt> <NL>
+     |  <Expression> <NL>
+     |  <Constructor Init Stms> <NL>
+
+<Constructor Init Stms>
+    ::= init base '(' <Arg List Opt> ')'
+     |  init this '(' <Arg List Opt> ')'
+
+<Variable Declarator Base>
+    ::= <Qualified ID> Identifier
+     |  <Qualified ID> <Rank Specifiers> Identifier
+     |  <Qualified ID> Identifier '=' <Variable Initializer>
+     |  <Qualified ID> <Rank Specifiers> Identifier '=' <Variable Initializer>
+
+<Variable Declarator>
+    ::= <Variable Declarator Base> <NL>
+
+<Variable Initializer>
+    ::= <Expression>
+     |  <Array Initializer>
+
+! Switch Clauses
+
+<Switch Sections Opt>
+    ::= <Switch Sections Opt> <Switch Label>
+     |
+
+<Switch Label>
+    ::= case <Expression> <NL> <Stm List> 'end' <NL>
+     |  default <NL> <Stm List> 'end' <NL>
+
+! Catch Clauses
+
+<Catch Clauses>
+    ::= <Catch Clause> <Catch Clauses>
+     |
+
+<Catch Clause>
+    ::= catch <Qualified ID> Identifier <NL> <Stm List> 'end' <NL>
+     |  catch <Qualified ID> <NL> <Stm List> 'end' <NL>
+     |  catch <NL> <Stm List> 'end' <NL>
+
+<Finally Clause Opt>
+    ::= finally <NL> <Stm List> 'end' <NL>
+     |  <NL>
+
+! Modifiers
+
+<Access>
+    ::= private
+     |  protected
+     |  public
+     |  internal
+
+<Modifier>
+    ::= abstract
+     |  override
+     |  sealed
+     |  static
+     |  <Access>
+
+<Modifiers>
+    ::= <Modifier> <Modifiers>
+     |  
+
+! Classes
+
+<Class Decl>
+    ::= <Modifiers> class Identifier <Class Base Opt> <NL> <Class Item Decs Opt> 'end' <NL Or EOF>
+
+<Class Base Opt>
+    ::= inherits <Non Array Type>
+     |
+
+<Class Item Decs Opt>
+    ::= <Class Item Decs Opt> <Class Item>
+     |
+
+<Class Item>
+    ::= <Method Dec>
+     |  <Constructor Dec>
+     |  <Destructor Dec>
+     |  <Type Decl>
+     |  <Field Dec>
+
+! Class Items
+
+<Field Dec>
+    ::= <Modifiers> <Type> Identifier <NL>
+     |  <Modifiers> <Type> Identifier '=' <Expression> <NL>
+
+<Method Dec>
+    ::= <Modifiers> <Type> Identifier '(' <Formal Param List Opt> ')' <NL> <Stm List> 'end' <NL>
+
+<Formal Param List Opt>
+    ::= <Formal Param List>
+     |
+
+<Formal Param List>
+    ::= <Formal Param>
+     |  <Formal Param List> ',' <Formal Param>
+
+<Formal Param>
+    ::= <Type> Identifier
+
+<Type Decl>
+    ::= <Class Decl>
+
+<Type Decl Opt>
+    ::= <Type Decl>
+     |  <NL>
+
+! Constructor / Destructor Declarations
+
+<Constructor Dec>
+    ::= <Modifiers> ctor Identifier '(' <Formal Param List Opt> ')' <NL> <Stm List> 'end' <NL>
+
+<Destructor Dec>
+    ::= <Modifiers> dctor Identifier '(' ')' <NL> <Stm List> 'end' <NL>
+! Arrays
+
+<Array Initializer>
+    ::= '[' <Variable Initializer List Opt> ']'
+     |  '[' <Variable Initializer List> ',' ']'
+
+<Variable Initializer List Opt>
+    ::= <Variable Initializer List>
+     |
+
+<Variable Initializer List>
+    ::= <Variable Initializer>
+     |  <Variable Initializer List> ',' <Variable Initializer>
