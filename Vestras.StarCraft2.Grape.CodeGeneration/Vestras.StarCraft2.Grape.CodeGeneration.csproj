@@ -36,9 +36,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IGrapeCodeGenerator.cs" />
+    <Compile Include="Implementation\GrapeClassValidator.cs" />
+    <Compile Include="Implementation\GrapeClassVisitor.cs" />
+    <Compile Include="Implementation\GrapeFieldValidator.cs" />
+    <Compile Include="Implementation\GrapeFieldVisitor.cs" />
+    <Compile Include="Implementation\GrapeFunctionValidator.cs" />
+    <Compile Include="Implementation\GrapeFunctionVisitor.cs" />
     <Compile Include="Implementation\GrapeAstVisitor.cs" />
     <Compile Include="Implementation\GrapeCodeGenerator.cs" />
     <Compile Include="Implementation\GrapeCodeGeneratorConfiguration.cs" />
+    <Compile Include="Implementation\GrapeVariableValidator.cs" />
+    <Compile Include="Implementation\GrapeVariableVisitor.cs" />
+    <Compile Include="Implementation\IAstNodeValidator.cs" />
     <Compile Include="Implementation\IAstNodeVisitor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

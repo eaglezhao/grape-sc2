@@ -367,6 +367,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
         private LALRParser parser;
         private GrapeParserConfiguration config;
         private List<NonterminalToken> processedExpressionTokens = new List<NonterminalToken>();
+        internal GrapeErrorSink errorSink;
 
         public GrapeSkeletonParser(string filename, GrapeParserConfiguration config) {
             this.config = config;
@@ -398,7 +399,9 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             parser.OnParseError += new LALRParser.ParseErrorHandler(ParseErrorEvent);
         }
 
+        private string currentFileName;
         public void Parse(string source) {
+            currentFileName = source;
             parser.Parse(source);
         }
 
@@ -408,6 +411,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
         private GrapeEntity currentEntity;
         private GrapeBlock currentBlock;
         private void AddGrapeEntityToCurrentParent(GrapeEntity entity) {
+            entity.FileName = currentFileName;
             while (currentBlock != null && entity.Offset > currentBlock.Offset + currentBlock.Length) {
                 if (entity is GrapeStatement && !((GrapeStatement)entity).CanHaveBlock) {
                     break;
@@ -1876,7 +1880,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             }
 
             if (config.OutputErrors) {
-                Console.WriteLine(message);
+                errorSink.AddError(new GrapeErrorSink.Error { Description = message, FileName = currentFileName, Offset = args.Token.Location.Position, Length = 1 });
             }
         }
 
@@ -1887,7 +1891,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             }
 
             if (config.OutputErrors) {
-                Console.WriteLine(message);
+                errorSink.AddError(new GrapeErrorSink.Error { Description = message, FileName = currentFileName, Offset = args.UnexpectedToken.Location.Position, Length = 1 });
             }
         }
     }

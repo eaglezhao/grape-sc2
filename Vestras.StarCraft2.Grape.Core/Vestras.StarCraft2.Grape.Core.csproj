@@ -72,6 +72,7 @@
     <Compile Include="Ast\GrapeTypecastExpression.cs" />
     <Compile Include="Ast\GrapeUnaryExpression.cs" />
     <Compile Include="Ast\GrapeWhileStatement.cs" />
+    <Compile Include="GrapeErrorSink.cs" />
     <Compile Include="GrapeAst.cs" />
     <Compile Include="Ast\GrapeBlock.cs" />
     <Compile Include="GrapeClass.cs" />

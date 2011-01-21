@@ -9,7 +9,7 @@ import system.utils
 class mod inherits mod_base
 	string args
 
-    static abstract override void main(string args)
+    override void main(string args)
         string[100] args_array = args.split(" ")
 
         if args_array.null_or_empty()

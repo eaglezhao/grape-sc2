@@ -1,11 +1,10 @@
 ﻿using System;
 
 namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
-    internal interface IAstNodeVisitor {
+    internal interface IAstNodeValidator {
         Type NodeType { get; }
         GrapeCodeGeneratorConfiguration Config { get; set; }
-        IAstNodeValidator Validator { get; set; }
 
-        void VisitNode(object obj);
+        bool ValidateNode(object obj);
     }
 }
