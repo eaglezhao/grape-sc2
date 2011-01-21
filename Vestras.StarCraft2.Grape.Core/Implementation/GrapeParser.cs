@@ -59,6 +59,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             skeletonParser.errorSink = errorSink;
             foreach (string file in files) {
                 using (StreamReader reader = new StreamReader(file)) {
+                    skeletonParser.currentFileName = file;
                     skeletonParser.Parse(reader.ReadToEnd());
                 }
             }

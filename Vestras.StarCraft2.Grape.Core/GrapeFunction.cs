@@ -7,7 +7,7 @@ namespace Vestras.StarCraft2.Grape.Core {
         public GrapeFunctionType Type { get; internal set; }
         public string Modifiers { get; internal set; }
         public string Name { get; internal set; }
-        public string ReturnType { get; internal set; }
+        public GrapeExpression ReturnType { get; internal set; }
         public List<GrapeVariable> Parameters { get; internal set; }
         public List<GrapeFunction> Overloads { get; internal set; }
 

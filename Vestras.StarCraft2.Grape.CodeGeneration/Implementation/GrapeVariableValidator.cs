@@ -34,10 +34,10 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
 
         public bool ValidateNode(object obj) {
             if (Config.OutputErrors) {
-                GrapeField f = obj as GrapeField;
-                if (f != null) {
-                    if (!(f.Parent is GrapeFunction-)) {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "A field must be the child of a function.", FileName = f.FileName, Offset = f.Offset, Length = f.Length });
+                GrapeVariable v = obj as GrapeVariable;
+                if (v != null) {
+                    if (!(v.Parent is GrapeFunction)) {
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "A variable must be the child of a function.", FileName = v.FileName, Offset = v.Offset, Length = v.Length });
                         if (!Config.ContinueOnError) {
                             return false;
                         }

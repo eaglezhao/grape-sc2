@@ -11,9 +11,9 @@ namespace Vestras.StarCraft2.Grape.TestApplication {
     [Export(typeof(Window))]
     public partial class MainWindow : Window {
         [Import]
-        private IGrapeParser parser;
+        private IGrapeParser parser = null;
         [Import]
-        private IGrapeCodeGenerator codeGenerator;
+        private IGrapeCodeGenerator codeGenerator = null;
 
         private void openButton_Click(object sender, RoutedEventArgs e) {
             using (OpenFileDialog openFileDialog = new OpenFileDialog() { Filter = "Grape Files (*.gp)|*.gp|All Files (*.*)|*.*" }) {
