@@ -2,7 +2,31 @@
 
 namespace Vestras.StarCraft2.Grape.Core.Ast {
     public class GrapeTypecastExpression : GrapeExpression {
-        public GrapeExpression Type { get; internal set; }
-        public GrapeExpression Value { get; internal set; }
+        private GrapeExpression type;
+        private GrapeExpression value;
+
+        public GrapeExpression Type {
+            get {
+                return type;
+            }
+            internal set {
+                type = value;
+                if (type != null) {
+                    type.Parent = this;
+                }
+            }
+        }
+
+        public GrapeExpression Value {
+            get {
+                return value;
+            }
+            internal set {
+                this.value = value;
+                if (this.value != null) {
+                    this.value.Parent = this;
+                }
+            }
+        }
     }
 }

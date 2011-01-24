@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using Vestras.StarCraft2.Grape.Core;
+using Vestras.StarCraft2.Grape.Core.Ast;
 
 namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
     [Export(typeof(IAstNodeValidator))]
@@ -16,9 +17,9 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
         };
 
         public GrapeCodeGeneratorConfiguration Config { get; set; }
-        public Type NodeType {
+        public Type[] NodeType {
             get {
-                return typeof(GrapeClass);
+                return new Type[] { typeof(GrapeClass) };
             }
         }
 
@@ -85,6 +86,28 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                     string modifiersErrorMessage;
                     if (!ValidateModifiers(c, out modifiersErrorMessage)) {
                         errorSink.AddError(new GrapeErrorSink.Error { Description = modifiersErrorMessage, FileName = c.FileName, Offset = c.Offset, Length = c.Length });
+                        if (!Config.ContinueOnError) {
+                            return false;
+                        }
+                    }
+
+                    if (c.Inherits != null && !GrapeTypeCheckingUtilities.DoesTypeExist(Config.Ast, c.Inherits, c.FileName)) {
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "The type '" + GrapeTypeCheckingUtilities.GetTypeNameForTypeAccessExpression(c.Inherits) + "' could not be found.", FileName = c.FileName, Offset = c.Inherits.Offset, Length = c.Inherits.Length });
+                        if (!Config.ContinueOnError) {
+                            return false;
+                        }
+                    }
+
+                    GrapeMemberExpression inheritsTypeMemberExpression = c.Inherits as GrapeMemberExpression;
+                    string inheritsTypeQualifiedId = "";
+                    if (inheritsTypeMemberExpression != null) {
+                        inheritsTypeQualifiedId = inheritsTypeMemberExpression.GetMemberExpressionQualifiedId();
+                    } else if (c.Inherits is GrapeIdentifierExpression) {
+                        inheritsTypeQualifiedId = ((GrapeIdentifierExpression)c.Inherits).Identifier;
+                    }
+
+                    if (inheritsTypeQualifiedId == "void" || inheritsTypeQualifiedId == "void_base") {
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "The void type cannot be inherited.", FileName = c.FileName, Offset = inheritsTypeMemberExpression.Offset, Length = inheritsTypeMemberExpression.Length });
                         if (!Config.ContinueOnError) {
                             return false;
                         }

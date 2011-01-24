@@ -7,9 +7,9 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
     internal sealed class GrapeFieldVisitor : IAstNodeVisitor {
         public GrapeCodeGeneratorConfiguration Config { get; set; }
         public IAstNodeValidator Validator { get; set; }
-        public Type NodeType {
+        public Type[] NodeType {
             get {
-                return typeof(GrapeField);
+                return new Type[] { typeof(GrapeField) };
             }
         }
 

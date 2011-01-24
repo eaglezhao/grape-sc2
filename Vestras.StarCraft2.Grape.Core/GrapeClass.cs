@@ -7,7 +7,7 @@ namespace Vestras.StarCraft2.Grape.Core {
         public bool IsNativeType { get; internal set; }
         public string Name { get; internal set; }
         public string Modifiers { get; internal set; }
-        public string Inherits { get; internal set; }
+        public GrapeExpression Inherits { get; internal set; }
 
         public override string ToString() {
             return GetType().Name + " Name = " + Name;

@@ -7,6 +7,8 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
     internal sealed class GrapeFunctionValidator : IAstNodeValidator {
         [Import]
         private GrapeErrorSink errorSink = null;
+        [Import]
+        private GrapeVariableValidator variableValidator = null;
 
         private static readonly string[] AccessModifiers = new string[] {
             "public",
@@ -16,9 +18,9 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
         };
 
         public GrapeCodeGeneratorConfiguration Config { get; set; }
-        public Type NodeType {
+        public Type[] NodeType {
             get {
-                return typeof(GrapeFunction);
+                return new Type[] { typeof(GrapeFunction) };
             }
         }
 
@@ -103,10 +105,24 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         }
                     }
 
+                    if (f.ReturnType != null && !GrapeTypeCheckingUtilities.DoesTypeExist(Config.Ast, f.ReturnType, f.FileName)) {
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "The type '" + GrapeTypeCheckingUtilities.GetTypeNameForTypeAccessExpression(f.ReturnType) + "' could not be found.", FileName = f.FileName, Offset = f.ReturnType.Offset, Length = f.ReturnType.Length });
+                        if (!Config.ContinueOnError) {
+                            return false;
+                        }
+                    }
+
                     string modifiersErrorMessage;
                     if (!ValidateModifiers(f, out modifiersErrorMessage)) {
                         errorSink.AddError(new GrapeErrorSink.Error { Description = modifiersErrorMessage, FileName = f.FileName, Offset = f.Offset, Length = f.Length });
                         if (!Config.ContinueOnError) {
+                            return false;
+                        }
+                    }
+
+                    foreach (GrapeVariable param in f.Parameters) {
+                        bool isParamValid = variableValidator.ValidateNode(param);
+                        if (!isParamValid) {
                             return false;
                         }
                     }

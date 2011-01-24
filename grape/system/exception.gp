@@ -20,6 +20,18 @@ class exception
 		return message
 	end
 
+	override int get_hash_code()
+		return message.get_hash_code() ^ stack_trace.get_hash_code()
+	end
+
+	override bool equals(object value)
+		return this == value
+	end
+
+	override string to_string()
+		return message
+	end
+
 	ctor exception(string message)
 		init this(message, "")
 	end

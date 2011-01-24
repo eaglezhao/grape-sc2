@@ -15,25 +15,42 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
 
         private IAstNodeValidator FindValidatorForVisitor(IAstNodeVisitor nodeVisitor) {
             foreach (IAstNodeValidator nodeValidator in nodeValidators) {
-                if (nodeValidator.NodeType == nodeVisitor.NodeType) {
-                    return nodeValidator;
+                foreach (Type type in nodeValidator.NodeType) {
+                    if (IsTypeInTypeArray(type, nodeVisitor.NodeType)) {
+                        return nodeValidator;
+                    }
                 }
             }
 
             return null;
         }
 
+        internal static bool IsTypeInTypeArray(Type type, Type[] array) {
+            foreach (Type t in array) {
+                if (t == type) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private void VisitNodesForEntityList(List<GrapeEntity> entities) {
             foreach (GrapeEntity entity in entities) {
                 foreach (IAstNodeVisitor nodeVisitor in nodeVisitors) {
-                    if (entity.GetType() == nodeVisitor.NodeType) {
+                    if (IsTypeInTypeArray(entity.GetType(), nodeVisitor.NodeType)) {
                         nodeVisitor.Config = config;
                         nodeVisitor.Validator = FindValidatorForVisitor(nodeVisitor);
                         if (nodeVisitor.Validator != null) {
                             nodeVisitor.Validator.Config = config;
                         }
 
-                        nodeVisitor.VisitNode(entity);
+                        if (config.GenerateCode) {
+                            nodeVisitor.VisitNode(entity);
+                        } else {
+                            nodeVisitor.Validator.ValidateNode(entity);
+                        }
+
                         break;
                     }
                 }

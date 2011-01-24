@@ -1,12 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 
 namespace Vestras.StarCraft2.Grape.Core.Ast {
     public class GrapeCallExpression : GrapeMemberExpression {
-        public List<GrapeExpression> Parameters { get; internal set; }
+        private ObservableCollection<GrapeExpression> parameters = new ObservableCollection<GrapeExpression>();
+
+        public ObservableCollection<GrapeExpression> Parameters {
+            get {
+                return parameters;
+            }
+        }
 
         public GrapeCallExpression() {
-            Parameters = new List<GrapeExpression>();
+            parameters.CollectionChanged += (sender, e) => {
+                if (e.Action == NotifyCollectionChangedAction.Add) {
+                    foreach (object item in e.NewItems) {
+                        if (item is GrapeExpression) {
+                            (item as GrapeExpression).Parent = this;
+                        }
+                    }
+                }
+            };
         }
     }
 }

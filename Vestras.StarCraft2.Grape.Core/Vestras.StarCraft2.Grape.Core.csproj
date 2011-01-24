@@ -65,6 +65,7 @@
     <Compile Include="Ast\GrapeReturnStatement.cs" />
     <Compile Include="Ast\GrapeSetExpression.cs" />
     <Compile Include="Ast\GrapeShiftExpression.cs" />
+    <Compile Include="Ast\GrapeStackExpression.cs" />
     <Compile Include="Ast\GrapeStatement.cs" />
     <Compile Include="Ast\GrapeSwitchStatement.cs" />
     <Compile Include="Ast\GrapeThrowStatement.cs" />

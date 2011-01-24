@@ -16,11 +16,14 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
         internal static List<Tuple<GalaxyLiteralAttribute, GalaxyLiteralTypeAttribute>> Literals { get; set; }
         internal static List<Tuple<GalaxyTypeAttribute, GalaxyTypeDefaultValueAttribute>> Types { get; set; }
 
-        public void Generate(GrapeAst ast, bool outputErrors, bool continueOnError, string outputFileName) {
-            GrapeCodeGeneratorConfiguration config = new GrapeCodeGeneratorConfiguration(ast, outputErrors, continueOnError);
+        public void Generate(GrapeAst ast, bool outputErrors, bool continueOnError, bool generateCode, string outputFileName) {
+            GrapeCodeGeneratorConfiguration config = new GrapeCodeGeneratorConfiguration(ast, outputErrors, continueOnError, generateCode);
             astVisitor.VisitNodes(config);
-            using (StreamWriter writer = new StreamWriter(outputFileName)) {
-                writer.Write(config.OutputCode);
+            if (generateCode) {
+                DirectoryHelper.CreatePath(outputFileName);
+                using (StreamWriter writer = new StreamWriter(outputFileName)) {
+                    writer.Write(config.OutputCode);
+                }
             }
         }
 

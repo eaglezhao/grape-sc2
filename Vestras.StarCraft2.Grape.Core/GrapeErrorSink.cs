@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
+using System.IO;
 
 namespace Vestras.StarCraft2.Grape.Core {
     [Export]
@@ -28,6 +29,10 @@ namespace Vestras.StarCraft2.Grape.Core {
             public string Description { get; internal set; }
             public int Offset { get; internal set; }
             public int Length { get; internal set; }
+
+            public override string ToString() {
+                return string.Format("{0}: Offset: {1}, length: {2} -- \"{3}\"", Path.GetFileName(FileName), Offset, Length, Description);
+            }
 
             public Error() {
                 Type = ErrorType.Error;

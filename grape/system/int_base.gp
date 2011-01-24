@@ -48,7 +48,7 @@ class int_base
 		return RandomInt(minimum_int_value, maximum_int_value)
 	end
 
-	override bool equals(int_base value)
+	override bool equals(object value)
 		return this == value
 	end
 
@@ -57,7 +57,7 @@ class int_base
 	end
 
 	override string to_string()
-		return (string)this
+		return this as string
 	end
 end
 

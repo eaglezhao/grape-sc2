@@ -6,6 +6,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
         private GrapeAst ast;
         private bool outputErrors;
         private bool continueOnError;
+        private bool generateCode;
         private string outputCode;
         public GrapeAst Ast {
             get {
@@ -25,6 +26,12 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
             }
         }
 
+        public bool GenerateCode {
+            get {
+                return generateCode;
+            }
+        }
+
         public string OutputCode {
             get {
                 return outputCode;
@@ -34,10 +41,11 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
             }
         }
 
-        public GrapeCodeGeneratorConfiguration(GrapeAst ast, bool outputErrors, bool continueOnError) {
+        public GrapeCodeGeneratorConfiguration(GrapeAst ast, bool outputErrors, bool continueOnError, bool generateCode) {
             this.ast = ast;
             this.outputErrors = outputErrors;
             this.continueOnError = continueOnError;
+            this.generateCode = generateCode;
             this.outputCode = "";
         }
     }

@@ -9,7 +9,7 @@ package system
 
 // summary: Represents a decimal value.
 class fixed_base
-	static int any_precision = c_fixedPrecisionAny;
+	static int any_precision = c_fixedPrecisionAny
 
 	fixed_base abs()
 		return AbsF(this)
@@ -63,12 +63,12 @@ class fixed_base
 		return RandomFixed(min, max)
 	end
 
-	override bool equals(fixed_base value)
+	override bool equals(object value)
 		return this == value
 	end
 
 	override int get_hash_code()
-		return (int)this
+		return this as string
 	end
 
 	override string to_string()

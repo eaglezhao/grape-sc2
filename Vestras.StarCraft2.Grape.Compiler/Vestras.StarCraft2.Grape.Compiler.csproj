@@ -9,7 +9,7 @@
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Vestras.StarCraft2.Grape.Compiler</RootNamespace>
-    <AssemblyName>csc</AssemblyName>
+    <AssemblyName>gpc</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
@@ -36,10 +36,21 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Vestras.StarCraft2.Grape.CodeGeneration\Vestras.StarCraft2.Grape.CodeGeneration.csproj">
+      <Project>{B7D42AC7-A1E7-45AC-AAAA-151BE8A3148E}</Project>
+      <Name>Vestras.StarCraft2.Grape.CodeGeneration</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Vestras.StarCraft2.Grape.Core\Vestras.StarCraft2.Grape.Core.csproj">
+      <Project>{7A47FBE0-8CDA-42CE-94B3-6D9B4F6B47EF}</Project>
+      <Name>Vestras.StarCraft2.Grape.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

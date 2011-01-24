@@ -16,9 +16,9 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
         };
 
         public GrapeCodeGeneratorConfiguration Config { get; set; }
-        public Type NodeType {
+        public Type[] NodeType {
             get {
-                return typeof(GrapeField);
+                return new Type[] { typeof(GrapeField) };
             }
         }
 
@@ -102,9 +102,23 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         }
                     }
 
+                    if (f.Type != null && !GrapeTypeCheckingUtilities.DoesTypeExist(Config.Ast, f.Type, f.FileName)) {
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "The type '" + GrapeTypeCheckingUtilities.GetTypeNameForTypeAccessExpression(f.Type) + "' could not be found.", FileName = f.FileName, Offset = f.Type.Offset, Length = f.Type.Length });
+                        if (!Config.ContinueOnError) {
+                            return false;
+                        }
+                    }
+
                     string modifiersErrorMessage;
                     if (!ValidateModifiers(f, out modifiersErrorMessage)) {
                         errorSink.AddError(new GrapeErrorSink.Error { Description = modifiersErrorMessage, FileName = f.FileName, Offset = f.Offset, Length = f.Length });
+                        if (!Config.ContinueOnError) {
+                            return false;
+                        }
+                    }
+
+                    if (f.Value != null && !GrapeTypeCheckingUtilities.DoesExpressionResolveToType(Config.Ast, f.Value, f.Type)) {
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot resolve expression to the type '" + GrapeTypeCheckingUtilities.GetTypeNameForTypeAccessExpression(f.Type) + "'.", FileName = f.FileName, Offset = f.Value.Offset, Length = f.Value.Length });
                         if (!Config.ContinueOnError) {
                             return false;
                         }

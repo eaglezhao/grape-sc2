@@ -444,6 +444,10 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
 
         private string GetQualifiedIdText(NonterminalToken qualifiedIdToken, ref TerminalToken firstToken, out TerminalToken lastToken) {
             string qualifiedIdText = "";
+            return GetQualifiedIdText(qualifiedIdToken, ref firstToken, ref qualifiedIdText, out lastToken);
+        }
+
+        private string GetQualifiedIdText(NonterminalToken qualifiedIdToken, ref TerminalToken firstToken, ref string qualifiedIdText, out TerminalToken lastToken) {
             lastToken = null;
             foreach (Token childNormalToken in qualifiedIdToken.Tokens) {
                 NonterminalToken childToken = childNormalToken as NonterminalToken;
@@ -462,7 +466,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                             qualifiedIdText += terminalToken.Text;
                             lastToken = terminalToken;
                         } else if (nonterminalToken != null && nonterminalToken.Rule.Id != (int)RuleConstants.RULE_MEMBERLIST) {
-                            return GetQualifiedIdText(nonterminalToken, ref firstToken, out lastToken);
+                            GetQualifiedIdText(nonterminalToken, ref firstToken, ref qualifiedIdText, out lastToken);
                         }
                     }
                 } else if (childTerminalToken != null) {
@@ -472,7 +476,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                         firstToken = childTerminalToken;
                     }
 
-                    return childTerminalToken.Text;
+                    qualifiedIdText += childTerminalToken.Text;
                 }
             }
 
@@ -579,12 +583,12 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             int currentIndex = 0;
             foreach (Token token in tokens) {
                 NonterminalToken nonterminalToken = token as NonterminalToken;
-                if (nonterminalToken != null && (nonterminalToken.Rule.Id == (int)RuleConstants.RULE_TYPE || nonterminalToken.Rule.Id == (int)RuleConstants.RULE_TYPE2)) {
-                    if (currentIndex < nonterminalToken.Tokens.Length && nonterminalToken.Tokens[currentIndex] is NonterminalToken && ((NonterminalToken)nonterminalToken.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_RANKSPECIFIERS) {
+                if (nonterminalToken != null && ((nonterminalToken.Rule.Id == (int)RuleConstants.RULE_TYPE || nonterminalToken.Rule.Id == (int)RuleConstants.RULE_TYPE2) || nonterminalToken.Rule.Id == (int)RuleConstants.RULE_QUALIFIEDID)) {
+                    if (currentIndex + 1 < tokens.Length && tokens[currentIndex + 1] is NonterminalToken && ((NonterminalToken)tokens[currentIndex + 1]).Rule.Id == (int)RuleConstants.RULE_RANKSPECIFIERS) {
                         expression = new GrapeArrayAccessExpression();
                         GrapeArrayAccessExpression arrayExpression = expression as GrapeArrayAccessExpression;
-                        arrayExpression.Member = CreateExpression(nonterminalToken.Tokens[currentIndex - 1] as NonterminalToken);
-                        NonterminalToken rankSpecifierToken = (nonterminalToken.Tokens[currentIndex] as NonterminalToken).Tokens[0] as NonterminalToken;
+                        arrayExpression.Member = CreateExpression(tokens[currentIndex] as NonterminalToken);
+                        NonterminalToken rankSpecifierToken = (tokens[currentIndex + 1] as NonterminalToken).Tokens[0] as NonterminalToken;
                         NonterminalToken arrayExpressionToken = rankSpecifierToken.Tokens[1] as NonterminalToken;
                         arrayExpression.Array = CreateExpression(arrayExpressionToken);
                     } else {
@@ -693,10 +697,17 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             GrapeArrayAccessExpression arrayExpression = null;
             GrapeTypecastExpression typecastExpression = null;
             GrapeMemberExpression memberExpression = null;
+            GrapeStackExpression stackExpression = null;
             if (token != null) {
                 processedExpressionTokens.Add(token);
                 if (token.Tokens.Length > 1 || (token.Tokens.Length == 1 && token.Tokens[0] is TerminalToken)) {
                     switch (token.Rule.Id) {
+                        // Expression in brackets: ((expression))
+                        case (int)RuleConstants.RULE_VALUE_LPARAN_RPARAN:
+                            expression = new GrapeStackExpression();
+                            stackExpression = expression as GrapeStackExpression;
+                            stackExpression.Child = CreateExpression(token.Tokens[1] as NonterminalToken);
+                            break;
                         // General statements (method calling, member accessing, variable accessing, etc.).
                         case (int)RuleConstants.RULE_STATEMENTEXP_LPARAN_RPARAN:
                         case (int)RuleConstants.RULE_STATEMENTEXP_LPARAN_RPARAN2:
@@ -1027,9 +1038,12 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             }
 
             if (expression != null) {
+                expression.FileName = currentFileName;
                 TerminalToken randomTerminalToken = GetFirstTerminalToken(token.Tokens);
                 if (randomTerminalToken != null) {
                     expression.Line = randomTerminalToken.Location.LineNr;
+                    expression.Offset = randomTerminalToken.Location.Position;
+                    expression.Length = 1;
                 }
             }
 
@@ -1153,7 +1167,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                         currentIndex = 0;
                         expressionToken = null;
                         while (currentIndex < token.Tokens.Length) {
-                            if (token.Tokens[currentIndex] is NonterminalToken && ((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSION) {
+                            if (token.Tokens[currentIndex] is NonterminalToken && (((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSION || ((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSIONOPT || ((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSIONOPT2 || ((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSION_EQ)) {
                                 expressionToken = token.Tokens[currentIndex] as NonterminalToken;
                                 break;
                             }
@@ -1188,7 +1202,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                             currentIndex = 0;
                             expressionToken = null;
                             while (currentIndex < token.Tokens.Length) {
-                                if (token.Tokens[currentIndex] is NonterminalToken && ((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSION) {
+                                if (token.Tokens[currentIndex] is NonterminalToken && (((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSION || ((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSIONOPT || ((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSIONOPT2 || ((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSION_EQ)) {
                                     expressionToken = token.Tokens[currentIndex] as NonterminalToken;
                                     break;
                                 }
@@ -1321,7 +1335,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                     currentIndex = 0;
                     expressionToken = null;
                     while (currentIndex < token.Tokens.Length) {
-                        if (token.Tokens[currentIndex] is NonterminalToken && ((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSION) {
+                        if (token.Tokens[currentIndex] is NonterminalToken && (((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSION || ((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSIONOPT || ((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSIONOPT2 || ((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSION_EQ)) {
                             expressionToken = token.Tokens[currentIndex] as NonterminalToken;
                             break;
                         }
@@ -1375,7 +1389,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                         currentIndex = 0;
                         expressionToken = null;
                         while (currentIndex < token.Tokens.Length) {
-                            if (token.Tokens[currentIndex] is NonterminalToken && ((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSION) {
+                            if (token.Tokens[currentIndex] is NonterminalToken && (((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSION || ((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSIONOPT || ((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSIONOPT2 || ((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSION_EQ)) {
                                 expressionToken = token.Tokens[currentIndex] as NonterminalToken;
                                 break;
                             }
@@ -1406,7 +1420,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                         currentIndex = 0;
                         expressionToken = null;
                         while (currentIndex < token.Tokens.Length) {
-                            if (token.Tokens[currentIndex] is NonterminalToken && ((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSION) {
+                            if (token.Tokens[currentIndex] is NonterminalToken && (((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSION || ((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSIONOPT || ((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSIONOPT2 || ((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSION_EQ)) {
                                 expressionToken = token.Tokens[currentIndex] as NonterminalToken;
                                 break;
                             }
@@ -1522,10 +1536,21 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
 
         private void AddParametersToFunction(GrapeInitStatement i, NonterminalToken token, int startIndex, out int lastTokenIndex) {
             lastTokenIndex = startIndex;
-            foreach (NonterminalToken paramToken in token.Tokens) {
-                GrapeExpression expression = CreateExpression(paramToken);
-                expression.Parent = i;
-                i.Parameters.Add(expression);
+            if (token.Tokens.Length > 0) {
+                NonterminalToken formalParamListToken = token.Tokens[0] as NonterminalToken;
+                foreach (Token formalParamToken in formalParamListToken.Tokens) {
+                    NonterminalToken formalParamNonterminalToken = formalParamToken as NonterminalToken;
+                    if (formalParamNonterminalToken != null) {
+                        if (formalParamNonterminalToken.Rule.Id == (int)RuleConstants.RULE_ARGLIST || formalParamNonterminalToken.Rule.Id == (int)RuleConstants.RULE_ARGLIST_COMMA || formalParamNonterminalToken.Rule.Id == (int)RuleConstants.RULE_ARGLISTOPT || formalParamNonterminalToken.Rule.Id == (int)RuleConstants.RULE_ARGLISTOPT2) {
+                            AddParametersToFunction(i, formalParamListToken, startIndex, out lastTokenIndex);
+                        } else {
+                            GrapeExpression param = CreateExpression(formalParamNonterminalToken);
+                            i.Parameters.Add(param);
+                            lastTokenIndex++;
+                        }
+                    }
+                }
+            } else {
                 lastTokenIndex++;
             }
         }
@@ -1542,15 +1567,19 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                         } else {
                             GrapeVariable param = new GrapeVariable();
                             param.IsParameter = true;
+                            param.FileName = currentFileName;
+                            param.Parent = f;
                             foreach (Token childToken in formalParamNonterminalToken.Tokens) {
                                 NonterminalToken childNonterminalToken = childToken as NonterminalToken;
                                 TerminalToken childTerminalToken = childToken as TerminalToken;
                                 if (childNonterminalToken != null) {
-                                    GrapeExpression paramType = GetTypeFromTypeToken(token.Tokens, param);
+                                    GrapeExpression paramType = GetTypeFromTypeToken(formalParamNonterminalToken.Tokens, param);
                                     param.Type = paramType;
                                 } else if (childTerminalToken != null && childTerminalToken.Text != ",") {
                                     string paramName = childTerminalToken.Text;
                                     param.Name = paramName;
+                                    param.Offset = childTerminalToken.Location.Position;
+                                    param.Length = childTerminalToken.Text.Length;
                                 }
                             }
 
@@ -1676,11 +1705,10 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                         NonterminalToken qualifiedSuperIdToken = inheritanceToken.Tokens[1] as NonterminalToken;
                         if (qualifiedSuperIdToken != null && qualifiedSuperIdToken.Tokens.Length >= 1) {
                             NonterminalToken qualifiedIdToken = qualifiedSuperIdToken.Tokens[0] as NonterminalToken;
-                            string baseClassName = GetQualifiedIdText(qualifiedIdToken, out lastToken);
-                            c.Inherits = baseClassName;
+                            c.Inherits = CreateExpression(qualifiedIdToken);
                         }
-                    } else {
-                        c.Inherits = "object";
+                    } else if (c.Name != "void" && c.Name != "void_base") {
+                        c.Inherits = new GrapeIdentifierExpression { Identifier = "object" };
                     }
                 }
 

@@ -36,8 +36,31 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IGrapeCodeGenerator.cs" />
+    <Compile Include="Implementation\DirectoryHelper.cs" />
+    <Compile Include="Implementation\GrapeMemberExpressionValidator.cs" />
+    <Compile Include="Implementation\GrapeMemberExpressionVisitor.cs" />
+    <Compile Include="Implementation\GrapeForEachStatementValidator.cs" />
+    <Compile Include="Implementation\GrapeForEachStatementVisitor.cs" />
+    <Compile Include="Implementation\GrapeAstUtilities.cs" />
+    <Compile Include="Implementation\GrapeTypeCheckingUtilities.cs" />
+    <Compile Include="Implementation\GrapeWhileStatementValidator.cs" />
+    <Compile Include="Implementation\GrapeWhileStatementVisitor.cs" />
+    <Compile Include="Implementation\GrapeThrowStatementValidator.cs" />
+    <Compile Include="Implementation\GrapeThrowStatementVisitor.cs" />
+    <Compile Include="Implementation\GrapeInitStatementValidator.cs" />
+    <Compile Include="Implementation\GrapeInitStatementVisitor.cs" />
+    <Compile Include="Implementation\GrapeExpressionExtensionMethods.cs" />
+    <Compile Include="Implementation\GrapeReturnStatementValidator.cs" />
+    <Compile Include="Implementation\GrapeReturnStatementVisitor.cs" />
+    <Compile Include="Implementation\GrapeIfStatementValidator.cs" />
+    <Compile Include="Implementation\GrapeIfStatementVisitor.cs" />
+    <Compile Include="Implementation\GrapeContinueStatementValidator.cs" />
+    <Compile Include="Implementation\GrapeContinueStatementVisitor.cs" />
+    <Compile Include="Implementation\GrapeBreakStatementValidator.cs" />
+    <Compile Include="Implementation\GrapeBreakStatementVisitor.cs" />
     <Compile Include="Implementation\GrapeClassValidator.cs" />
     <Compile Include="Implementation\GrapeClassVisitor.cs" />
+    <Compile Include="Implementation\GrapeEntityExtensionMethods.cs" />
     <Compile Include="Implementation\GrapeFieldValidator.cs" />
     <Compile Include="Implementation\GrapeFieldVisitor.cs" />
     <Compile Include="Implementation\GrapeFunctionValidator.cs" />

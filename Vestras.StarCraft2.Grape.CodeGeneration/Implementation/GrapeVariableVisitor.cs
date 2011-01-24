@@ -3,13 +3,13 @@ using System.ComponentModel.Composition;
 using Vestras.StarCraft2.Grape.Core;
 
 namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
-    [Export(typeof(IAstNodeVisitor))]
+    [Export(typeof(IAstNodeVisitor)), Export]
     internal sealed class GrapeVariableVisitor : IAstNodeVisitor {
         public GrapeCodeGeneratorConfiguration Config { get; set; }
         public IAstNodeValidator Validator { get; set; }
-        public Type NodeType {
+        public Type[] NodeType {
             get {
-                return typeof(GrapeVariable);
+                return new Type[] { typeof(GrapeVariable) };
             }
         }
 
@@ -22,7 +22,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                 }
 
                 if (isValid) {
-                    // TODO: insert field code generation here.
+                    // TODO: insert variable code generation here.
                 }
             }
         }
