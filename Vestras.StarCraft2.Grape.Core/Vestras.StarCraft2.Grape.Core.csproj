@@ -44,13 +44,14 @@
     <Compile Include="Ast\GrapeArrayAccessExpression.cs" />
     <Compile Include="Ast\GrapeBreakStatement.cs" />
     <Compile Include="Ast\GrapeAddExpression.cs" />
-    <Compile Include="Ast\GrapeArrayCreationExpression.cs" />
     <Compile Include="Ast\GrapeCallExpression.cs" />
     <Compile Include="Ast\GrapeCaseStatement.cs" />
     <Compile Include="Ast\GrapeCatchStatement.cs" />
     <Compile Include="Ast\GrapeConditionalExpression.cs" />
     <Compile Include="Ast\GrapeContinueStatement.cs" />
     <Compile Include="Ast\GrapeDefaultStatement.cs" />
+    <Compile Include="Ast\GrapeElseIfStatement.cs" />
+    <Compile Include="Ast\GrapeElseStatement.cs" />
     <Compile Include="Ast\GrapeFinallyStatement.cs" />
     <Compile Include="Ast\GrapeForEachStatement.cs" />
     <Compile Include="Ast\GrapeIdentifierExpression.cs" />
@@ -60,7 +61,6 @@
     <Compile Include="Ast\GrapeLiteralExpression.cs" />
     <Compile Include="Ast\GrapeMemberExpression.cs" />
     <Compile Include="Ast\GrapeMultiplicationExpression.cs" />
-    <Compile Include="Ast\GrapeNonArrayCreationExpression.cs" />
     <Compile Include="Ast\GrapeObjectCreationExpression.cs" />
     <Compile Include="Ast\GrapeReturnStatement.cs" />
     <Compile Include="Ast\GrapeSetExpression.cs" />
@@ -92,7 +92,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Implementation\grape.cgt" />
-    <None Include="Implementation\grape-sample.gp" />
     <None Include="Implementation\grape.grm" />
   </ItemGroup>
   <ItemGroup />

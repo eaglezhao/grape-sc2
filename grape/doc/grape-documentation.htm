@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Grape Programming Language - Documentation</title>
+</head>
+<body>
+    <img src="grape-logo.png" alt="" />
+    <ul>
+        <li><a href="#document-purposes">The purposes of this document</a></li>
+        <li>
+            <a href="#grape-purposes">The purpose of Grape</a>
+            <ul>
+                <li><a href="#grape-meant-for">What is was meant for</a></li>
+                <li><a href="#grape-not-meant-for">What Grape is not meant for</a></li>
+            </ul>
+        </li>
+        <li>
+            <a href="#grape-syntax">The Grape syntax</a>
+            <ul>
+                
+            </ul>
+        </li>
+    </ul>
+    <h2 id="document-purposes">The purposes of this document</h2>
+    <span>
+        This document will try to explain what Grape is meant for, what is supported, what is intended, what is allowed and what is not, and will explain the official code style of Grape.<br />
+        For official resources, samples, spells, etc., this document should be complied with as much as possible. For unofficial resources, using own coding style is allowed but not encourages as the stdlib uses the official code style.
+    </span>
+
+    <h2 id="grape-purposes">The purpose of Grape</h2>
+    <h3 id="grape-meant-for">What Grape is meant for</h3>
+    <span>
+        Basically, Grape is meant for fixing the issues that are currently present with the StarCraft 2 native scripting language by the name of Galaxy. Galaxy is a C-like language, meaning that it is a procedural language. When working on larger projects, this will become a problem for maintainability and overview of code. Grape tries to fix this by implementing forced object orientation, meaning that all code has to be contained in a class.<br />
+        There are also problems with the Galaxy syntax checker. This means that it will sometimes report issues that don't exist, or won't report existing issues. This problem is solved by Grape being both open source and actively developed.<br /><br />
+        Grape also follows a very minimalistic, simple and readable syntax that is supposed to feel more like a scripting language. It is inspired by Lua and Ruby.<br />
+        <pre style='color:#000000;background:#ffffff;'><span style='color:#7f0055; font-weight:bold; '>class</span> mod inherits mod_base
+    override void main()
+        game.display(<span style='color:#2a00ff; '>"hello"</span>)
+    <span style='color:#7f0055; font-weight:bold; '>end</span>
+<span style='color:#7f0055; font-weight:bold; '>end</span>
+</pre>
+        The above code will display the string "hello" on the screen when the map or mod has been loaded.
+    </span>
+
+    <h3 id="grape-not-meant-for">What Grape is not meant for</h3>
+    <span>
+        
+    </span>
+</body>
+</html>

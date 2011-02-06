@@ -11,6 +11,9 @@ namespace Vestras.StarCraft2.Grape.Core.Ast {
             get {
                 return parameters;
             }
+            internal set {
+                parameters = value;
+            }
         }
 
         public GrapeCallExpression() {

@@ -64,11 +64,12 @@ class fixed_base
 	end
 
 	override bool equals(object value)
-		return this == value
+		fixed f = value as fixed
+		return this == f
 	end
 
 	override int get_hash_code()
-		return this as string
+		return this as int
 	end
 
 	override string to_string()
@@ -77,5 +78,9 @@ class fixed_base
 
 	string to_string(int_base precision)
 		return FixedToString(this, precision)
+	end
+
+	private ctor fixed_base()
+
 	end
 end

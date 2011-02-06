@@ -222,7 +222,6 @@ Comment End = '*/'
      |  <Literal>
      |  <Statement Exp>
      |  new <Qualified ID> '(' <Arg List Opt> ')'
-     |  new <Qualified ID> '[' <Expression> ']'
 
 ! Arguments
 
@@ -246,8 +245,8 @@ Comment End = '*/'
 <Statement>
     ::= <Local Var decl>
      |  if <Expression> <NL> <Stm List> 'end' <NL>
-     |  if <Expression> <NL> <Stm List> else <NL> <Stm List> 'end' <NL>
-
+     |  else <NL> <Stm List>
+     |  elseif <Expression> <NL> <Stm List>
      |  foreach <Qualified ID> Identifier in <Expression> <NL> <Stm List> 'end' <NL>
      |  foreach <Qualified ID> <Rank Specifiers> Identifier in <Expression> <NL> <Stm List> 'end' <NL>
      |  while <Expression> <NL> <Stm List> 'end' <NL>

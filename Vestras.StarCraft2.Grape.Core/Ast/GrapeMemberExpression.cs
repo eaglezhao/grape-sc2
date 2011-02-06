@@ -13,6 +13,7 @@ namespace Vestras.StarCraft2.Grape.Core.Ast {
                 member = value;
                 if (member != null) {
                     member.Parent = this;
+                    member.FileName = FileName;
                 }
             }
         }
@@ -25,6 +26,7 @@ namespace Vestras.StarCraft2.Grape.Core.Ast {
                 next = value;
                 if (next != null) {
                     next.Parent = this;
+                    next.FileName = FileName;
                 }
             }
         }

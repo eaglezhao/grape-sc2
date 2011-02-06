@@ -17,7 +17,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                     }
                 }
 
-                if (currentExpression.Next == null && currentExpression.Member is GrapeMemberExpression) {
+                while (currentExpression != null && currentExpression.Next == null && currentExpression.Member is GrapeMemberExpression) {
                     currentExpression = currentExpression.Member as GrapeMemberExpression;
                 }
 
@@ -26,6 +26,16 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
 
             result = result.Trim('.');
             return result;
+        }
+
+        public static GrapeMemberExpression GetMemberExpressionInMemberExpression(this GrapeMemberExpression expression) {
+            if (expression.Member is GrapeMemberExpression) {
+                return expression.Member as GrapeMemberExpression;
+            } else if (expression.Next != null) {
+                return expression.Next.GetMemberExpressionInMemberExpression();
+            }
+
+            return null;
         }
     }
 }

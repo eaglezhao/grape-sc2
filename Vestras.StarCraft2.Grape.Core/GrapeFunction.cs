@@ -9,7 +9,6 @@ namespace Vestras.StarCraft2.Grape.Core {
         public string Name { get; internal set; }
         public GrapeExpression ReturnType { get; internal set; }
         public List<GrapeVariable> Parameters { get; internal set; }
-        public List<GrapeFunction> Overloads { get; internal set; }
 
         public override string ToString() {
             return GetType().Name + " Name = " + Name + ", ReturnType = " + ReturnType;
@@ -19,7 +18,6 @@ namespace Vestras.StarCraft2.Grape.Core {
             Modifiers = "public";
             Type = GrapeFunctionType.Function;
             Parameters = new List<GrapeVariable>();
-            Overloads = new List<GrapeFunction>();
         }
 
         public enum GrapeFunctionType {

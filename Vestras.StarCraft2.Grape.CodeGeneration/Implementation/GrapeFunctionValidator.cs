@@ -9,6 +9,8 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
         private GrapeErrorSink errorSink = null;
         [Import]
         private GrapeVariableValidator variableValidator = null;
+        [Import]
+        private GrapeTypeCheckingUtilities typeCheckingUtils = null;
 
         private static readonly string[] AccessModifiers = new string[] {
             "public",
@@ -89,7 +91,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         }
                     }
 
-                    if (!(f.Parent is GrapeClass)) {
+                    if (!f.IsLogicalChildOfEntityType<GrapeClass>()) {
                         errorSink.AddError(new GrapeErrorSink.Error { Description = "A function must be the child of a class.", FileName = f.FileName, Offset = f.Offset, Length = f.Length });
                         if (!Config.ContinueOnError) {
                             return false;
@@ -105,8 +107,39 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         }
                     }
 
-                    if (f.ReturnType != null && !GrapeTypeCheckingUtilities.DoesTypeExist(Config.Ast, f.ReturnType, f.FileName)) {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "The type '" + GrapeTypeCheckingUtilities.GetTypeNameForTypeAccessExpression(f.ReturnType) + "' could not be found.", FileName = f.FileName, Offset = f.ReturnType.Offset, Length = f.ReturnType.Length });
+                    GrapeClass c = f.GetLogicalParentOfEntityType<GrapeClass>();
+                    if (f.Type == GrapeFunction.GrapeFunctionType.Constructor || f.Type == GrapeFunction.GrapeFunctionType.Destructor) {
+                        if (f.Name != c.Name) {
+                            errorSink.AddError(new GrapeErrorSink.Error { Description = "A ctor/dctor must have the same name as the parent class.", FileName = f.FileName, Offset = f.Offset, Length = f.Length });
+                            if (!Config.ContinueOnError) {
+                                return false;
+                            }
+                        }
+
+                        if (f.Modifiers.Contains("static")) {
+                            errorSink.AddError(new GrapeErrorSink.Error { Description = "A ctor/dctor cannot be declared static.", FileName = f.FileName, Offset = f.Offset, Length = f.Length });
+                            if (!Config.ContinueOnError) {
+                                return false;
+                            }
+                        }
+
+                        if (c.Modifiers.Contains("static")) {
+                            errorSink.AddError(new GrapeErrorSink.Error { Description = "A static class cannot have ctors/dctors.", FileName = f.FileName, Offset = f.Offset, Length = f.Length });
+                            if (!Config.ContinueOnError) {
+                                return false;
+                            }
+                        }
+                    } else {
+                        if (f.Name == c.Name) {
+                            errorSink.AddError(new GrapeErrorSink.Error { Description = "A function cannot have the same name as the parent class.", FileName = f.FileName, Offset = f.Offset, Length = f.Length });
+                            if (!Config.ContinueOnError) {
+                                return false;
+                            }
+                        }
+                    }
+
+                    if (f.ReturnType != null && !typeCheckingUtils.DoesTypeExist(Config, f.ReturnType, f.FileName)) {
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "The type '" + typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, f.ReturnType) + "' could not be found.", FileName = f.FileName, Offset = f.ReturnType.Offset, Length = f.ReturnType.Length });
                         if (!Config.ContinueOnError) {
                             return false;
                         }

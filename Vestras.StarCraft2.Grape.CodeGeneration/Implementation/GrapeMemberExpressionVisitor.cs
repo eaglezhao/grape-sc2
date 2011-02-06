@@ -10,10 +10,10 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
         public Type[] NodeType {
             get {
                 return new Type[] { 
-                    typeof(GrapeMemberExpression),
                     typeof(GrapeArrayAccessExpression),
                     typeof(GrapeCallExpression),
-                    typeof(GrapeSetExpression)
+                    typeof(GrapeSetExpression),
+                    typeof(GrapeObjectCreationExpression)
                 };
             }
         }

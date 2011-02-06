@@ -8,6 +8,8 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
     internal sealed class GrapeClassValidator : IAstNodeValidator {
         [Import]
         private GrapeErrorSink errorSink = null;
+        [Import]
+        private GrapeTypeCheckingUtilities typeCheckingUtils = null;
 
         private static readonly string[] AccessModifiers = new string[] {
             "public",
@@ -91,8 +93,8 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         }
                     }
 
-                    if (c.Inherits != null && !GrapeTypeCheckingUtilities.DoesTypeExist(Config.Ast, c.Inherits, c.FileName)) {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "The type '" + GrapeTypeCheckingUtilities.GetTypeNameForTypeAccessExpression(c.Inherits) + "' could not be found.", FileName = c.FileName, Offset = c.Inherits.Offset, Length = c.Inherits.Length });
+                    if (c.Inherits != null && !typeCheckingUtils.DoesTypeExist(Config, c.Inherits, c.FileName)) {
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "The type '" + typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, c.Inherits) + "' could not be found.", FileName = c.FileName, Offset = c.Inherits.Offset, Length = c.Inherits.Length });
                         if (!Config.ContinueOnError) {
                             return false;
                         }

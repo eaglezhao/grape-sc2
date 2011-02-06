@@ -7,6 +7,8 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
     internal sealed class GrapeFieldValidator : IAstNodeValidator {
         [Import]
         private GrapeErrorSink errorSink = null;
+        [Import]
+        private GrapeTypeCheckingUtilities typeCheckingUtils = null;
 
         private static readonly string[] AccessModifiers = new string[] {
             "public",
@@ -86,7 +88,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         }
                     }
 
-                    if (!(f.Parent is GrapeClass)) {
+                    if (!f.IsLogicalChildOfEntityType<GrapeClass>()) {
                         errorSink.AddError(new GrapeErrorSink.Error { Description = "A field must be the child of a class.", FileName = f.FileName, Offset = f.Offset, Length = f.Length });
                         if (!Config.ContinueOnError) {
                             return false;
@@ -102,8 +104,8 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         }
                     }
 
-                    if (f.Type != null && !GrapeTypeCheckingUtilities.DoesTypeExist(Config.Ast, f.Type, f.FileName)) {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "The type '" + GrapeTypeCheckingUtilities.GetTypeNameForTypeAccessExpression(f.Type) + "' could not be found.", FileName = f.FileName, Offset = f.Type.Offset, Length = f.Type.Length });
+                    if (f.Type != null && !typeCheckingUtils.DoesTypeExist(Config, f.Type, f.FileName)) {
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "The type '" + typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, f.Type) + "' could not be found.", FileName = f.FileName, Offset = f.Type.Offset, Length = f.Type.Length });
                         if (!Config.ContinueOnError) {
                             return false;
                         }
@@ -117,8 +119,9 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         }
                     }
 
-                    if (f.Value != null && !GrapeTypeCheckingUtilities.DoesExpressionResolveToType(Config.Ast, f.Value, f.Type)) {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot resolve expression to the type '" + GrapeTypeCheckingUtilities.GetTypeNameForTypeAccessExpression(f.Type) + "'.", FileName = f.FileName, Offset = f.Value.Offset, Length = f.Value.Length });
+                    string errorMessage = "";
+                    if (f.Value != null && !typeCheckingUtils.DoesExpressionResolveToType(Config, f, f.Value, f.Type, ref errorMessage)) {
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot resolve expression to the type '" + typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, f.Type) + "'. " + errorMessage, FileName = f.FileName, Offset = f.Value.Offset, Length = f.Value.Length });
                         if (!Config.ContinueOnError) {
                             return false;
                         }

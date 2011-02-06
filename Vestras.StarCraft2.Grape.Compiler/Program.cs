@@ -104,6 +104,7 @@ namespace Vestras.StarCraft2.Grape.Compiler {
                 }
             }
 
+            GrapeAst.ClearAllEntities();
             DateTime startCompilationTime = DateTime.Now;
             GrapeAst ast = null;
             foreach (string inputFile in inputFiles) {
@@ -126,6 +127,7 @@ namespace Vestras.StarCraft2.Grape.Compiler {
 
             foreach (GrapeErrorSink.Error error in errors) {
                 Console.WriteLine(error.ToString());
+                System.Diagnostics.Debug.Write(error.ToString() + Environment.NewLine);
             }
         }
 

@@ -25,7 +25,8 @@ class exception
 	end
 
 	override bool equals(object value)
-		return this == value
+		exception ex = value as exception
+		return this == ex
 	end
 
 	override string to_string()

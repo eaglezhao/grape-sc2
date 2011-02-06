@@ -10,6 +10,8 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
         private GrapeErrorSink errorSink = null;
         [Import]
         private GrapeVariableValidator variableValidator = null;
+        [Import]
+        private GrapeTypeCheckingUtilities typeCheckingUtils = null;
 
         public GrapeCodeGeneratorConfiguration Config { get; set; }
         public Type[] NodeType {
@@ -22,7 +24,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
             if (Config.OutputErrors) {
                 GrapeForEachStatement s = obj as GrapeForEachStatement;
                 if (s != null) {
-                    if (!GrapeTypeCheckingUtilities.DoesExpressionResolveToType(Config.Ast, s.ContainerExpression, "abstract_enumerator")) {
+                    if (!typeCheckingUtils.DoesExpressionResolveToType(Config, s, s.ContainerExpression, "abstract_enumerator")) {
                         errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot resolve expression to the type 'abstract_enumerator'.", FileName = s.FileName, Offset = s.ContainerExpression.Offset, Length = s.ContainerExpression.Length });
                         if (!Config.ContinueOnError) {
                             return false;

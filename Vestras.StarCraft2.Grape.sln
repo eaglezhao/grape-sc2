@@ -11,15 +11,38 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Lib", "Lib", "{F1DBA63A-2CA
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Stdlib", "Stdlib", "{3F9FC55D-08B1-4C0A-ACA2-D10D478B5B0F}"
 	ProjectSection(SolutionItems) = preProject
+		grape\system\abilcmd_base.gp = grape\system\abilcmd_base.gp
 		grape\system\abstract_enumerable.gp = grape\system\abstract_enumerable.gp
 		grape\system\abstract_enumerator.gp = grape\system\abstract_enumerator.gp
+		grape\system\actor_base.gp = grape\system\actor_base.gp
+		grape\system\actorscope_base.gp = grape\system\actorscope_base.gp
+		grape\system\bank_base.gp = grape\system\bank_base.gp
 		grape\system\bool_base.gp = grape\system\bool_base.gp
+		grape\system\camerainfo_base.gp = grape\system\camerainfo_base.gp
+		grape\system\color_base.gp = grape\system\color_base.gp
+		grape\system\convert.gp = grape\system\convert.gp
+		grape\system\doodad_base.gp = grape\system\doodad_base.gp
 		grape\system\exception.gp = grape\system\exception.gp
 		grape\system\fixed_base.gp = grape\system\fixed_base.gp
+		grape\system\game.gp = grape\system\game.gp
 		grape\system\int_base.gp = grape\system\int_base.gp
-		grape\system\list.gp = grape\system\list.gp
+		grape\system\marker_base.gp = grape\system\marker_base.gp
+		grape\system\mod_base.gp = grape\system\mod_base.gp
 		grape\system\object.gp = grape\system\object.gp
+		grape\system\order_base.gp = grape\system\order_base.gp
+		grape\system\playergroup_base.gp = grape\system\playergroup_base.gp
+		grape\system\point_base.gp = grape\system\point_base.gp
+		grape\system\region_base.gp = grape\system\region_base.gp
+		grape\system\revealer_base.gp = grape\system\revealer_base.gp
+		grape\system\sound_base.gp = grape\system\sound_base.gp
+		grape\system\soundlink_base.gp = grape\system\soundlink_base.gp
 		grape\system\string_base.gp = grape\system\string_base.gp
+		grape\system\timer_base.gp = grape\system\timer_base.gp
+		grape\system\trigger_base.gp = grape\system\trigger_base.gp
+		grape\system\unit_base.gp = grape\system\unit_base.gp
+		grape\system\unitfilter_base.gp = grape\system\unitfilter_base.gp
+		grape\system\unitgroup_base.gp = grape\system\unitgroup_base.gp
+		grape\system\unitref_base.gp = grape\system\unitref_base.gp
 		grape\system\void_base.gp = grape\system\void_base.gp
 	EndProjectSection
 EndProject
@@ -28,6 +51,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vestras.StarCraft2.Grape.CodeGeneration", "Vestras.StarCraft2.Grape.CodeGeneration\Vestras.StarCraft2.Grape.CodeGeneration.csproj", "{B7D42AC7-A1E7-45AC-AAAA-151BE8A3148E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vestras.StarCraft2.Grape.Compiler", "Vestras.StarCraft2.Grape.Compiler\Vestras.StarCraft2.Grape.Compiler.csproj", "{5025A97F-8810-4F9F-8F63-7CB0B4D4393A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{7F2C1234-79C2-4ED1-AAE0-38F1F733768E}"
+	ProjectSection(SolutionItems) = preProject
+		grape\doc\grape-documentation.htm = grape\doc\grape-documentation.htm
+		grape\doc\grape-logo.png = grape\doc\grape-logo.png
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -12,6 +12,7 @@ namespace Vestras.StarCraft2.Grape.Core.Ast {
                 array = value;
                 if (array != null) {
                     array.Parent = this;
+                    array.FileName = FileName;
                 }
             }
         }

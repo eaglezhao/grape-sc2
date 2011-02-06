@@ -7,6 +7,8 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
     internal sealed class GrapeVariableValidator : IAstNodeValidator {
         [Import]
         private GrapeErrorSink errorSink = null;
+        [Import]
+        private GrapeTypeCheckingUtilities typeCheckingUtils = null;
 
         private static readonly string[] AccessModifiers = new string[] {
             "public",
@@ -43,15 +45,16 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         }
                     }
 
-                    if (v.Type != null && !GrapeTypeCheckingUtilities.DoesTypeExist(Config.Ast, v.Type, v.FileName)) {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "The type '" + GrapeTypeCheckingUtilities.GetTypeNameForTypeAccessExpression(v.Type) + "' could not be found.", FileName = v.FileName, Offset = v.Type.Offset, Length = v.Type.Length });
+                    string errorMessage = "";
+                    if (v.Type != null && !typeCheckingUtils.DoesTypeExist(Config, v.Type, v.FileName)) {
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "The type '" + typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, v.Type) + "' could not be found. " + errorMessage, FileName = v.FileName, Offset = v.Type.Offset, Length = v.Type.Length });
                         if (!Config.ContinueOnError) {
                             return false;
                         }
                     }
 
-                    if (v.Value != null && !GrapeTypeCheckingUtilities.DoesExpressionResolveToType(Config.Ast, v.Value, v.Type)) {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot resolve expression to the type '" + GrapeTypeCheckingUtilities.GetTypeNameForTypeAccessExpression(v.Type) + "'.", FileName = v.FileName, Offset = v.Value.Offset, Length = v.Value.Length });
+                    if (v.Value != null && !typeCheckingUtils.DoesExpressionResolveToType(Config, v, v.Value, v.Type, ref errorMessage)) {
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot resolve expression to the type '" + typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, v.Type) + "'. " + errorMessage, FileName = v.FileName, Offset = v.Value.Offset, Length = v.Value.Length });
                         if (!Config.ContinueOnError) {
                             return false;
                         }

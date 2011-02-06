@@ -8,6 +8,8 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
     internal class GrapeThrowStatementValidator : IAstNodeValidator {
         [Import]
         private GrapeErrorSink errorSink = null;
+        [Import]
+        private GrapeTypeCheckingUtilities typeCheckingUtils = null;
 
         public GrapeCodeGeneratorConfiguration Config { get; set; }
         public Type[] NodeType {
@@ -27,7 +29,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         }
                     }
 
-                    if (!GrapeTypeCheckingUtilities.DoesExpressionResolveToType(Config.Ast, s.ThrowExpression, "exception")) {
+                    if (!typeCheckingUtils.DoesExpressionResolveToType(Config, s, s.ThrowExpression, "exception")) {
                         errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot resolve throw expression to type 'exception'.", FileName = s.FileName, Offset = s.ThrowExpression.Offset, Length = s.ThrowExpression.Length });
                         if (!Config.ContinueOnError) {
                             return false;

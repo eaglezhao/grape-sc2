@@ -41,7 +41,8 @@ class string_base
 	end
 
 	override bool equals(object other)
-		return this == other
+		string other_str = other as string
+		return this == other_str
 	end
 
 	bool equals_ignore_case(string str)
@@ -114,5 +115,9 @@ class string_base
 
 	string replace(string search_for, string replace_with, int max_replacements, bool case_sensitive)
 		return StringReplaceWord(this, search_for, replace_with, max_replacements, case_sensitive)
+	end
+
+	private ctor string_base()
+
 	end
 end

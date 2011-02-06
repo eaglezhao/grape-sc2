@@ -10,8 +10,7 @@ package system
 // summary: Represents a 32-bit integer value.
 class int_base
 	static int_base minimum_int_value = 1 << 32
-	static int_base maximmum_int_value = ~minimum_int_value
-	static string_base test = "hello world"
+	static int_base maximum_int_value = ~minimum_int_value
 
 	int_base abs()
 		return AbsI(this)
@@ -49,7 +48,8 @@ class int_base
 	end
 
 	override bool equals(object value)
-		return this == value
+		int i = value as int
+		return this == i
 	end
 
 	override int_base get_hash_code()
@@ -59,8 +59,8 @@ class int_base
 	override string to_string()
 		return this as string
 	end
-end
 
-// summary: Represents a 32-bit integer value.
-class int32 inherits int_base
+	private ctor int_base()
+
+	end
 end

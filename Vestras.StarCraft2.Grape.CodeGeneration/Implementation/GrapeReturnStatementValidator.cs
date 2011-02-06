@@ -8,6 +8,8 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
     internal class GrapeReturnStatementValidator : IAstNodeValidator {
         [Import]
         private GrapeErrorSink errorSink = null;
+        [Import]
+        private GrapeTypeCheckingUtilities typeCheckingUtils = null;
 
         public GrapeCodeGeneratorConfiguration Config { get; set; }
         public Type[] NodeType {
@@ -28,6 +30,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         }
                     }
 
+                    string errorMessage = "";
                     GrapeMemberExpression returnTypeMemberExpression = logicalFunctionParent.ReturnType as GrapeMemberExpression;
                     string returnTypeQualifiedId = "";
                     if (returnTypeMemberExpression != null) {
@@ -48,8 +51,8 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         if (!Config.ContinueOnError) {
                             return false;
                         }
-                    } else if (!GrapeTypeCheckingUtilities.DoesExpressionResolveToType(Config.Ast, s.ReturnValue, returnTypeMemberExpression)) {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot resolve expression to the type '" + GrapeTypeCheckingUtilities.GetTypeNameForTypeAccessExpression(logicalFunctionParent.ReturnType) + "'.", FileName = s.FileName, Offset = s.ReturnValue.Offset, Length = s.ReturnValue.Length });
+                    } else if (!typeCheckingUtils.DoesExpressionResolveToType(Config, s, s.ReturnValue, returnTypeMemberExpression, ref errorMessage)) {
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot resolve expression to the type '" + typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, logicalFunctionParent.ReturnType) + "'. " + errorMessage, FileName = s.FileName, Offset = s.ReturnValue.Offset, Length = s.ReturnValue.Length });
                         if (!Config.ContinueOnError) {
                             return false;
                         }

@@ -14,6 +14,7 @@ namespace Vestras.StarCraft2.Grape.Core.Ast {
                 left = value;
                 if (left != null) {
                     left.Parent = this;
+                    left.FileName = FileName;
                 }
             }
         }
@@ -26,6 +27,7 @@ namespace Vestras.StarCraft2.Grape.Core.Ast {
                 right = value;
                 if (right != null) {
                     right.Parent = this;
+                    right.FileName = FileName;
                 }
             }
         }
