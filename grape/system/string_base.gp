@@ -117,7 +117,22 @@ class string_base
 		return StringReplaceWord(this, search_for, replace_with, max_replacements, case_sensitive)
 	end
 
-	private ctor string_base()
+	text to_text()
+		return this as text
+	end
 
+	override bool equals(object other)
+		return this == other
+	end
+
+	override int get_hash_code()
+		return get_length().get_hash_code()
+	end
+
+	override string to_string()
+		return this
+	end
+
+	private ctor string_base()
 	end
 end

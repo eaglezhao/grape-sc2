@@ -104,6 +104,11 @@ namespace Vestras.StarCraft2.Grape.Compiler {
                 }
             }
 
+            if (inputFiles.Count == 0) {
+                Console.WriteLine("No input files specified.");
+                return;
+            }
+
             GrapeAst.ClearAllEntities();
             DateTime startCompilationTime = DateTime.Now;
             GrapeAst ast = null;

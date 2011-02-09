@@ -61,6 +61,5 @@ class int_base
 	end
 
 	private ctor int_base()
-
 	end
 end

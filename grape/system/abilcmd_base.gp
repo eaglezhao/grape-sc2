@@ -21,6 +21,5 @@
 	end
 
 	private ctor abilcmd_base()
-
 	end
  end

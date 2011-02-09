@@ -5,7 +5,7 @@ using System.CodeDom.Compiler;
 
 namespace Vestras.StarCraft2.Grape.Galaxy.Interop.NativeApi.Functions {
 	[GeneratedCode("generate_functions.py", "1.0.0.0")]
-	[GalaxyFunction("bool", "PowerIsProvidedBy", "int inPlayer, point inPos, string inLink, unit inSource, int inMinLevel")]
+	[GalaxyFunction("bool", "PowerIsProvidedBy", "int inPlayer, point inPos, unit inSource, int inMinLevel")]
 	public sealed class PowerIsProvidedBy {
 	}
 }

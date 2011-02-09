@@ -61,6 +61,13 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                     return ValidateExpression(config, ((GrapeStackExpression)expression).Child);
                 } else if (expression.GetType() == typeof(GrapeTypecastExpression)) {
                     GrapeTypecastExpression typecastExpression = expression as GrapeTypecastExpression;
+                    if (typeCheckingUtils.DoesExpressionResolveToType(config, typecastExpression, typecastExpression.Value, "text_base")) {
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot cast from type 'text_base'.", FileName = expression.FileName, Offset = expression.Offset, Length = expression.Offset });
+                        if (!config.ContinueOnError) {
+                            return false;
+                        }
+                    }
+
                     return typeCheckingUtils.DoesExpressionResolveToType(config, expression, typecastExpression.Value, typecastExpression.Type);
                 } else if (expression.GetType() == typeof(GrapeUnaryExpression)) {
                     GrapeUnaryExpression unaryExpression = expression as GrapeUnaryExpression;

@@ -12,6 +12,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
         private GrapeTypeCheckingUtilities typeCheckingUtils = null;
         private GrapeAst lastAst;
         private Dictionary<string, List<string>> packageFileNames = new Dictionary<string, List<string>>();
+        internal static GrapeAstUtilities Instance;
 
         private void PopulatePackageFileNames(GrapeAst ast) {
             if (lastAst != ast) {
@@ -135,7 +136,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
             foreach (string importedPackageFile in importedPackageFiles) {
                 IEnumerable<GrapeEntity> functions = GetEntitiesOfTypeInFile(importedPackageFile, typeof(GrapeFunction));
                 foreach (GrapeFunction f in functions) {
-                    if (f.Name == actualFunctionName && f.GetLogicalParentOfEntityType<GrapeClass>() == c) {
+                    if (f.Name == actualFunctionName && (f.GetLogicalParentOfEntityType<GrapeClass>() == c || c.IsClassInInheritanceTree(config, f.GetLogicalParentOfEntityType<GrapeClass>()))) {
                         list.Add(f);
                     }
                 }
@@ -146,11 +147,30 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
             foreach (GrapePackageDeclaration packageDeclaration in packages) {
                 if (packageDeclaration.PackageName == actualQualifiedId) {
                     foreach (GrapeFunction f in allFunctions) {
-                        if (f.Name == actualFunctionName && f.GetLogicalParentOfEntityType<GrapeClass>() == c) {
+                        if (f.Name == actualFunctionName && (f.GetLogicalParentOfEntityType<GrapeClass>() == c || c.IsClassInInheritanceTree(config, f.GetLogicalParentOfEntityType<GrapeClass>()))) {
                             list.Add(f);
                         }
                     }
                 }
+            }
+
+            if (list.Count > 1) {
+                GrapeClass mostTopLevelClassInInheritanceTree = c;
+                foreach (GrapeFunction function in list) {
+                    GrapeClass functionClass = function.GetLogicalParentOfEntityType<GrapeClass>();
+                    if (!mostTopLevelClassInInheritanceTree.IsClassInInheritanceTree(config, functionClass)) {
+                        mostTopLevelClassInInheritanceTree = functionClass;
+                    }
+                }
+
+                List<GrapeFunction> functionsToRemove = new List<GrapeFunction>();
+                foreach (GrapeFunction function in list) {
+                    if (function.GetLogicalParentOfEntityType<GrapeClass>() != mostTopLevelClassInInheritanceTree) {
+                        functionsToRemove.Add(function);
+                    }
+                }
+
+                functionsToRemove.ForEach(f => list.Remove(f));
             }
 
             return list;
@@ -261,7 +281,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
             foreach (GrapePackageDeclaration packageDeclaration in packages) {
                 if (packageDeclaration.PackageName == actualQualifiedId) {
                     foreach (GrapeField f in allFields) {
-                        if (f.Name == actualVariableName && f.Parent == e) {
+                        if (f.Name == actualVariableName && f.GetActualParent() == e) {
                             list.Add(f);
                         }
                     }
@@ -333,6 +353,10 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
             }
 
             return null;
+        }
+
+        private GrapeAstUtilities() {
+            Instance = this;
         }
     }
 }

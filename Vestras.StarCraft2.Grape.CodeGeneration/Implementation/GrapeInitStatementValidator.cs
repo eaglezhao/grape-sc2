@@ -52,7 +52,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                                 function = new GrapeFunction { Block = new GrapeBlock(), FileName = inheritingClass.FileName, Modifiers = "public", Name = inheritingClass.Name, ReturnType = new GrapeIdentifierExpression { Identifier = inheritingClass.Name }, Type = GrapeFunction.GrapeFunctionType.Constructor, Parent = inheritingClass };
                             }
 
-                            string[] modifiers = new string[] { "" };
+                            string[] modifiers = c.GetAppropriateModifiersForEntityAccess(Config, function);
                             bool valid = memberExpressionValidator.ValidateFunctionSignatureAndOverloads(new GrapeCallExpression { FileName = s.FileName, Length = s.Length, Member = new GrapeIdentifierExpression { Identifier = inheritingClass.Name }, Offset = s.Offset, Parameters = new ObservableCollection<GrapeExpression>(s.Parameters), Parent = s }, function, modifiers, ref errorMessage);
                             if (!valid) {
                                 errorSink.AddError(new GrapeErrorSink.Error { Description = errorMessage, FileName = s.FileName, Offset = s.Offset, Length = s.Length });
@@ -81,7 +81,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         }
 
                         string errorMessage = "";
-                        string[] modifiers = new string[] { "" };
+                        string[] modifiers = c.GetAppropriateModifiersForEntityAccess(Config, function);
                         bool valid = memberExpressionValidator.ValidateFunctionSignatureAndOverloads(new GrapeCallExpression { FileName = s.FileName, Length = s.Length, Member = new GrapeIdentifierExpression { Identifier = c.Name }, Offset = s.Offset, Parameters = new ObservableCollection<GrapeExpression>(s.Parameters), Parent = s }, function, modifiers, ref errorMessage);
                         if (!valid) {
                             errorSink.AddError(new GrapeErrorSink.Error { Description = errorMessage, FileName = s.FileName, Offset = s.Offset, Length = s.Length });

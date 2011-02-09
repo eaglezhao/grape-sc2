@@ -135,60 +135,61 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
         SYMBOL_CLASSDECL = 89, // <Class Decl>
         SYMBOL_CLASSITEM = 90, // <Class Item>
         SYMBOL_CLASSITEMDECSOPT = 91, // <Class Item Decs Opt>
-        SYMBOL_COMPAREEXP = 92, // <Compare Exp>
-        SYMBOL_CONSTRUCTORDEC = 93, // <Constructor Dec>
-        SYMBOL_CONSTRUCTORINITSTMS = 94, // <Constructor Init Stms>
-        SYMBOL_DESTRUCTORDEC = 95, // <Destructor Dec>
-        SYMBOL_EQUALITYEXP = 96, // <Equality Exp>
-        SYMBOL_EXPRESSION = 97, // <Expression>
-        SYMBOL_EXPRESSIONOPT = 98, // <Expression Opt>
-        SYMBOL_FIELDDEC = 99, // <Field Dec>
-        SYMBOL_FINALLYCLAUSEOPT = 100, // <Finally Clause Opt>
-        SYMBOL_FORMALPARAM = 101, // <Formal Param>
-        SYMBOL_FORMALPARAMLIST = 102, // <Formal Param List>
-        SYMBOL_FORMALPARAMLISTOPT = 103, // <Formal Param List Opt>
-        SYMBOL_IMPORT2 = 104, // <Import>
-        SYMBOL_LITERAL = 105, // <Literal>
-        SYMBOL_LOCALVARDECL = 106, // <Local Var Decl>
-        SYMBOL_LOGICALANDEXP = 107, // <Logical And Exp>
-        SYMBOL_LOGICALOREXP = 108, // <Logical Or Exp>
-        SYMBOL_LOGICALXOREXP = 109, // <Logical Xor Exp>
-        SYMBOL_MEMBERLIST = 110, // <Member List>
-        SYMBOL_METHODCALL = 111, // <Method Call>
-        SYMBOL_METHODCALLS = 112, // <Method Calls>
-        SYMBOL_METHODDEC = 113, // <Method Dec>
-        SYMBOL_MODIFIER = 114, // <Modifier>
-        SYMBOL_MODIFIERS = 115, // <Modifiers>
-        SYMBOL_MULTEXP = 116, // <Mult Exp>
-        SYMBOL_NL = 117, // <NL>
-        SYMBOL_NLOREOF = 118, // <NL Or EOF>
-        SYMBOL_NONARRAYTYPE = 119, // <Non Array Type>
-        SYMBOL_NORMALSTM = 120, // <Normal Stm>
-        SYMBOL_OBJECTS = 121, // <Objects>
-        SYMBOL_OREXP = 122, // <Or Exp>
-        SYMBOL_PACKAGE2 = 123, // <Package>
-        SYMBOL_QUALIFIEDID = 124, // <Qualified ID>
-        SYMBOL_RANKSPECIFIER = 125, // <Rank Specifier>
-        SYMBOL_RANKSPECIFIERS = 126, // <Rank Specifiers>
-        SYMBOL_SHIFTEXP = 127, // <Shift Exp>
-        SYMBOL_START = 128, // <Start>
-        SYMBOL_STATEMENT = 129, // <Statement>
-        SYMBOL_STATEMENTEXP = 130, // <Statement Exp>
-        SYMBOL_STMLIST = 131, // <Stm List>
-        SYMBOL_SWITCHLABEL = 132, // <Switch Label>
-        SYMBOL_SWITCHSECTIONSOPT = 133, // <Switch Sections Opt>
-        SYMBOL_TYPE = 134, // <Type>
-        SYMBOL_TYPEDECL = 135, // <Type Decl>
-        SYMBOL_TYPEDECLOPT = 136, // <Type Decl Opt>
-        SYMBOL_TYPECASTEXP = 137, // <Typecast Exp>
-        SYMBOL_UNARYEXP = 138, // <Unary Exp>
-        SYMBOL_VALIDID = 139, // <Valid ID>
-        SYMBOL_VALUE = 140, // <Value>
-        SYMBOL_VARIABLEDECLARATOR = 141, // <Variable Declarator>
-        SYMBOL_VARIABLEDECLARATORBASE = 142, // <Variable Declarator Base>
-        SYMBOL_VARIABLEINITIALIZER = 143, // <Variable Initializer>
-        SYMBOL_VARIABLEINITIALIZERLIST = 144, // <Variable Initializer List>
-        SYMBOL_VARIABLEINITIALIZERLISTOPT = 145  // <Variable Initializer List Opt>
+        SYMBOL_CLASSSIZEOPT = 92, // <Class Size Opt>
+        SYMBOL_COMPAREEXP = 93, // <Compare Exp>
+        SYMBOL_CONSTRUCTORDEC = 94, // <Constructor Dec>
+        SYMBOL_CONSTRUCTORINITSTMS = 95, // <Constructor Init Stms>
+        SYMBOL_DESTRUCTORDEC = 96, // <Destructor Dec>
+        SYMBOL_EQUALITYEXP = 97, // <Equality Exp>
+        SYMBOL_EXPRESSION = 98, // <Expression>
+        SYMBOL_EXPRESSIONOPT = 99, // <Expression Opt>
+        SYMBOL_FIELDDEC = 100, // <Field Dec>
+        SYMBOL_FINALLYCLAUSEOPT = 101, // <Finally Clause Opt>
+        SYMBOL_FORMALPARAM = 102, // <Formal Param>
+        SYMBOL_FORMALPARAMLIST = 103, // <Formal Param List>
+        SYMBOL_FORMALPARAMLISTOPT = 104, // <Formal Param List Opt>
+        SYMBOL_IMPORT2 = 105, // <Import>
+        SYMBOL_LITERAL = 106, // <Literal>
+        SYMBOL_LOCALVARDECL = 107, // <Local Var Decl>
+        SYMBOL_LOGICALANDEXP = 108, // <Logical And Exp>
+        SYMBOL_LOGICALOREXP = 109, // <Logical Or Exp>
+        SYMBOL_LOGICALXOREXP = 110, // <Logical Xor Exp>
+        SYMBOL_MEMBERLIST = 111, // <Member List>
+        SYMBOL_METHODCALL = 112, // <Method Call>
+        SYMBOL_METHODCALLS = 113, // <Method Calls>
+        SYMBOL_METHODDEC = 114, // <Method Dec>
+        SYMBOL_MODIFIER = 115, // <Modifier>
+        SYMBOL_MODIFIERS = 116, // <Modifiers>
+        SYMBOL_MULTEXP = 117, // <Mult Exp>
+        SYMBOL_NL = 118, // <NL>
+        SYMBOL_NLOREOF = 119, // <NL Or EOF>
+        SYMBOL_NONARRAYTYPE = 120, // <Non Array Type>
+        SYMBOL_NORMALSTM = 121, // <Normal Stm>
+        SYMBOL_OBJECTS = 122, // <Objects>
+        SYMBOL_OREXP = 123, // <Or Exp>
+        SYMBOL_PACKAGE2 = 124, // <Package>
+        SYMBOL_QUALIFIEDID = 125, // <Qualified ID>
+        SYMBOL_RANKSPECIFIER = 126, // <Rank Specifier>
+        SYMBOL_RANKSPECIFIERS = 127, // <Rank Specifiers>
+        SYMBOL_SHIFTEXP = 128, // <Shift Exp>
+        SYMBOL_START = 129, // <Start>
+        SYMBOL_STATEMENT = 130, // <Statement>
+        SYMBOL_STATEMENTEXP = 131, // <Statement Exp>
+        SYMBOL_STMLIST = 132, // <Stm List>
+        SYMBOL_SWITCHLABEL = 133, // <Switch Label>
+        SYMBOL_SWITCHSECTIONSOPT = 134, // <Switch Sections Opt>
+        SYMBOL_TYPE = 135, // <Type>
+        SYMBOL_TYPEDECL = 136, // <Type Decl>
+        SYMBOL_TYPEDECLOPT = 137, // <Type Decl Opt>
+        SYMBOL_TYPECASTEXP = 138, // <Typecast Exp>
+        SYMBOL_UNARYEXP = 139, // <Unary Exp>
+        SYMBOL_VALIDID = 140, // <Valid ID>
+        SYMBOL_VALUE = 141, // <Value>
+        SYMBOL_VARIABLEDECLARATOR = 142, // <Variable Declarator>
+        SYMBOL_VARIABLEDECLARATORBASE = 143, // <Variable Declarator Base>
+        SYMBOL_VARIABLEINITIALIZER = 144, // <Variable Initializer>
+        SYMBOL_VARIABLEINITIALIZERLIST = 145, // <Variable Initializer List>
+        SYMBOL_VARIABLEINITIALIZERLISTOPT = 146  // <Variable Initializer List Opt>
     };
 
     enum RuleConstants : int {
@@ -333,35 +334,37 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
         RULE_MODIFIER = 138, // <Modifier> ::= <Access>
         RULE_MODIFIERS = 139, // <Modifiers> ::= <Modifier> <Modifiers>
         RULE_MODIFIERS2 = 140, // <Modifiers> ::= 
-        RULE_CLASSDECL_CLASS_IDENTIFIER_END = 141, // <Class Decl> ::= <Modifiers> class Identifier <Class Base Opt> <NL> <Class Item Decs Opt> end <NL Or EOF>
-        RULE_CLASSBASEOPT_INHERITS = 142, // <Class Base Opt> ::= inherits <Non Array Type>
-        RULE_CLASSBASEOPT = 143, // <Class Base Opt> ::= 
-        RULE_CLASSITEMDECSOPT = 144, // <Class Item Decs Opt> ::= <Class Item Decs Opt> <Class Item>
-        RULE_CLASSITEMDECSOPT2 = 145, // <Class Item Decs Opt> ::= 
-        RULE_CLASSITEM = 146, // <Class Item> ::= <Method Dec>
-        RULE_CLASSITEM2 = 147, // <Class Item> ::= <Constructor Dec>
-        RULE_CLASSITEM3 = 148, // <Class Item> ::= <Destructor Dec>
-        RULE_CLASSITEM4 = 149, // <Class Item> ::= <Type Decl>
-        RULE_CLASSITEM5 = 150, // <Class Item> ::= <Field Dec>
-        RULE_FIELDDEC_IDENTIFIER = 151, // <Field Dec> ::= <Modifiers> <Type> Identifier <NL>
-        RULE_FIELDDEC_IDENTIFIER_EQ = 152, // <Field Dec> ::= <Modifiers> <Type> Identifier '=' <Expression> <NL>
-        RULE_METHODDEC_IDENTIFIER_LPARAN_RPARAN_END = 153, // <Method Dec> ::= <Modifiers> <Type> Identifier '(' <Formal Param List Opt> ')' <NL> <Stm List> end <NL>
-        RULE_FORMALPARAMLISTOPT = 154, // <Formal Param List Opt> ::= <Formal Param List>
-        RULE_FORMALPARAMLISTOPT2 = 155, // <Formal Param List Opt> ::= 
-        RULE_FORMALPARAMLIST = 156, // <Formal Param List> ::= <Formal Param>
-        RULE_FORMALPARAMLIST_COMMA = 157, // <Formal Param List> ::= <Formal Param List> ',' <Formal Param>
-        RULE_FORMALPARAM_IDENTIFIER = 158, // <Formal Param> ::= <Type> Identifier
-        RULE_TYPEDECL = 159, // <Type Decl> ::= <Class Decl>
-        RULE_TYPEDECLOPT = 160, // <Type Decl Opt> ::= <Type Decl>
-        RULE_TYPEDECLOPT2 = 161, // <Type Decl Opt> ::= <NL>
-        RULE_CONSTRUCTORDEC_CTOR_IDENTIFIER_LPARAN_RPARAN_END = 162, // <Constructor Dec> ::= <Modifiers> ctor Identifier '(' <Formal Param List Opt> ')' <NL> <Stm List> end <NL>
-        RULE_DESTRUCTORDEC_DCTOR_IDENTIFIER_LPARAN_RPARAN_END = 163, // <Destructor Dec> ::= <Modifiers> dctor Identifier '(' ')' <NL> <Stm List> end <NL>
-        RULE_ARRAYINITIALIZER_LBRACKET_RBRACKET = 164, // <Array Initializer> ::= '[' <Variable Initializer List Opt> ']'
-        RULE_ARRAYINITIALIZER_LBRACKET_COMMA_RBRACKET = 165, // <Array Initializer> ::= '[' <Variable Initializer List> ',' ']'
-        RULE_VARIABLEINITIALIZERLISTOPT = 166, // <Variable Initializer List Opt> ::= <Variable Initializer List>
-        RULE_VARIABLEINITIALIZERLISTOPT2 = 167, // <Variable Initializer List Opt> ::= 
-        RULE_VARIABLEINITIALIZERLIST = 168, // <Variable Initializer List> ::= <Variable Initializer>
-        RULE_VARIABLEINITIALIZERLIST_COMMA = 169  // <Variable Initializer List> ::= <Variable Initializer List> ',' <Variable Initializer>
+        RULE_CLASSDECL_CLASS_IDENTIFIER_END = 141, // <Class Decl> ::= <Modifiers> class Identifier <Class Size Opt> <Class Base Opt> <NL> <Class Item Decs Opt> end <NL Or EOF>
+        RULE_CLASSSIZEOPT_LBRACKET_DECIMALLITERAL_RBRACKET = 142, // <Class Size Opt> ::= '[' DecimalLiteral ']'
+        RULE_CLASSSIZEOPT = 143, // <Class Size Opt> ::= 
+        RULE_CLASSBASEOPT_INHERITS = 144, // <Class Base Opt> ::= inherits <Non Array Type>
+        RULE_CLASSBASEOPT = 145, // <Class Base Opt> ::= 
+        RULE_CLASSITEMDECSOPT = 146, // <Class Item Decs Opt> ::= <Class Item Decs Opt> <Class Item>
+        RULE_CLASSITEMDECSOPT2 = 147, // <Class Item Decs Opt> ::= 
+        RULE_CLASSITEM = 148, // <Class Item> ::= <Method Dec>
+        RULE_CLASSITEM2 = 149, // <Class Item> ::= <Constructor Dec>
+        RULE_CLASSITEM3 = 150, // <Class Item> ::= <Destructor Dec>
+        RULE_CLASSITEM4 = 151, // <Class Item> ::= <Type Decl>
+        RULE_CLASSITEM5 = 152, // <Class Item> ::= <Field Dec>
+        RULE_FIELDDEC_IDENTIFIER = 153, // <Field Dec> ::= <Modifiers> <Type> Identifier <NL>
+        RULE_FIELDDEC_IDENTIFIER_EQ = 154, // <Field Dec> ::= <Modifiers> <Type> Identifier '=' <Expression> <NL>
+        RULE_METHODDEC_IDENTIFIER_LPARAN_RPARAN_END = 155, // <Method Dec> ::= <Modifiers> <Type> Identifier '(' <Formal Param List Opt> ')' <NL> <Stm List> end <NL>
+        RULE_FORMALPARAMLISTOPT = 156, // <Formal Param List Opt> ::= <Formal Param List>
+        RULE_FORMALPARAMLISTOPT2 = 157, // <Formal Param List Opt> ::= 
+        RULE_FORMALPARAMLIST = 158, // <Formal Param List> ::= <Formal Param>
+        RULE_FORMALPARAMLIST_COMMA = 159, // <Formal Param List> ::= <Formal Param List> ',' <Formal Param>
+        RULE_FORMALPARAM_IDENTIFIER = 160, // <Formal Param> ::= <Type> Identifier
+        RULE_TYPEDECL = 161, // <Type Decl> ::= <Class Decl>
+        RULE_TYPEDECLOPT = 162, // <Type Decl Opt> ::= <Type Decl>
+        RULE_TYPEDECLOPT2 = 163, // <Type Decl Opt> ::= <NL>
+        RULE_CONSTRUCTORDEC_CTOR_IDENTIFIER_LPARAN_RPARAN_END = 164, // <Constructor Dec> ::= <Modifiers> ctor Identifier '(' <Formal Param List Opt> ')' <NL> <Stm List> end <NL>
+        RULE_DESTRUCTORDEC_DCTOR_IDENTIFIER_LPARAN_RPARAN_END = 165, // <Destructor Dec> ::= <Modifiers> dctor Identifier '(' ')' <NL> <Stm List> end <NL>
+        RULE_ARRAYINITIALIZER_LBRACKET_RBRACKET = 166, // <Array Initializer> ::= '[' <Variable Initializer List Opt> ']'
+        RULE_ARRAYINITIALIZER_LBRACKET_COMMA_RBRACKET = 167, // <Array Initializer> ::= '[' <Variable Initializer List> ',' ']'
+        RULE_VARIABLEINITIALIZERLISTOPT = 168, // <Variable Initializer List Opt> ::= <Variable Initializer List>
+        RULE_VARIABLEINITIALIZERLISTOPT2 = 169, // <Variable Initializer List Opt> ::= 
+        RULE_VARIABLEINITIALIZERLIST = 170, // <Variable Initializer List> ::= <Variable Initializer>
+        RULE_VARIABLEINITIALIZERLIST_COMMA = 171  // <Variable Initializer List> ::= <Variable Initializer List> ',' <Variable Initializer>
     };
 
     internal class GrapeSkeletonParser {
@@ -513,7 +516,6 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             return qualifiedIdText;
         }
 
-        private static readonly string DefaultAccessModifier = "public";
         private static readonly string[] AccessModifiers = new string[] {
             "public",
             "private",
@@ -522,6 +524,15 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
         };
 
         private string GetModifiers(NonterminalToken modifiers, out TerminalToken firstToken) {
+            string foundModifiers = GetModifiers(modifiers, out firstToken, true);
+            if (foundModifiers.Trim() == "") {
+                return "public";
+            }
+
+            return foundModifiers;
+        }
+
+        private string GetModifiers(NonterminalToken modifiers, out TerminalToken firstToken, bool dummyArgument) {
             string result = "";
             firstToken = null;
             if (modifiers.Tokens.Length >= 1) {
@@ -533,6 +544,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                         if (id == (int)RuleConstants.RULE_MODIFIER || id == (int)RuleConstants.RULE_MODIFIER_ABSTRACT || id == (int)RuleConstants.RULE_MODIFIER_OVERRIDE || id == (int)RuleConstants.RULE_MODIFIER_SEALED || id == (int)RuleConstants.RULE_MODIFIER_STATIC) {
                             int childIndex = 0;
                             foreach (Token childToken in nonterminalToken.Tokens) {
+                                NonterminalToken childNonterminalToken = childToken as NonterminalToken;
                                 TerminalToken terminalToken = childToken as TerminalToken;
                                 if (terminalToken != null) {
                                     if (firstToken == null) {
@@ -544,6 +556,27 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                                     }
 
                                     result += terminalToken.Text;
+                                } else if (childNonterminalToken != null) {
+                                    int childChildIndex = 0;
+                                    foreach (Token childChildToken in childNonterminalToken.Tokens) {
+                                        TerminalToken childTerminalToken = childChildToken as TerminalToken;
+                                        if (childTerminalToken != null) {
+                                            if (firstToken == null) {
+                                                firstToken = childTerminalToken;
+                                            } else {
+                                                if (childTerminalToken.Location.Position < firstToken.Location.Position) {
+                                                    firstToken = childTerminalToken;
+                                                }
+                                            }
+
+                                            result += childTerminalToken.Text;
+                                            if (childChildIndex < childNonterminalToken.Tokens.Length - 1) {
+                                                result += " ";
+                                            }
+
+                                            childChildIndex++;
+                                        }
+                                    }
                                 }
 
                                 if (childIndex < nonterminalToken.Tokens.Length - 1) {
@@ -557,7 +590,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                                 result += " ";
                             }
                         } else if (id == (int)RuleConstants.RULE_MODIFIERS || id == (int)RuleConstants.RULE_MODIFIERS2) {
-                            result += GetModifiers(nonterminalToken, out firstToken);
+                            result += GetModifiers(nonterminalToken, out firstToken, true);
                             if (index < modifiers.Tokens.Length - 1) {
                                 result += " ";
                             }
@@ -566,20 +599,6 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
 
                     index++;
                 }
-            }
-
-            bool containsAccessModifier = false;
-            foreach (string modifier in result.Split(' ')) {
-                foreach (string accessModifier in AccessModifiers) {
-                    if (modifier == accessModifier) {
-                        containsAccessModifier = true;
-                        break;
-                    }
-                }
-            }
-
-            if (!containsAccessModifier) {
-                result = DefaultAccessModifier + " " + result;
             }
 
             return result;
@@ -1882,9 +1901,6 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                 if (f.Type != GrapeFunction.GrapeFunctionType.Destructor) {
                     NonterminalToken parametersToken = token.Tokens[nameTokenIndex + 2] as NonterminalToken;
                     AddParametersToFunction(f, parametersToken, nameTokenIndex + 2, out lastTokenIndex);
-                    if (lastTokenIndex > -1) {
-                        lastToken = token.Tokens[lastTokenIndex] as TerminalToken;
-                    }
                 }
 
                 TerminalToken endToken = GetEndToken(token.Tokens);
@@ -1935,7 +1951,17 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                 }
 
                 if (token.Tokens.Length >= 4) {
-                    NonterminalToken inheritanceToken = token.Tokens[3] as NonterminalToken;
+                    NonterminalToken sizeToken = token.Tokens[3] as NonterminalToken;
+                    if (sizeToken != null && sizeToken.Tokens.Length > 0) {
+                        TerminalToken terminalToken = sizeToken.Tokens[1] as TerminalToken;
+                        if (terminalToken != null) {
+                            c.Size = Convert.ToInt32(terminalToken.Text);
+                        }
+                    }
+                }
+
+                if (token.Tokens.Length >= 5) {
+                    NonterminalToken inheritanceToken = token.Tokens[4] as NonterminalToken;
                     if (inheritanceToken != null && inheritanceToken.Tokens.Length >= 2) {
                         NonterminalToken qualifiedSuperIdToken = inheritanceToken.Tokens[1] as NonterminalToken;
                         if (qualifiedSuperIdToken != null && qualifiedSuperIdToken.Tokens.Length >= 1) {

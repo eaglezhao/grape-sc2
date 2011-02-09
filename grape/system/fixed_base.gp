@@ -81,6 +81,5 @@ class fixed_base
 	end
 
 	private ctor fixed_base()
-
 	end
 end

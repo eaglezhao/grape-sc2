@@ -5,7 +5,9 @@
  * The Grape programming language and stdlib are released under the BSD license.
  */
 
-package system
+package systems
+
+import system
 
 // summary: Represents a base class for mods. Provides mod initialization methods along with other mod utilities.
 abstract class mod_base
@@ -13,10 +15,8 @@ abstract class mod_base
 	end
 
 	ctor mod_base()
-
 	end
 
 	ctor mod_base(string args)
-
 	end
 end

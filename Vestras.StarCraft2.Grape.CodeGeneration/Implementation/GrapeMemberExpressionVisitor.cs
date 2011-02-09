@@ -9,7 +9,8 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
         public IAstNodeValidator Validator { get; set; }
         public Type[] NodeType {
             get {
-                return new Type[] { 
+                return new Type[] {
+                    typeof(GrapeMemberExpression),
                     typeof(GrapeArrayAccessExpression),
                     typeof(GrapeCallExpression),
                     typeof(GrapeSetExpression),

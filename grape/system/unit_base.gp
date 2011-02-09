@@ -6,3 +6,8 @@
  */
 
  package system
+
+ class unit_base
+	private ctor unit_base()
+	end
+ end

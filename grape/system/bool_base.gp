@@ -10,7 +10,6 @@
  // summary: Represents a value that is either true or false.
  class bool_base
 	bool and(bool b)
-		fixed_base f = new fixed_base()
 		return this && b
 	end
 
@@ -44,5 +43,8 @@
 		end
 
 		return "false"
+	end
+
+	private ctor bool_base()
 	end
  end

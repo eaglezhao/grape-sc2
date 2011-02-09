@@ -20,10 +20,11 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
         public Type[] NodeType {
             get {
                 return new Type[] { 
+                    typeof(GrapeMemberExpression),
                     typeof(GrapeArrayAccessExpression),
                     typeof(GrapeCallExpression),
                     typeof(GrapeSetExpression),
-                    typeof(GrapeObjectCreationExpression)
+                    typeof(GrapeObjectCreationExpression),
                 };
             }
         }
@@ -92,7 +93,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         GrapeEntity entity = (new List<GrapeEntity>(typeCheckingUtils.GetEntitiesForMemberExpression(Config, objectCreationExpression, objectCreationExpression, out errorMessage)))[0];
                         if (entity != null) {
                             GrapeFunction functionWithSignature = entity as GrapeFunction;
-                            string[] modifiers = new string[] { "" };
+                            string[] modifiers = objectCreationExpression.GetLogicalParentOfEntityType<GrapeClass>().GetAppropriateModifiersForEntityAccess(Config, functionWithSignature);
                             if (functionWithSignature != null && !ValidateFunctionSignatureAndOverloads(objectCreationExpression, functionWithSignature, modifiers, ref errorMessage) && !Config.ContinueOnError) {
                                 return false;
                             }
@@ -121,7 +122,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                             }
 
                             if (!foundCorrectFunction) {
-                                errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot find object for expression '" + callExpression.GetMemberExpressionQualifiedId() + "'.", FileName = s.FileName, Offset = s.Offset, Length = s.Length });
+                                errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot find object for expression '" + callExpression.GetMemberExpressionQualifiedId() + "'. " + errorMessage, FileName = s.FileName, Offset = s.Offset, Length = s.Length });
                                 if (!Config.ContinueOnError) {
                                     return false;
                                 }
@@ -137,13 +138,22 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         }
 
                         GrapeFunction functionWithSignature = entity as GrapeFunction;
-                        string[] modifiers = new string[] { "" };
-                        if (functionWithSignature != null && !ValidateFunctionSignatureAndOverloads(callExpression, functionWithSignature, modifiers, ref errorMessage) && !Config.ContinueOnError) {
-                            return false;
+                        if (functionWithSignature != null) {
+                            string[] modifiers = callExpression.GetLogicalParentOfEntityType<GrapeClass>().GetAppropriateModifiersForEntityAccess(Config, functionWithSignature);
+                            if (!ValidateFunctionSignatureAndOverloads(callExpression, functionWithSignature, modifiers, ref errorMessage) && !Config.ContinueOnError) {
+                                return false;
+                            }
                         }
                     } else if (setExpression != null) {
                         string errorMessage;
                         GrapeEntity entityBeingSet = (new List<GrapeEntity>(typeCheckingUtils.GetEntitiesForMemberExpression(Config, setExpression as GrapeMemberExpression, setExpression, out errorMessage)))[0];
+                        if (entityBeingSet == null) {
+                            errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot find object for expression '" + setExpression.GetMemberExpressionQualifiedId() + "'. " + errorMessage, FileName = s.FileName, Offset = s.Offset, Length = s.Length });
+                            if (!Config.ContinueOnError) {
+                                return false;
+                            }
+                        }
+
                         if (!(entityBeingSet is GrapeVariable)) {
                             errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot set an object that is not a variable.", FileName = s.FileName, Offset = s.Offset, Length = s.Length });
                             if (!Config.ContinueOnError) {
@@ -160,7 +170,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         if (setExpression.Value is GrapeMemberExpression) {
                             IEnumerable<GrapeEntity> valueEntities = typeCheckingUtils.GetEntitiesForMemberExpression(Config, new GrapeMemberExpression { Member = setExpression.Value }, setExpression, out errorMessage);
                             if (valueEntities.Count() == 0) {
-                                errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot find object for expression '" + ((GrapeMemberExpression)setExpression.Value).GetMemberExpressionQualifiedId() + "'.", FileName = s.FileName, Offset = s.Offset, Length = s.Length });
+                                errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot find object for expression '" + ((GrapeMemberExpression)setExpression.Value).GetMemberExpressionQualifiedId() + "'. " + errorMessage, FileName = s.FileName, Offset = s.Offset, Length = s.Length });
                                 if (!Config.ContinueOnError) {
                                     return false;
                                 }
@@ -170,6 +180,15 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         GrapeVariable variable = entityBeingSet as GrapeVariable;
                         if (!typeCheckingUtils.DoesExpressionResolveToType(Config, setExpression, setExpression.Value, variable.Type, ref errorMessage)) {
                             errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot resolve expression to the type '" + typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, variable.Type) + "'. " + errorMessage, FileName = s.FileName, Offset = s.Offset, Length = s.Length });
+                            if (!Config.ContinueOnError) {
+                                return false;
+                            }
+                        }
+                    } else {
+                        string errorMessage;
+                        IEnumerable<GrapeEntity> entities = typeCheckingUtils.GetEntitiesForMemberExpression(Config, s, obj as GrapeEntity, out errorMessage);
+                        if (errorMessage != "") {
+                            errorSink.AddError(new GrapeErrorSink.Error { Description = errorMessage, FileName = s.FileName, Offset = s.Offset, Length = s.Length });
                             if (!Config.ContinueOnError) {
                                 return false;
                             }

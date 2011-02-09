@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using Vestras.StarCraft2.Grape.Core;
+using Vestras.StarCraft2.Grape.Core.Ast;
 
 namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
     [Export(typeof(IAstNodeValidator))]
@@ -111,6 +113,18 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         }
                     }
 
+                    string errorMessage;
+                    GrapeEntity type = (new List<GrapeEntity>(typeCheckingUtils.GetEntitiesForMemberExpression(Config, f.Type as GrapeMemberExpression, f, out errorMessage)))[0];
+                    if (type is GrapeClass) {
+                        GrapeClass typeClass = type as GrapeClass;
+                        if (typeClass.Modifiers.Contains("static")) {
+                            errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot declare a field of static type '" + typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, f.Type) + "'.", FileName = f.FileName, Offset = f.Type.Offset, Length = f.Type.Length });
+                            if (!Config.ContinueOnError) {
+                                return false;
+                            }
+                        }
+                    }
+
                     string modifiersErrorMessage;
                     if (!ValidateModifiers(f, out modifiersErrorMessage)) {
                         errorSink.AddError(new GrapeErrorSink.Error { Description = modifiersErrorMessage, FileName = f.FileName, Offset = f.Offset, Length = f.Length });
@@ -119,7 +133,6 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         }
                     }
 
-                    string errorMessage = "";
                     if (f.Value != null && !typeCheckingUtils.DoesExpressionResolveToType(Config, f, f.Value, f.Type, ref errorMessage)) {
                         errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot resolve expression to the type '" + typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, f.Type) + "'. " + errorMessage, FileName = f.FileName, Offset = f.Value.Offset, Length = f.Value.Length });
                         if (!Config.ContinueOnError) {

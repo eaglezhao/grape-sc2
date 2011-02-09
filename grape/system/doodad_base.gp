@@ -6,3 +6,16 @@
  */
 
  package system
+
+ class doodad_base
+	static doodad get_from_id(int id)
+		return DoodadFromId(id)
+	end
+
+	actor get_actor()
+		return ActorFromDoodad(this)
+	end
+
+	private ctor doodad_base()
+	end
+ end

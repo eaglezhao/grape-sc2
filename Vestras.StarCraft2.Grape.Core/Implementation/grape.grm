@@ -245,8 +245,8 @@ Comment End = '*/'
 <Statement>
     ::= <Local Var decl>
      |  if <Expression> <NL> <Stm List> 'end' <NL>
-     |  else <NL> <Stm List>
-     |  elseif <Expression> <NL> <Stm List>
+     |  else <NL> <Stm List> 'end' <NL>
+     |  elseif <Expression> <NL> <Stm List> 'end' <NL>
      |  foreach <Qualified ID> Identifier in <Expression> <NL> <Stm List> 'end' <NL>
      |  foreach <Qualified ID> <Rank Specifiers> Identifier in <Expression> <NL> <Stm List> 'end' <NL>
      |  while <Expression> <NL> <Stm List> 'end' <NL>
@@ -328,7 +328,11 @@ Comment End = '*/'
 ! Classes
 
 <Class Decl>
-    ::= <Modifiers> class Identifier <Class Base Opt> <NL> <Class Item Decs Opt> 'end' <NL Or EOF>
+    ::= <Modifiers> class Identifier <Class Size Opt> <Class Base Opt> <NL> <Class Item Decs Opt> 'end' <NL Or EOF>
+
+<Class Size Opt>
+    ::= '[' DecimalLiteral ']'
+     |
 
 <Class Base Opt>
     ::= inherits <Non Array Type>

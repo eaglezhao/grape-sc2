@@ -93,6 +93,20 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         }
                     }
 
+                    if (c.Modifiers.Contains("static") && c.Size != GrapeClass.UseDefaultSize) {
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "A static class cannot have a size specified.", FileName = c.FileName, Offset = c.Offset, Length = c.Length });
+                        if (!Config.ContinueOnError) {
+                            return false;
+                        }
+                    }
+
+                    if (c.Size == 0) {
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "The size of a class cannot be 0.", FileName = c.FileName, Offset = c.Offset, Length = c.Length });
+                        if (!Config.ContinueOnError) {
+                            return false;
+                        }
+                    }
+
                     if (c.Inherits != null && !typeCheckingUtils.DoesTypeExist(Config, c.Inherits, c.FileName)) {
                         errorSink.AddError(new GrapeErrorSink.Error { Description = "The type '" + typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, c.Inherits) + "' could not be found.", FileName = c.FileName, Offset = c.Inherits.Offset, Length = c.Inherits.Length });
                         if (!Config.ContinueOnError) {

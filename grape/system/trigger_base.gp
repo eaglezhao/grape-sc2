@@ -6,3 +6,8 @@
  */
 
  package system
+
+ class trigger_base
+	private ctor trigger_base()
+	end
+ end

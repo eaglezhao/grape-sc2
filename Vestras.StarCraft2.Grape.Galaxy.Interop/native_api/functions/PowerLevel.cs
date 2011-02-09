@@ -5,7 +5,7 @@ using System.CodeDom.Compiler;
 
 namespace Vestras.StarCraft2.Grape.Galaxy.Interop.NativeApi.Functions {
 	[GeneratedCode("generate_functions.py", "1.0.0.0")]
-	[GalaxyFunction("int", "PowerLevel", "int inPlayer, point inPos, string inLink")]
+	[GalaxyFunction("int", "PowerLevel", "int inPlayer, point inPos")]
 	public sealed class PowerLevel {
 	}
 }

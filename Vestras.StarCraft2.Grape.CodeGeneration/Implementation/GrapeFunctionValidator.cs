@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using Vestras.StarCraft2.Grape.Core;
+using Vestras.StarCraft2.Grape.Core.Ast;
 
 namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
     [Export(typeof(IAstNodeValidator))]
@@ -142,6 +144,18 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         errorSink.AddError(new GrapeErrorSink.Error { Description = "The type '" + typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, f.ReturnType) + "' could not be found.", FileName = f.FileName, Offset = f.ReturnType.Offset, Length = f.ReturnType.Length });
                         if (!Config.ContinueOnError) {
                             return false;
+                        }
+                    }
+
+                    string errorMessage;
+                    GrapeEntity type = (new List<GrapeEntity>(typeCheckingUtils.GetEntitiesForMemberExpression(Config, f.ReturnType as GrapeMemberExpression, f, out errorMessage)))[0];
+                    if (type is GrapeClass) {
+                        GrapeClass typeClass = type as GrapeClass;
+                        if (typeClass.Modifiers.Contains("static")) {
+                            errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot declare a function of static type '" + typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, f.ReturnType) + "'.", FileName = f.FileName, Offset = f.ReturnType.Offset, Length = f.ReturnType.Length });
+                            if (!Config.ContinueOnError) {
+                                return false;
+                            }
                         }
                     }
 
