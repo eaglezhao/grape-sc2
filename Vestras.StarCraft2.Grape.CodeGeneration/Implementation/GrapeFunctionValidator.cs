@@ -140,6 +140,24 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         }
                     }
 
+                    if (f.Modifiers.Contains("abstract") && f.Block.Children.Count > 0) {
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "An abstract function cannot have an implementation.", FileName = f.FileName, Offset = f.Offset, Length = f.Length });
+                        if (!Config.ContinueOnError) {
+                            return false;
+                        }
+                    }
+
+                    string errorMessage;
+                    if (f.Modifiers.Contains("override")) {
+                        GrapeFunction baseFunction = f.GetOverridingFunction(Config, out errorMessage);
+                        if (baseFunction == null) {
+                            errorSink.AddError(new GrapeErrorSink.Error { Description = errorMessage, FileName = f.FileName, Offset = f.Offset, Length = f.Length });
+                            if (!Config.ContinueOnError) {
+                                return false;
+                            }
+                        }
+                    }
+
                     if (f.ReturnType != null && !typeCheckingUtils.DoesTypeExist(Config, f.ReturnType, f.FileName)) {
                         errorSink.AddError(new GrapeErrorSink.Error { Description = "The type '" + typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, f.ReturnType) + "' could not be found.", FileName = f.FileName, Offset = f.ReturnType.Offset, Length = f.ReturnType.Length });
                         if (!Config.ContinueOnError) {
@@ -147,7 +165,6 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         }
                     }
 
-                    string errorMessage;
                     GrapeEntity type = (new List<GrapeEntity>(typeCheckingUtils.GetEntitiesForMemberExpression(Config, f.ReturnType as GrapeMemberExpression, f, out errorMessage)))[0];
                     if (type is GrapeClass) {
                         GrapeClass typeClass = type as GrapeClass;

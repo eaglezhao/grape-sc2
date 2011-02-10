@@ -194,6 +194,29 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                                 return false;
                             }
                         }
+
+                        GrapeMemberExpression lastExpressionWithNext = s;
+                        GrapeMemberExpression lastExpression = s;
+                        while (lastExpression != null && !(lastExpression is GrapeSetExpression) && !(lastExpression is GrapeCallExpression)) {
+                            if (lastExpression.Next != null) {
+                                lastExpressionWithNext = lastExpression;
+                            }
+
+                            lastExpression = lastExpression.Member as GrapeMemberExpression;
+                            if (lastExpression == null && lastExpressionWithNext != null) {
+                                lastExpression = lastExpressionWithNext.Next;
+                                if (lastExpression.Member != null && !(lastExpression.Member is GrapeMemberExpression)) {
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        if (!(lastExpression is GrapeSetExpression) && !(lastExpression is GrapeCallExpression)) {
+                            errorSink.AddError(new GrapeErrorSink.Error { Description = "Only call, set and new object expressions can be used as a statement.", FileName = s.FileName, Offset = s.Offset, Length = s.Length });
+                            if (!Config.ContinueOnError) {
+                                return false;
+                            }
+                        }
                     }
                 }
             }

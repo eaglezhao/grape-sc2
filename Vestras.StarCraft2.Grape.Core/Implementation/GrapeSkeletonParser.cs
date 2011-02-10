@@ -801,6 +801,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                             callExpression.FileName = currentFileName;
                             memberExpression = CreateExpression(token.Tokens[startIndex] as NonterminalToken, ref lastToken) as GrapeMemberExpression;
                             if (memberExpression != null) {
+                                memberExpression.Parent = callExpression;
                                 memberExpression.FileName = currentFileName;
                                 GrapeMemberExpression actualMember = memberExpression;
                                 if (actualMember.Member != null && actualMember.Member is GrapeMemberExpression) {
@@ -815,6 +816,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                                 }
 
                                 callExpression.Member = actualMember;
+                                actualMember.Parent = callExpression;
                                 int lastTokenIndex;
                                 NonterminalToken parametersToken = token.Tokens[startIndex + 2] as NonterminalToken;
                                 if (parametersToken != null) {

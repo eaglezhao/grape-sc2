@@ -17,21 +17,76 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
             return null;
         }
 
+        public static GrapeClass GetBaseClass(this GrapeClass c, GrapeAst ast) {
+            if (c.Inherits == null) {
+                return null;
+            }
+
+            string inheritsQualifiedId = c.Inherits is GrapeIdentifierExpression ? ((GrapeIdentifierExpression)c.Inherits).Identifier : ((GrapeMemberExpression)c.Inherits).GetMemberExpressionQualifiedId();
+            return GrapeAstUtilities.Instance.GetClassWithNameFromImportedPackagesInFile(ast, inheritsQualifiedId, c.FileName);
+        }
+
+        private static List<GrapeFunction> GetFunctionsWithNameInInheritanceTree(this GrapeClass c,  GrapeAst ast, string name) {
+            List<GrapeFunction> functions = new List<GrapeFunction>();
+            foreach (GrapeEntity entity in c.Block.Children) {
+                if (entity is GrapeFunction && ((GrapeFunction)entity).Name == name) {
+                    functions.Add((GrapeFunction)entity);
+                }
+            }
+
+            GrapeClass baseClass = c.GetBaseClass(ast);
+            if (baseClass != null) {
+                functions.AddRange(baseClass.GetFunctionsWithNameInInheritanceTree(ast, name));
+            }
+
+            return functions;
+        }
+
+        public static GrapeFunction GetOverridingFunction(this GrapeFunction function, GrapeCodeGeneratorConfiguration config, out string errorMessage) {
+            errorMessage = "";
+            GrapeClass c = function.GetLogicalParentOfEntityType<GrapeClass>();
+            if (c != null && c.Inherits != null) {
+                GrapeClass baseClass = c.GetBaseClass(config.Ast);
+                if (baseClass != null) {
+                    List<GrapeFunction> functions = baseClass.GetFunctionsWithNameInInheritanceTree(config.Ast, function.Name);
+                    if (functions.Count == 0) {
+                        errorMessage = "Cannot find function with name '" + function.Name + "' in base classes.";
+                        return null;
+                    }
+
+                    string[] modifiers = c.GetAppropriateModifiersForEntityAccess(config, functions[0]);
+                    List<GrapeVariable> parameters = function.Parameters;
+                    List<GrapeFunction> functionsWithSignature = GrapeTypeCheckingUtilities.Instance.GetFunctionWithSignature(config, functions, null, function.Name, function.ReturnType, parameters, ref errorMessage);
+                    List<GrapeFunction> functionsToRemove = new List<GrapeFunction>();
+                    foreach (GrapeFunction f in functionsWithSignature) {
+                        if (f.Modifiers.Contains("sealed")) {
+                            functionsToRemove.Add(f);
+                        }
+                    }
+
+                    functionsToRemove.ForEach(f => functionsWithSignature.Remove(f));
+                    if (functionsWithSignature.Count == 0) {
+                        errorMessage = "'" + GrapeTypeCheckingUtilities.Instance.GetFunctionSignatureString(config, function.Name, function.ReturnType, parameters) + "': no suitable function found to override.";
+                        return null;
+                    }
+
+                    if (errorMessage != "") {
+                        return null;
+                    }
+
+                    return functionsWithSignature[0];
+                } else {
+                    string inheritsQualifiedId = c.Inherits is GrapeIdentifierExpression ? ((GrapeIdentifierExpression)c.Inherits).Identifier : ((GrapeMemberExpression)c.Inherits).GetMemberExpressionQualifiedId();
+                    errorMessage = "Cannot finding base class '" + inheritsQualifiedId + "'.";
+                }
+            } else {
+                errorMessage = "Cannot find class parent of function '" + function.Name + "'.";
+            }
+
+            return null;
+        }
+
         public static bool IsClassInInheritanceTree(this GrapeClass c, GrapeCodeGeneratorConfiguration config, GrapeClass testingClass) {
-            //GrapeClass currentClass = c;
-            //while (currentClass != null) {
-            //    if (currentClass.Name == testingClass.Name) {
-            //        return true;
-            //    }
-            //
-            //    if (currentClass.Inherits == null) {
-            //        break;
-            //    }
-            //
-            //    currentClass = GrapeAstUtilities.Instance.GetClassWithNameFromImportedPackagesInFile(config.Ast, GrapeTypeCheckingUtilities.Instance.GetTypeNameForTypeAccessExpression(config, currentClass.Inherits), currentClass.FileName);
-            //}
-            //
-            //return false;
             return GrapeTypeCheckingUtilities.Instance.IsTypeInClassInheritanceTree(config, testingClass.Name, c);
         }
 

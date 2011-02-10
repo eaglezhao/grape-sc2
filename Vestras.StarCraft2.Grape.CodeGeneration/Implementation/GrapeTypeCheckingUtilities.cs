@@ -211,6 +211,22 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
             return result;
         }
 
+        public string GetFunctionSignatureString(GrapeCodeGeneratorConfiguration config, string name, GrapeExpression returnType, List<GrapeVariable> parameters) {
+            string result = GetTypeNameForTypeAccessExpression(config, returnType) + " " + name + "(";
+            int index = 0;
+            foreach (GrapeVariable parameter in parameters) {
+                result += GetTypeNameForTypeAccessExpression(config, parameter.Type);
+                if (index < parameters.Count - 1) {
+                    result += ", ";
+                }
+
+                index++;
+            }
+
+            result += ")";
+            return result;
+        }
+
         public List<GrapeFunction> GetFunctionWithSignature(GrapeCodeGeneratorConfiguration config, List<GrapeFunction> functions, string[] modifiers, string name, GrapeExpression returnType, List<GrapeExpression> parameters, ref string errorMessage) {
             List<GrapeFunction> foundFunctions = new List<GrapeFunction>();
             string parameterErrorMessage = "";
@@ -267,10 +283,71 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
             return foundFunctions;
         }
 
+        public List<GrapeFunction> GetFunctionWithSignature(GrapeCodeGeneratorConfiguration config, List<GrapeFunction> functions, string[] modifiers, string name, GrapeExpression returnType, List<GrapeVariable> parameters, ref string errorMessage) {
+            List<GrapeFunction> foundFunctions = new List<GrapeFunction>();
+            string parameterErrorMessage = "";
+            foreach (GrapeFunction function in functions) {
+                if (function.Name == name && GetTypeNameForTypeAccessExpression(config, function.ReturnType) == GetTypeNameForTypeAccessExpression(config, returnType) && function.Parameters.Count == parameters.Count) {
+                    if (modifiers != null) {
+                        bool shouldContinue = false;
+                        foreach (string modifier in modifiers) {
+                            bool hasModifier = false;
+                            foreach (string functionModifier in function.Modifiers.Split(' ')) {
+                                if (functionModifier == modifier) {
+                                    hasModifier = true;
+                                    break;
+                                }
+                            }
+
+                            if (!hasModifier) {
+                                shouldContinue = true;
+                                break;
+                            }
+                        }
+
+                        if (shouldContinue) {
+                            continue;
+                        }
+                    }
+
+                    int currentParameterIndex = 0;
+                    bool validParameters = true;
+                    foreach (GrapeVariable param in function.Parameters) {
+                        GrapeVariable currentParameter = parameters[currentParameterIndex];
+                        if (!DoesExpressionResolveToType(config, currentParameter, currentParameter.Type, param.Type, ref parameterErrorMessage)) {
+                            validParameters = false;
+                            if (parameterErrorMessage == "") {
+                                parameterErrorMessage = "Cannot resolve parameter type '" + GetTypeNameForTypeAccessExpression(config, currentParameter.Type) + "' to type '" + GetTypeNameForTypeAccessExpression(config, param.Type) + "'.";
+                            }
+
+                            break;
+                        }
+
+                        currentParameterIndex++;
+                    }
+
+                    if (validParameters) {
+                        foundFunctions.Add(function);
+                    }
+                }
+            }
+
+            if (foundFunctions.Count == 0) {
+                errorMessage = "Cannot find function with signature '" + GetFunctionSignatureString(config, name, returnType, parameters) + "'. " + parameterErrorMessage;
+            }
+
+            return foundFunctions;
+        }
+
         public IEnumerable<GrapeEntity> GetEntitiesForMemberExpression(GrapeCodeGeneratorConfiguration config, GrapeMemberExpression memberExpression, GrapeEntity parent, out string errorMessage) {
             errorMessage = "";
             string memberExpressionQualifiedId = memberExpression.GetMemberExpressionQualifiedId();
             if (memberExpressionQualifiedId == "this") {
+                if ((memberExpression.GetType() != typeof(GrapeMemberExpression) && memberExpression.GetType() != typeof(GrapeIdentifierExpression) && memberExpression.GetType() != typeof(GrapeSetExpression)) || (parent is GrapeExpression && parent.GetType() != typeof(GrapeMemberExpression) && parent.GetType() != typeof(GrapeIdentifierExpression) && parent.GetType() != typeof(GrapeSetExpression))) {
+                    errorMessage = "Cannot access this class through a statement expression.";
+                    return new GrapeEntity[] { null };
+                }
+
                 GrapeClass thisClass = parent.GetLogicalParentOfEntityType<GrapeClass>();
                 if (thisClass != null) {
                     return new GrapeEntity[] { thisClass };
@@ -278,6 +355,11 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
 
                 return new GrapeEntity[] { null };
             } else if (memberExpressionQualifiedId == "base") {
+                if ((memberExpression.GetType() != typeof(GrapeMemberExpression) && memberExpression.GetType() != typeof(GrapeIdentifierExpression) && memberExpression.GetType() != typeof(GrapeSetExpression)) || (parent is GrapeExpression && parent.GetType() != typeof(GrapeMemberExpression) && parent.GetType() != typeof(GrapeIdentifierExpression) && parent.GetType() != typeof(GrapeSetExpression))) {
+                    errorMessage = "Cannot access base class through a statement expression.";
+                    return new GrapeEntity[] { null };
+                }
+
                 GrapeClass thisClass = parent.GetLogicalParentOfEntityType<GrapeClass>();
                 if (thisClass != null && thisClass.Inherits != null) {
                     GrapeClass baseClass = astUtils.GetClassWithNameFromImportedPackagesInFile(config.Ast, GetTypeNameForTypeAccessExpression(config, thisClass.Inherits, ref errorMessage), parent.FileName);
@@ -351,9 +433,14 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         lastExpressionWithoutNext = lastExpressionWithoutNext.Member as GrapeMemberExpression;
                     }
 
-                    lastParent = (new List<GrapeEntity>(GetEntitiesForMemberExpression(config, lastExpressionWithoutNext, lastParent == null ? parent : lastParent.GetLogicalParentOfEntityType<GrapeClass>(), out errorMessage)))[0];
+                    lastParent = (new List<GrapeEntity>(GetEntitiesForMemberExpression(config, lastExpressionWithoutNext, lastParent == null ? memberExpression as GrapeEntity : lastParent.GetLogicalParentOfEntityType<GrapeClass>(), out errorMessage)))[0];
                     if (lastParent == null) {
                         break;
+                    }
+
+                    if (lastParent is GrapeFunction && !(currentExpression is GrapeCallExpression) && !(memberExpression is GrapeCallExpression) && !(parent is GrapeCallExpression)) {
+                        errorMessage = "Cannot use function '" + lastExpressionWithoutNext.GetMemberExpressionQualifiedId() + "' as a variable or type.";
+                        return new GrapeEntity[] { null };
                     }
 
                     if (lastLastParent != null) {
@@ -373,7 +460,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
 
                             lastMemberAccess = null;
                         } else if (lastLastParent is GrapeClass) {
-                            shouldBeStatic = !lastClassAccessWasThisOrBaseAccess && !(lastEntity is GrapeClass);
+                            shouldBeStatic = !lastClassAccessWasThisOrBaseAccess && !(lastParent is GrapeClass);
                             staticnessMatters = true;
                         } else if (lastLastParent is GrapeField) {
                             string variableModifiers = ((GrapeField)lastLastParent).Modifiers;
@@ -485,6 +572,11 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         break;
                     }
 
+                    if (lastEntity is GrapeFunction && !(currentExpression is GrapeCallExpression) && !(memberExpression is GrapeCallExpression) && !(parent is GrapeCallExpression)) {
+                        errorMessage = "Cannot use function '" + expressionWithoutNextQualifiedId + "' as a variable or type.";
+                        return new GrapeEntity[] { null };
+                    }
+
                     if (lastLastEntity != null) {
                         if (lastMemberAccess != null) {
                             GrapeClass c = null;
@@ -569,7 +661,10 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                 }
 
                 if (entities.Count == 0) {
-                    errorMessage = "Cannot find variable, field, type or function with name '" + memberExpressionQualifiedId + "'.";
+                    if (errorMessage == "") {
+                        errorMessage = "Cannot find variable, field, type or function with name '" + memberExpressionQualifiedId + "'.";
+                    }
+
                     return new GrapeEntity[] { null };
                 }
 
