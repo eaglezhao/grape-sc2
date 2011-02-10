@@ -241,7 +241,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
             foreach (string importedPackageFile in importedPackageFiles) {
                 IEnumerable<GrapeEntity> variables = GetEntitiesOfTypeInFile(importedPackageFile, typeof(GrapeVariable));
                 foreach (GrapeVariable v in variables) {
-                    if (v.Name == actualVariableName && v.GetActualParent() == e) {
+                    if (v.Name == actualVariableName && (v.GetActualParent() == e || v.GetLogicalParentOfEntityType<GrapeFunction>() == e)) {
                         list.Add(v);
                     }
                 }
@@ -261,7 +261,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
             foreach (GrapePackageDeclaration packageDeclaration in packages) {
                 if (packageDeclaration.PackageName == actualQualifiedId) {
                     foreach (GrapeVariable v in allVariables) {
-                        if (v.Name == actualVariableName && v.GetActualParent() == e) {
+                        if (v.Name == actualVariableName && (v.GetActualParent() == e || v.GetLogicalParentOfEntityType<GrapeFunction>() == e)) {
                             list.Add(v);
                         }
                     }

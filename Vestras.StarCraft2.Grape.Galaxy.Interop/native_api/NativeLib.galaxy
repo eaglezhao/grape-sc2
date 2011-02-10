@@ -751,7 +751,8 @@ const string c_abilWarpTrainCmdTrain17Name = "Train17";
 const string c_abilWarpTrainCmdTrain18Name = "Train18";
 const string c_abilWarpTrainCmdTrain19Name = "Train19";
 const string c_abilWarpTrainCmdTrain20Name = "Train20";
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -765,7 +766,8 @@ const string c_abilWarpTrainCmdTrain20Name = "Train20";
 //  EClassIdCAchievement
 const int c_classIdCAchievement = 0;
 const string c_classIdCAchievementName = "CAchievement";
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -827,7 +829,8 @@ const string c_classIdCAchievementTermUnitDeathName = "CAchievementTermUnitDeath
 const string c_classIdCAchievementTermUnitKillsName = "CAchievementTermUnitKills";
 const string c_classIdCAchievementTermUnitRegenName = "CAchievementTermUnitRegen";
 const string c_classIdCAchievementTermUnitSupplyLossName = "CAchievementTermUnitSupplyLoss";
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -999,7 +1002,8 @@ const int c_flyerDisplayAll = 2;
 const string c_flyerDisplayNoneName = "None";
 const string c_flyerDisplaySelectedName = "Selected";
 const string c_flyerDisplayAllName = "All";
-
+
+
 //==================================================================================================
 //  AI Native Function Prototypes
 //==================================================================================================
@@ -1755,7 +1759,8 @@ native void AIClearAllBullies (int player);
 native void AIAddBully (int player, string unitType, point loc, int rebuildCount);
 
 native string AIGetBullyType (unit u);
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -1769,7 +1774,8 @@ native string AIGetBullyType (unit u);
 //  EClassIdCAlert
 const int c_classIdCAlert = 0;
 const string c_classIdCAlertName = "CAlert";
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -1807,7 +1813,8 @@ const string c_classIdCAttachMethodRandomName = "CAttachMethodRandom";
 const string c_classIdCAttachMethodReductionName = "CAttachMethodReduction";
 const string c_classIdCAttachMethodVolumesRequeryName = "CAttachMethodVolumesRequery";
 const string c_classIdCAttachMethodVolumesWeightedPickName = "CAttachMethodVolumesWeightedPick";
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -1831,7 +1838,8 @@ const string c_classIdCBeamSyncSweeperName = "CBeamSyncSweeper";
 const string c_classIdCBeamAsyncName = "CBeamAsync";
 const string c_classIdCBeamAsyncLinearName = "CBeamAsyncLinear";
 const string c_classIdCBeamAsyncShadowName = "CBeamAsyncShadow";
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -1879,7 +1887,8 @@ const int c_behaviorCategoryTemporary = 2;
 const string c_behaviorCategoryPermanentName = "Permanent";
 const string c_behaviorCategoryRestorableName = "Restorable";
 const string c_behaviorCategoryTemporaryName = "Temporary";
-
+
+
 //==================================================================================================
 //
 // Placeholder AI script file
@@ -1888,7 +1897,8 @@ const string c_behaviorCategoryTemporaryName = "Temporary";
 //  such that Core-only mods can compile properly.
 //
 //==================================================================================================
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -1902,7 +1912,8 @@ const string c_behaviorCategoryTemporaryName = "Temporary";
 //  EClassIdCButton
 const int c_classIdCButton = 0;
 const string c_classIdCButtonName = "CButton";
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -1916,7 +1927,8 @@ const string c_classIdCButtonName = "CButton";
 //  EClassIdCCamera
 const int c_classIdCCamera = 0;
 const string c_classIdCCameraName = "CCamera";
-
+
+
 //==================================================================================================
 //
 // Placeholder AI script file
@@ -1925,7 +1937,8 @@ const string c_classIdCCameraName = "CCamera";
 //  such that Core-only mods can compile properly.
 //
 //==================================================================================================
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -1939,7 +1952,8 @@ const string c_classIdCCameraName = "CCamera";
 //  EClassIdCCliff
 const int c_classIdCCliff = 0;
 const string c_classIdCCliffName = "CCliff";
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -1953,7 +1967,8 @@ const string c_classIdCCliffName = "CCliff";
 //  EClassIdCCliffMesh
 const int c_classIdCCliffMesh = 0;
 const string c_classIdCCliffMeshName = "CCliffMesh";
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -1967,7 +1982,8 @@ const string c_classIdCCliffMeshName = "CCliffMesh";
 //  EClassIdCConversation
 const int c_classIdCConversation = 0;
 const string c_classIdCConversationName = "CConversation";
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -1981,7 +1997,8 @@ const string c_classIdCConversationName = "CConversation";
 //  EClassIdCConversationState
 const int c_classIdCConversationState = 0;
 const string c_classIdCConversationStateName = "CConversationState";
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -1995,7 +2012,8 @@ const string c_classIdCConversationStateName = "CConversationState";
 //  EClassIdCCursor
 const int c_classIdCCursor = 0;
 const string c_classIdCCursorName = "CCursor";
-
+
+
 //==================================================================================================
 //  Test functions to debug Galaxy ASM
 //==================================================================================================
@@ -2133,7 +2151,8 @@ void InitMap () {
 //
 //    return local7;
 //}
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -2143,7 +2162,8 @@ void InitMap () {
 //  !!! WARNING !!! This is generated code. Changes made here will be overwritten.
 //  
 //GENERATED CODE====================================================================================
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -2203,7 +2223,8 @@ const string c_classIdCEffectTeleportName = "CEffectTeleport";
 const string c_classIdCEffectTransferBehaviorName = "CEffectTransferBehavior";
 const string c_classIdCEffectUseCalldownName = "CEffectUseCalldown";
 const string c_classIdCEffectUseMagazineName = "CEffectUseMagazine";
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -2215,7 +2236,8 @@ const string c_classIdCEffectUseMagazineName = "CEffectUseMagazine";
 //GENERATED CODE====================================================================================
 
 //  EClassIdCError
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -2229,7 +2251,8 @@ const string c_classIdCEffectUseMagazineName = "CEffectUseMagazine";
 //  EClassIdCFootprint
 const int c_classIdCFootprint = 0;
 const string c_classIdCFootprintName = "CFootprint";
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -2239,7 +2262,8 @@ const string c_classIdCFootprintName = "CFootprint";
 //  !!! WARNING !!! This is generated code. Changes made here will be overwritten.
 //  
 //GENERATED CODE====================================================================================
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -2491,7 +2515,8 @@ const int c_unitTauntCheer = 0;
 const int c_unitTauntDance = 1;
 const string c_unitTauntCheerName = "Cheer";
 const string c_unitTauntDanceName = "Dance";
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -2607,7 +2632,8 @@ const string c_gameCatalogUpgradeName = "Upgrade";
 const string c_gameCatalogValidatorName = "Validator";
 const string c_gameCatalogWaterName = "Water";
 const string c_gameCatalogWeaponName = "Weapon";
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -2671,7 +2697,8 @@ include "TriggerLibs/GameData/Upgrade.galaxy"
 include "TriggerLibs/GameData/Validator.galaxy"
 include "TriggerLibs/GameData/Water.galaxy"
 include "TriggerLibs/GameData/Weapon.galaxy"
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -2693,7 +2720,8 @@ const int c_unitColorStyleOverrideWorld = 2;
 const string c_unitColorStyleNormalName = "Normal";
 const string c_unitColorStyleOverrideMinimapName = "OverrideMinimap";
 const string c_unitColorStyleOverrideWorldName = "OverrideWorld";
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -2713,7 +2741,8 @@ const string c_classIdCItemName = "CItem";
 const string c_classIdCItemEffectName = "CItemEffect";
 const string c_classIdCItemEffectInstantName = "CItemEffectInstant";
 const string c_classIdCItemEffectTargetName = "CItemEffectTarget";
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -2727,7 +2756,8 @@ const string c_classIdCItemEffectTargetName = "CItemEffectTarget";
 //  EClassIdCItemClass
 const int c_classIdCItemClass = 0;
 const string c_classIdCItemClassName = "CItemClass";
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -2741,7 +2771,8 @@ const string c_classIdCItemClassName = "CItemClass";
 //  EClassIdCItemContainer
 const int c_classIdCItemContainer = 0;
 const string c_classIdCItemContainerName = "CItemContainer";
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -2755,7 +2786,8 @@ const string c_classIdCItemContainerName = "CItemContainer";
 //  EClassIdCLight
 const int c_classIdCLight = 0;
 const string c_classIdCLightName = "CLight";
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -2765,7 +2797,8 @@ const string c_classIdCLightName = "CLight";
 //  !!! WARNING !!! This is generated code. Changes made here will be overwritten.
 //  
 //GENERATED CODE====================================================================================
-
+
+
 //==================================================================================================
 //
 // Placeholder AI script file
@@ -2774,7 +2807,8 @@ const string c_classIdCLightName = "CLight";
 //  such that Core-only mods can compile properly.
 //
 //==================================================================================================
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -3270,7 +3304,8 @@ const string c_animPropWoundedName = "Wounded";
 const string c_animPropProtossName = "Protoss";
 const string c_animPropTerranName = "Terran";
 const string c_animPropZergName = "Zerg";
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -3292,7 +3327,8 @@ const string c_classIdCMoverAvoidName = "CMoverAvoid";
 const string c_classIdCMoverFlockName = "CMoverFlock";
 const string c_classIdCMoverMissileName = "CMoverMissile";
 const string c_classIdCMoverNullName = "CMoverNull";
-
+
+
 include "TriggerLibs/natives"
 
 //--------------------------------------------------------------------------------------------------
@@ -8353,7 +8389,8 @@ void libNtve_InitLib () {
     libNtve_InitTriggers();
 }
 
-
+
+
 //==================================================================================================
 // Native Function Prototypes
 //==================================================================================================
@@ -12195,7 +12232,8 @@ include "TriggerLibs/MeleeAI"
 include "TriggerLibs/TacticalAI"
 
 // $AS - Trigger Editor(Bug 33070): In order for line numbers to be correct you need a newline at the end of this file
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -12209,7 +12247,8 @@ include "TriggerLibs/TacticalAI"
 //  EClassIdCRace
 const int c_classIdCRace = 0;
 const string c_classIdCRaceName = "CRace";
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -12223,7 +12262,8 @@ const string c_classIdCRaceName = "CRace";
 //  EClassIdCRequirement
 const int c_classIdCRequirement = 0;
 const string c_classIdCRequirementName = "CRequirement";
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -12279,7 +12319,8 @@ const string c_classIdCRequirementCountBehaviorName = "CRequirementCountBehavior
 const string c_classIdCRequirementCountEffectName = "CRequirementCountEffect";
 const string c_classIdCRequirementCountUnitName = "CRequirementCountUnit";
 const string c_classIdCRequirementCountUpgradeName = "CRequirementCountUpgrade";
-
+
+
 //==================================================================================================
 //
 // Placeholder AI script file
@@ -12288,7 +12329,8 @@ const string c_classIdCRequirementCountUpgradeName = "CRequirementCountUpgrade";
 //  such that Core-only mods can compile properly.
 //
 //==================================================================================================
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -12298,7 +12340,8 @@ const string c_classIdCRequirementCountUpgradeName = "CRequirementCountUpgrade";
 //  !!! WARNING !!! This is generated code. Changes made here will be overwritten.
 //  
 //GENERATED CODE====================================================================================
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -12320,7 +12363,8 @@ const string c_classIdCRewardDecalName = "CRewardDecal";
 const string c_classIdCRewardIconName = "CRewardIcon";
 const string c_classIdCRewardModelName = "CRewardModel";
 const string c_classIdCRewardPortraitName = "CRewardPortrait";
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -12330,7 +12374,8 @@ const string c_classIdCRewardPortraitName = "CRewardPortrait";
 //  !!! WARNING !!! This is generated code. Changes made here will be overwritten.
 //  
 //GENERATED CODE====================================================================================
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -12340,7 +12385,8 @@ const string c_classIdCRewardPortraitName = "CRewardPortrait";
 //  !!! WARNING !!! This is generated code. Changes made here will be overwritten.
 //  
 //GENERATED CODE====================================================================================
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -12406,7 +12452,8 @@ const string c_soundCategorySPiecesName = "SPieces";
 const string c_soundCategoryFoleyName = "Foley";
 const string c_soundCategoryMovementName = "Movement";
 const string c_soundCategoryOtherName = "Other";
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -12426,7 +12473,8 @@ const int c_soundtrackCategoryAmbience = 0;
 const int c_soundtrackCategoryMusic = 1;
 const string c_soundtrackCategoryAmbienceName = "Ambience";
 const string c_soundtrackCategoryMusicName = "Music";
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -12444,7 +12492,8 @@ const int c_classIdCTacticalSet = 2;
 const string c_classIdCTacticalName = "CTactical";
 const string c_classIdCTacticalOrderName = "CTacticalOrder";
 const string c_classIdCTacticalSetName = "CTacticalSet";
-
+
+
 //==================================================================================================
 //
 // Placeholder AI script file
@@ -12453,7 +12502,8 @@ const string c_classIdCTacticalSetName = "CTacticalSet";
 //  such that Core-only mods can compile properly.
 //
 //==================================================================================================
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -12485,7 +12535,8 @@ const string c_classIdCTargetFindLastAttackerName = "CTargetFindLastAttacker";
 const string c_classIdCTargetFindOffsetName = "CTargetFindOffset";
 const string c_classIdCTargetFindOrderName = "CTargetFindOrder";
 const string c_classIdCTargetFindSetName = "CTargetFindSet";
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -12533,7 +12584,8 @@ const string c_classIdCTargetSortRandomName = "CTargetSortRandom";
 const string c_classIdCTargetSortVeterancyName = "CTargetSortVeterancy";
 const string c_classIdCTargetSortVitalName = "CTargetSortVital";
 const string c_classIdCTargetSortVitalFractionName = "CTargetSortVitalFraction";
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -12547,7 +12599,8 @@ const string c_classIdCTargetSortVitalFractionName = "CTargetSortVitalFraction";
 //  EClassIdCTerrain
 const int c_classIdCTerrain = 0;
 const string c_classIdCTerrainName = "CTerrain";
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -12557,7 +12610,8 @@ const string c_classIdCTerrainName = "CTerrain";
 //  !!! WARNING !!! This is generated code. Changes made here will be overwritten.
 //  
 //GENERATED CODE====================================================================================
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -12571,7 +12625,8 @@ const string c_classIdCTerrainName = "CTerrain";
 //  EClassIdCTerrainTex
 const int c_classIdCTerrainTex = 0;
 const string c_classIdCTerrainTexName = "CTerrainTex";
-
+
+
 //==================================================================================================
 // Performs tests on all natives functions
 //==================================================================================================
@@ -14067,7 +14122,8 @@ void TestNatives () {
 
     //CheckTestEvents();
 }
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -14081,7 +14137,8 @@ void TestNatives () {
 //  EClassIdCTexture
 const int c_classIdCTexture = 0;
 const string c_classIdCTextureName = "CTexture";
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -14095,7 +14152,8 @@ const string c_classIdCTextureName = "CTexture";
 //  EClassIdCTile
 const int c_classIdCTile = 0;
 const string c_classIdCTileName = "CTile";
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -14109,7 +14167,8 @@ const string c_classIdCTileName = "CTile";
 //  EClassIdCTurret
 const int c_classIdCTurret = 0;
 const string c_classIdCTurretName = "CTurret";
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -14269,7 +14328,8 @@ const string c_cmdSmartRallyName = "SmartRally";
 const string c_cmdSubgroupName = "Subgroup";
 const string c_cmdSetAutoCastName = "SetAutoCast";
 const string c_cmdSetAutoCastOnName = "SetAutoCastOn";
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -14283,7 +14343,8 @@ const string c_cmdSetAutoCastOnName = "SetAutoCastOn";
 //  EClassIdCUpgrade
 const int c_classIdCUpgrade = 0;
 const string c_classIdCUpgradeName = "CUpgrade";
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -14435,7 +14496,8 @@ const string c_classIdCValidatorUnitCompareSpeedName = "CValidatorUnitCompareSpe
 const string c_classIdCValidatorUnitCompareVeterancyLevelName = "CValidatorUnitCompareVeterancyLevel";
 const string c_classIdCValidatorUnitCompareVitalName = "CValidatorUnitCompareVital";
 const string c_classIdCValidatorUnitCompareVitalityName = "CValidatorUnitCompareVitality";
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -14445,7 +14507,8 @@ const string c_classIdCValidatorUnitCompareVitalityName = "CValidatorUnitCompare
 //  !!! WARNING !!! This is generated code. Changes made here will be overwritten.
 //  
 //GENERATED CODE====================================================================================
-
+
+
 //GENERATED CODE====================================================================================
 //  
 //  Copyright Blizzard Entertainment 2003-2005
@@ -14463,4 +14526,5 @@ const int c_classIdCWeaponStrafe = 2;
 const string c_classIdCWeaponName = "CWeapon";
 const string c_classIdCWeaponLegacyName = "CWeaponLegacy";
 const string c_classIdCWeaponStrafeName = "CWeaponStrafe";
-
+
+

@@ -24,8 +24,9 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
             if (Config.OutputErrors) {
                 GrapeForEachStatement s = obj as GrapeForEachStatement;
                 if (s != null) {
-                    if (!typeCheckingUtils.DoesExpressionResolveToType(Config, s, s.ContainerExpression, "abstract_enumerator")) {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot resolve expression to the type 'abstract_enumerator'.", FileName = s.FileName, Offset = s.ContainerExpression.Offset, Length = s.ContainerExpression.Length });
+                    string errorMessage = "";
+                    if (!typeCheckingUtils.DoesExpressionResolveToType(Config, s, s.ContainerExpression, "abstract_enumerator", ref errorMessage)) {
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot resolve expression to the type 'abstract_enumerator'. " + errorMessage, FileName = s.FileName, Offset = s.ContainerExpression.Offset, Length = s.ContainerExpression.Length });
                         if (!Config.ContinueOnError) {
                             return false;
                         }

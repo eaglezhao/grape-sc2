@@ -31,7 +31,7 @@
 	void set_offset(fixed time)
 		fixed value = time
 		int offset = c_soundOffsetStart
-		if time < 0
+		if time < 0.0
 			value = -time
 			offset = c_soundOffsetEnd
 		end
@@ -42,7 +42,7 @@
 	void wait(fixed time)
 		fixed value = time
 		int offset = c_soundOffsetStart
-		if time < 0
+		if time < 0.0
 			value = -time
 			offset = c_soundOffsetEnd
 		end

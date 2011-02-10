@@ -70,7 +70,7 @@
 	end
 
 	void add(unit u)
-		UnitGroupAdd(u)
+		UnitGroupAdd(this, u)
 	end
 
 	void remove(unit u)

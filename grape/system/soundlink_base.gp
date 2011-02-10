@@ -68,7 +68,7 @@
 	end
 
 	override int get_hash_code()
-		return get_id() ^ get_asset_index()
+		return get_id().get_hash_code() ^ get_asset_index()
 	end
 
 	override string to_string()

@@ -29,8 +29,9 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         }
                     }
 
-                    if (!typeCheckingUtils.DoesExpressionResolveToType(Config, s, s.ThrowExpression, "exception")) {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot resolve throw expression to type 'exception'.", FileName = s.FileName, Offset = s.ThrowExpression.Offset, Length = s.ThrowExpression.Length });
+                    string errorMessage = "";
+                    if (!typeCheckingUtils.DoesExpressionResolveToType(Config, s, s.ThrowExpression, "exception", ref errorMessage)) {
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot resolve throw expression to type 'exception'. " + errorMessage, FileName = s.FileName, Offset = s.ThrowExpression.Offset, Length = s.ThrowExpression.Length });
                         if (!Config.ContinueOnError) {
                             return false;
                         }

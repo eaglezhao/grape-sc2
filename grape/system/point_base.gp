@@ -10,6 +10,10 @@
  class point_base
 	static point origin_point = point.create(0, 0)
 
+	static point create(int x, int y)
+		return create(IntToFixed(x), IntToFixed(y))
+	end
+
 	static point create(fixed x, fixed y)
 		return Point(x, y)
 	end
@@ -73,7 +77,7 @@
 	end
 
 	bool is_point_in_range(point other, fixed range)
-		if range < 0
+		if range < 0.0
 			return false
 		end
 

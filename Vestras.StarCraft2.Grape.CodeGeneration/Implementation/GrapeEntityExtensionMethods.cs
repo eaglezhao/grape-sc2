@@ -18,20 +18,21 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
         }
 
         public static bool IsClassInInheritanceTree(this GrapeClass c, GrapeCodeGeneratorConfiguration config, GrapeClass testingClass) {
-            GrapeClass currentClass = c;
-            while (currentClass != null) {
-                if (currentClass.Name == testingClass.Name) {
-                    return true;
-                }
-
-                if (currentClass.Inherits == null) {
-                    break;
-                }
-
-                currentClass = GrapeAstUtilities.Instance.GetClassWithNameFromImportedPackagesInFile(config.Ast, GrapeTypeCheckingUtilities.Instance.GetTypeNameForTypeAccessExpression(config, currentClass.Inherits), currentClass.FileName);
-            }
-
-            return false;
+            //GrapeClass currentClass = c;
+            //while (currentClass != null) {
+            //    if (currentClass.Name == testingClass.Name) {
+            //        return true;
+            //    }
+            //
+            //    if (currentClass.Inherits == null) {
+            //        break;
+            //    }
+            //
+            //    currentClass = GrapeAstUtilities.Instance.GetClassWithNameFromImportedPackagesInFile(config.Ast, GrapeTypeCheckingUtilities.Instance.GetTypeNameForTypeAccessExpression(config, currentClass.Inherits), currentClass.FileName);
+            //}
+            //
+            //return false;
+            return GrapeTypeCheckingUtilities.Instance.IsTypeInClassInheritanceTree(config, testingClass.Name, c);
         }
 
         public static string GetPotentialModifiersOfEntity(this GrapeEntity entity) {

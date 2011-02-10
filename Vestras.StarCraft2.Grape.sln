@@ -12,11 +12,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Stdlib", "Stdlib", "{3F9FC55D-08B1-4C0A-ACA2-D10D478B5B0F}"
 	ProjectSection(SolutionItems) = preProject
 		grape\system\abilcmd_base.gp = grape\system\abilcmd_base.gp
-		grape\system\abstract_enumerable.gp = grape\system\abstract_enumerable.gp
-		grape\system\abstract_enumerator.gp = grape\system\abstract_enumerator.gp
 		grape\system\actor_base.gp = grape\system\actor_base.gp
 		grape\system\actorscope_base.gp = grape\system\actorscope_base.gp
 		grape\system\aifilter_base.gp = grape\system\aifilter_base.gp
+		grape\system\argument_exception.gp = grape\system\argument_exception.gp
+		grape\system\argument_null_exception.gp = grape\system\argument_null_exception.gp
+		grape\system\argument_out_of_range_exception.gp = grape\system\argument_out_of_range_exception.gp
 		grape\system\bank_base.gp = grape\system\bank_base.gp
 		grape\system\bool_base.gp = grape\system\bool_base.gp
 		grape\system\byte_base.gp = grape\system\byte_base.gp
@@ -28,7 +29,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Stdlib", "Stdlib", "{3F9FC5
 		grape\system\fixed_base.gp = grape\system\fixed_base.gp
 		grape\system\game.gp = grape\system\game.gp
 		grape\system\int_base.gp = grape\system\int_base.gp
+		grape\system\invalid_operation_exception.gp = grape\system\invalid_operation_exception.gp
 		grape\system\marker_base.gp = grape\system\marker_base.gp
+		grape\system\memory_limit_exceeded_exception.gp = grape\system\memory_limit_exceeded_exception.gp
 		grape\system\mod_base.gp = grape\system\mod_base.gp
 		grape\system\object.gp = grape\system\object.gp
 		grape\system\order_base.gp = grape\system\order_base.gp
@@ -63,6 +66,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentat
 	ProjectSection(SolutionItems) = preProject
 		grape\doc\grape-documentation.htm = grape\doc\grape-documentation.htm
 		grape\doc\grape-logo.png = grape\doc\grape-logo.png
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "collections", "collections", "{62EC5787-D4F9-4BED-83DF-F04F7B9CD1B4}"
+	ProjectSection(SolutionItems) = preProject
+		grape\system\collections\abstract_enumerable.gp = grape\system\collections\abstract_enumerable.gp
+		grape\system\collections\abstract_enumerator.gp = grape\system\collections\abstract_enumerator.gp
+		grape\system\collections\list.gp = grape\system\collections\list.gp
 	EndProjectSection
 EndProject
 Global
@@ -118,5 +128,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{62EC5787-D4F9-4BED-83DF-F04F7B9CD1B4} = {3F9FC55D-08B1-4C0A-ACA2-D10D478B5B0F}
 	EndGlobalSection
 EndGlobal

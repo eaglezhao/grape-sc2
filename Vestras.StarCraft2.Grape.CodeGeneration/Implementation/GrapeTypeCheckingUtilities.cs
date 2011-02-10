@@ -28,8 +28,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
             }
 
             if (c.Inherits != null) {
-                string dummyMessage = "";
-                string inheritsTypeName = GetTypeNameForTypeAccessExpression(config, c.Inherits, ref dummyMessage);
+                string inheritsTypeName = c.Inherits is GrapeMemberExpression ? ((GrapeMemberExpression)c.Inherits).GetMemberExpressionQualifiedId() : (c.Inherits as GrapeIdentifierExpression).Identifier;
                 if (inheritsTypeName == typeName) {
                     return true;
                 }
@@ -91,9 +90,31 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                     return GetCorrectNativeTypeName((((GrapeFunction)entity).ReturnType as GrapeIdentifierExpression).Identifier);
                 } else if (entity is GrapeClass) {
                     return GetCorrectNativeTypeName((entity as GrapeClass).Name);
+                } else if (entity == null) {
+                    string qualifiedId = ((GrapeMemberExpression)expression).GetMemberExpressionQualifiedId();
+                    foreach (GalaxyFunctionAttribute function in GalaxyNativeInterfaceAggregator.Functions) {
+                        if (function.Name == qualifiedId) {
+                            errorMessage = "";
+                            return GetCorrectNativeTypeName(function.Type);
+                        }
+                    }
+
+                    foreach (GalaxyConstantAttribute constant in GalaxyNativeInterfaceAggregator.Constants) {
+                        if (constant.Name == qualifiedId) {
+                            errorMessage = "";
+                            return GetCorrectNativeTypeName(constant.Type);
+                        }
+                    }
+
+                    foreach (Tuple<GalaxyTypeAttribute, GalaxyTypeDefaultValueAttribute> type in GalaxyNativeInterfaceAggregator.Types) {
+                        if (type.Item1.NativeAlias == qualifiedId || type.Item1.TypeName == qualifiedId) {
+                            errorMessage = "";
+                            return GetCorrectNativeTypeName(type.Item1.NativeAlias);
+                        }
+                    }
                 }
 
-                return GetCorrectNativeTypeName(((GrapeMemberExpression)expression).GetMemberExpressionQualifiedId());
+                return "";// GetCorrectNativeTypeName(((GrapeMemberExpression)expression).GetMemberExpressionQualifiedId());
             } else if (expression is GrapeStackExpression) {
                 return GetTypeNameForTypeAccessExpression(config, ((GrapeStackExpression)expression).Child, ref errorMessage);
             } else if (expression is GrapeLiteralExpression) {
@@ -352,7 +373,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
 
                             lastMemberAccess = null;
                         } else if (lastLastParent is GrapeClass) {
-                            shouldBeStatic = !lastClassAccessWasThisOrBaseAccess;
+                            shouldBeStatic = !lastClassAccessWasThisOrBaseAccess && !(lastEntity is GrapeClass);
                             staticnessMatters = true;
                         } else if (lastLastParent is GrapeField) {
                             string variableModifiers = ((GrapeField)lastLastParent).Modifiers;
@@ -374,10 +395,10 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                     string modifiers = lastParent.GetPotentialModifiersOfEntity();
                     if (modifiers != null && staticnessMatters) {
                         if (shouldBeStatic && !modifiers.Contains("static")) {
-                            errorMessage = "Cannot access instance member when the context implies that a static member should be accessed.";
+                            errorMessage = "Cannot access instance member when the context implies that a static member should be accessed. The expression is '" + identifierExpression.GetMemberExpressionQualifiedId() + "'.";
                             return new GrapeEntity[] { null };
                         } else if (!shouldBeStatic && modifiers.Contains("static")) {
-                            errorMessage = "Cannot access static member when the context implies that an instance member should be accessed.";
+                            errorMessage = "Cannot access static member when the context implies that an instance member should be accessed. The expression is '" + identifierExpression.GetMemberExpressionQualifiedId() + "'.";
                             return new GrapeEntity[] { null };
                         }
                     }
@@ -481,7 +502,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
 
                             lastMemberAccess = null;
                         } else if (lastLastEntity is GrapeClass) {
-                            shouldBeStatic = !lastClassAccessWasThisOrBaseAccess;
+                            shouldBeStatic = !lastClassAccessWasThisOrBaseAccess && !(lastEntity is GrapeClass);
                             staticnessMatters = true;
                         } else if (lastLastEntity is GrapeField) {
                             string variableModifiers = ((GrapeField)lastLastEntity).Modifiers;
@@ -503,10 +524,10 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                     string modifiers = lastEntity.GetPotentialModifiersOfEntity();
                     if (modifiers != null && staticnessMatters) {
                         if (shouldBeStatic && !modifiers.Contains("static")) {
-                            errorMessage = "Cannot access instance member when the context implies that a static member should be accessed.";
+                            errorMessage = "Cannot access instance member when the context implies that a static member should be accessed. The expression is '" + memberExpression.GetMemberExpressionQualifiedId() + "'.";
                             return new GrapeEntity[] { null };
                         } else if (!shouldBeStatic && modifiers.Contains("static")) {
-                            errorMessage = "Cannot access static member when the context implies that an instance member should be accessed.";
+                            errorMessage = "Cannot access static member when the context implies that an instance member should be accessed. The expression is '" + memberExpression.GetMemberExpressionQualifiedId() + "'.";
                             return new GrapeEntity[] { null };
                         }
                     }
@@ -620,7 +641,22 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                     return false;
                 }
 
-                return leftType == rightType;
+                bool result = leftType == rightType;
+                if (!result) {
+                    GrapeClass left = astUtils.GetClassWithNameFromImportedPackagesInFile(config.Ast, leftType, parent.FileName);
+                    GrapeClass right = astUtils.GetClassWithNameFromImportedPackagesInFile(config.Ast, rightType, parent.FileName);
+                    if (left != null && right != null) {
+                        if (left.IsClassInInheritanceTree(config, right)) {
+                            return true;
+                        }
+                    }
+                }
+
+                if (!result) {
+                    errorMessage = "Cannot resolve left and right expressions to the same type. The resolved left type is '" + leftType + "' and the resolved right type is '" + rightType + "'.";
+                }
+
+                return result;
             } else if (expression is GrapeMemberExpression) {
                 GrapeEntity entity = (new List<GrapeEntity>(GetEntitiesForMemberExpression(config, expression as GrapeMemberExpression, parent, out errorMessage)))[0];
                 if (entity != null) {

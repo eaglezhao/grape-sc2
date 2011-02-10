@@ -35,7 +35,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
             functions.AddRange(astUtils.GetFunctionsWithNameFromImportedPackagesInFile(Config, function.Name, function.FileName, function.GetLogicalParentOfEntityType<GrapeClass>()));
             List<GrapeFunction> functionsWithSignature = typeCheckingUtils.GetFunctionWithSignature(Config, functions, modifiers, function.Name, function.ReturnType, new List<GrapeExpression>(callExpression.Parameters), ref errorMessage);
             if (errorMessage != "") {
-                errorSink.AddError(new GrapeErrorSink.Error { Description = errorMessage, FileName = callExpression.FileName, Offset = callExpression.Offset, Length = callExpression.Length });
+               errorSink.AddError(new GrapeErrorSink.Error { Description = errorMessage, FileName = callExpression.FileName, Offset = callExpression.Offset, Length = callExpression.Length });
                 if (!Config.ContinueOnError) {
                     return false;
                 }
@@ -68,8 +68,9 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                             }
                         }
 
-                        if (!typeCheckingUtils.DoesExpressionResolveToType(Config, s, arrayAccessExpression.Array, "int_base")) {
-                            errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot resolve array access expression to the type 'int_base'.", FileName = s.FileName, Offset = s.Offset, Length = s.Length });
+                        string errorMessage = "";
+                        if (!typeCheckingUtils.DoesExpressionResolveToType(Config, s, arrayAccessExpression.Array, "int_base", ref errorMessage)) {
+                            errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot resolve array access expression to the type 'int_base'. " + errorMessage, FileName = s.FileName, Offset = s.Offset, Length = s.Length });
                             if (!Config.ContinueOnError) {
                                 return false;
                             }
