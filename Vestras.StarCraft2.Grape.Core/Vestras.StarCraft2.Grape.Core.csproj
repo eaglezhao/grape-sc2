@@ -50,6 +50,7 @@
     <Compile Include="Ast\GrapeConditionalExpression.cs" />
     <Compile Include="Ast\GrapeContinueStatement.cs" />
     <Compile Include="Ast\GrapeDefaultStatement.cs" />
+    <Compile Include="Ast\GrapeDeleteStatement.cs" />
     <Compile Include="Ast\GrapeElseIfStatement.cs" />
     <Compile Include="Ast\GrapeElseStatement.cs" />
     <Compile Include="Ast\GrapeFinallyStatement.cs" />

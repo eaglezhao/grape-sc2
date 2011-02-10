@@ -261,6 +261,7 @@ Comment End = '*/'
      |  continue <NL>
      |  return <Expression Opt> <NL>
      |  throw <Expression Opt> <NL>
+     |  delete <Expression> <NL>
      |  <Expression> <NL>
      |  <Constructor Init Stms> <NL>
 
