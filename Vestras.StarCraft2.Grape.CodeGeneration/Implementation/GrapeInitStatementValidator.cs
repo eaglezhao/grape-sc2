@@ -30,7 +30,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                     if (s.Type == GrapeInitStatement.GrapeInitStatementType.Base) {
                         GrapeClass c = s.GetLogicalParentOfEntityType<GrapeClass>();
                         if (c.Inherits == null) {
-                            errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot access base constructor when the current class has no base class.", FileName = s.FileName, Offset = s.Offset, Length = s.Length });
+                            errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot access base constructor when the current class has no base class.", FileName = s.FileName, Entity = s });
                             if (!Config.ContinueOnError) {
                                 return false;
                             }
@@ -55,13 +55,13 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                             string[] modifiers = c.GetAppropriateModifiersForEntityAccess(Config, function);
                             bool valid = memberExpressionValidator.ValidateFunctionSignatureAndOverloads(new GrapeCallExpression { FileName = s.FileName, Length = s.Length, Member = new GrapeIdentifierExpression { Identifier = inheritingClass.Name }, Offset = s.Offset, Parameters = new ObservableCollection<GrapeExpression>(s.Parameters), Parent = s }, function, modifiers, ref errorMessage);
                             if (!valid) {
-                                errorSink.AddError(new GrapeErrorSink.Error { Description = errorMessage, FileName = s.FileName, Offset = s.Offset, Length = s.Length });
+                                errorSink.AddError(new GrapeErrorSink.Error { Description = errorMessage, FileName = s.FileName, Entity = s });
                                 if (!Config.ContinueOnError) {
                                     return false;
                                 }
                             }
                         } else {
-                            errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot find base class '" + typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, c.Inherits) + "'.", FileName = s.FileName, Offset = s.Offset, Length = s.Length });
+                            errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot find base class '" + typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, c.Inherits) + "'.", FileName = s.FileName, Entity = s });
                             if (!Config.ContinueOnError) {
                                 return false;
                             }
@@ -84,13 +84,13 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         string[] modifiers = c.GetAppropriateModifiersForEntityAccess(Config, function);
                         bool valid = memberExpressionValidator.ValidateFunctionSignatureAndOverloads(new GrapeCallExpression { FileName = s.FileName, Length = s.Length, Member = new GrapeIdentifierExpression { Identifier = c.Name }, Offset = s.Offset, Parameters = new ObservableCollection<GrapeExpression>(s.Parameters), Parent = s }, function, modifiers, ref errorMessage);
                         if (!valid) {
-                            errorSink.AddError(new GrapeErrorSink.Error { Description = errorMessage, FileName = s.FileName, Offset = s.Offset, Length = s.Length });
+                            errorSink.AddError(new GrapeErrorSink.Error { Description = errorMessage, FileName = s.FileName, Entity = s });
                             if (!Config.ContinueOnError) {
                                 return false;
                             }
                         }
                     } else {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot find initialization type.", FileName = s.FileName, Offset = s.Offset, Length = s.Length });
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot find initialization type.", FileName = s.FileName, Entity = s });
                         if (!Config.ContinueOnError) {
                             return false;
                         }

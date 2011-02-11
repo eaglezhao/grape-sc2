@@ -21,7 +21,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                 GrapeBreakStatement s = obj as GrapeBreakStatement;
                 if (s != null) {
                     if (!s.IsLogicalChildOfEntityType<GrapeWhileStatement>() || !s.IsLogicalChildOfEntityType<GrapeForEachStatement>()) {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "A break statement must be the logical child of a while or foreach statement.", FileName = s.FileName, Offset = s.Offset, Length = s.Length });
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "A break statement must be the logical child of a while or foreach statement.", FileName = s.FileName, Entity = s });
                         if (!Config.ContinueOnError) {
                             return false;
                         }

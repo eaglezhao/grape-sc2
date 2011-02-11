@@ -25,7 +25,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                 if (s != null) {
                     string qualifiedId = s.Value is GrapeIdentifierExpression ? ((GrapeIdentifierExpression)s.Value).Identifier : s.Value is GrapeMemberExpression ? ((GrapeMemberExpression)s.Value).GetMemberExpressionQualifiedId() : typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, s.Value);
                     if (qualifiedId == "this" || qualifiedId == "base") {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot delete static type '" + qualifiedId + "'.", FileName = s.FileName, Offset = s.Offset, Length = s.Length });
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot delete static type '" + qualifiedId + "'.", FileName = s.FileName, Entity = s });
                         if (!Config.ContinueOnError) {
                             return false;
                         }
@@ -33,14 +33,14 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
 
                     string errorMessage = "";
                     if (!typeCheckingUtils.DoesExpressionResolveToType(Config, s, s.Value, "object", ref errorMessage)) {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot delete object for expression that does not resolve to type 'object'. " + errorMessage, FileName = s.FileName, Offset = s.Offset, Length = s.Length });
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot delete object for expression that does not resolve to type 'object'. " + errorMessage, FileName = s.FileName, Entity = s });
                         if (!Config.ContinueOnError) {
                             return false;
                         }
                     }
 
                     if (typeCheckingUtils.DoesExpressionResolveToType(Config, s, s.Value, "void_base", ref errorMessage)) {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot delete object for expression that resolves to type 'void_base'. " + errorMessage, FileName = s.FileName, Offset = s.Offset, Length = s.Length });
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot delete object for expression that resolves to type 'void_base'. " + errorMessage, FileName = s.FileName, Entity = s });
                         if (!Config.ContinueOnError) {
                             return false;
                         }
@@ -48,7 +48,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
 
                     GrapeEntity entity = (new List<GrapeEntity>(typeCheckingUtils.GetEntitiesForMemberExpression(Config, s.Value as GrapeMemberExpression, s, out errorMessage)))[0];
                     if (entity != null && entity is GrapeClass) {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot delete static type '" + qualifiedId + "'.", FileName = s.FileName, Offset = s.Offset, Length = s.Length });
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot delete static type '" + qualifiedId + "'.", FileName = s.FileName, Entity = s });
                         if (!Config.ContinueOnError) {
                             return false;
                         }
@@ -86,7 +86,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                     }
 
                     if (invalidModifiers) {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot access member '" + qualifiedId + "'.", FileName = s.FileName, Offset = s.Offset, Length = s.Length });
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot access member '" + qualifiedId + "'.", FileName = s.FileName, Entity = s });
                         if (!Config.ContinueOnError) {
                             return false;
                         }

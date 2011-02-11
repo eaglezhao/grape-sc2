@@ -24,7 +24,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                 if (s != null) {
                     string errorMessage = "";
                     if (!typeCheckingUtils.DoesExpressionResolveToType(Config, s, s.Condition, "bool_base", ref errorMessage)) {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot resolve expression to type 'bool_base'. " + errorMessage, FileName = s.FileName, Offset = s.Condition.Offset, Length = s.Condition.Length });
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot resolve expression to type 'bool_base'. " + errorMessage, FileName = s.FileName, Entity = s.Condition });
                         if (!Config.ContinueOnError) {
                             return false;
                         }

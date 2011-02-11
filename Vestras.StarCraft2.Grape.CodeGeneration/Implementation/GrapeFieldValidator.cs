@@ -84,14 +84,14 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                 GrapeField f = obj as GrapeField;
                 if (f != null) {
                     if (f.Parent == null || f.Parent is GrapePackageDeclaration) {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Top level field declarations are not allowed.", FileName = f.FileName, Offset = f.Offset, Length = f.Length });
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Top level field declarations are not allowed.", FileName = f.FileName, Entity = f });
                         if (!Config.ContinueOnError) {
                             return false;
                         }
                     }
 
                     if (!f.IsLogicalChildOfEntityType<GrapeClass>()) {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "A field must be the child of a class.", FileName = f.FileName, Offset = f.Offset, Length = f.Length });
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "A field must be the child of a class.", FileName = f.FileName, Entity = f });
                         if (!Config.ContinueOnError) {
                             return false;
                         }
@@ -99,7 +99,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
 
                     if (f.Parent != null && f.Parent is GrapeClass && ((GrapeClass)f.Parent).Modifiers.Contains("static")) {
                         if (!f.Modifiers.Contains("static")) {
-                            errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot declare instance members in a static class.", FileName = f.FileName, Offset = f.Offset, Length = f.Length });
+                            errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot declare instance members in a static class.", FileName = f.FileName, Entity = f });
                             if (!Config.ContinueOnError) {
                                 return false;
                             }
@@ -107,7 +107,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                     }
 
                     if (f.Type != null && !typeCheckingUtils.DoesTypeExist(Config, f.Type, f.FileName)) {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "The type '" + typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, f.Type) + "' could not be found.", FileName = f.FileName, Offset = f.Type.Offset, Length = f.Type.Length });
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "The type '" + typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, f.Type) + "' could not be found.", FileName = f.FileName, Entity = f.Type });
                         if (!Config.ContinueOnError) {
                             return false;
                         }
@@ -118,7 +118,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                     if (type is GrapeClass) {
                         GrapeClass typeClass = type as GrapeClass;
                         if (typeClass.Modifiers.Contains("static")) {
-                            errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot declare a field of static type '" + typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, f.Type) + "'.", FileName = f.FileName, Offset = f.Type.Offset, Length = f.Type.Length });
+                            errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot declare a field of static type '" + typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, f.Type) + "'.", FileName = f.FileName, Entity = f.Type });
                             if (!Config.ContinueOnError) {
                                 return false;
                             }
@@ -127,14 +127,14 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
 
                     string modifiersErrorMessage;
                     if (!ValidateModifiers(f, out modifiersErrorMessage)) {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = modifiersErrorMessage, FileName = f.FileName, Offset = f.Offset, Length = f.Length });
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = modifiersErrorMessage, FileName = f.FileName, Entity = f });
                         if (!Config.ContinueOnError) {
                             return false;
                         }
                     }
 
                     if (f.Value != null && !typeCheckingUtils.DoesExpressionResolveToType(Config, f, f.Value, f.Type, ref errorMessage)) {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot resolve expression to the type '" + typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, f.Type) + "'. " + errorMessage, FileName = f.FileName, Offset = f.Value.Offset, Length = f.Value.Length });
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot resolve expression to the type '" + typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, f.Type) + "'. " + errorMessage, FileName = f.FileName, Entity = f });
                         if (!Config.ContinueOnError) {
                             return false;
                         }

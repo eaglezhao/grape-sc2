@@ -23,7 +23,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                 GrapeThrowStatement s = obj as GrapeThrowStatement;
                 if (s != null) {
                     if (s.ThrowExpression == null) {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "A throw keyword must be followed by an object expression returning an exception value.", FileName = s.FileName, Offset = s.Offset, Length = s.Length });
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "A throw keyword must be followed by an object expression returning an exception value.", FileName = s.FileName, Entity = s });
                         if (!Config.ContinueOnError) {
                             return false;
                         }
@@ -31,7 +31,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
 
                     string errorMessage = "";
                     if (!typeCheckingUtils.DoesExpressionResolveToType(Config, s, s.ThrowExpression, "exception", ref errorMessage)) {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot resolve throw expression to type 'exception'. " + errorMessage, FileName = s.FileName, Offset = s.ThrowExpression.Offset, Length = s.ThrowExpression.Length });
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot resolve throw expression to type 'exception'. " + errorMessage, FileName = s.FileName, Entity = s.ThrowExpression });
                         if (!Config.ContinueOnError) {
                             return false;
                         }

@@ -87,28 +87,28 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                 if (c != null) {
                     string modifiersErrorMessage;
                     if (!ValidateModifiers(c, out modifiersErrorMessage)) {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = modifiersErrorMessage, FileName = c.FileName, Offset = c.Offset, Length = c.Length });
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = modifiersErrorMessage, FileName = c.FileName, Entity = c });
                         if (!Config.ContinueOnError) {
                             return false;
                         }
                     }
 
                     if (c.Modifiers.Contains("static") && c.Size != GrapeClass.UseDefaultSize) {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "A static class cannot have a size specified.", FileName = c.FileName, Offset = c.Offset, Length = c.Length });
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "A static class cannot have a size specified.", FileName = c.FileName, Entity = c });
                         if (!Config.ContinueOnError) {
                             return false;
                         }
                     }
 
                     if (c.Size == 0) {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "The size of a class cannot be 0.", FileName = c.FileName, Offset = c.Offset, Length = c.Length });
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "The size of a class cannot be 0.", FileName = c.FileName, Entity = c });
                         if (!Config.ContinueOnError) {
                             return false;
                         }
                     }
 
                     if (c.Inherits != null && !typeCheckingUtils.DoesTypeExist(Config, c.Inherits, c.FileName)) {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "The type '" + typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, c.Inherits) + "' could not be found.", FileName = c.FileName, Offset = c.Inherits.Offset, Length = c.Inherits.Length });
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "The type '" + typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, c.Inherits) + "' could not be found.", FileName = c.FileName, Entity = c.Inherits });
                         if (!Config.ContinueOnError) {
                             return false;
                         }
@@ -123,7 +123,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                     }
 
                     if (inheritsTypeQualifiedId == "void" || inheritsTypeQualifiedId == "void_base") {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "The void type cannot be inherited.", FileName = c.FileName, Offset = inheritsTypeMemberExpression.Offset, Length = inheritsTypeMemberExpression.Length });
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "The void type cannot be inherited.", FileName = c.FileName, Entity = inheritsTypeMemberExpression });
                         if (!Config.ContinueOnError) {
                             return false;
                         }
