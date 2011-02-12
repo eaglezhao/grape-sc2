@@ -103,94 +103,95 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
         SYMBOL_INIT = 57, // init
         SYMBOL_INTERNAL = 58, // internal
         SYMBOL_MEMBERNAME = 59, // MemberName
-        SYMBOL_NEW = 60, // new
-        SYMBOL_NEWLINE = 61, // NewLine
-        SYMBOL_NULL = 62, // null
-        SYMBOL_OVERRIDE = 63, // override
-        SYMBOL_PACKAGE = 64, // package
-        SYMBOL_PRIVATE = 65, // private
-        SYMBOL_PROTECTED = 66, // protected
-        SYMBOL_PUBLIC = 67, // public
-        SYMBOL_REALLITERAL = 68, // RealLiteral
-        SYMBOL_RETURN = 69, // return
-        SYMBOL_SEALED = 70, // sealed
-        SYMBOL_STATIC = 71, // static
-        SYMBOL_STRINGLITERAL = 72, // StringLiteral
-        SYMBOL_SWITCH = 73, // switch
-        SYMBOL_THIS = 74, // this
-        SYMBOL_THROW = 75, // throw
-        SYMBOL_TRUE = 76, // true
-        SYMBOL_TRY = 77, // try
-        SYMBOL_WHILE = 78, // while
-        SYMBOL_ACCESS = 79, // <Access>
-        SYMBOL_ADDEXP = 80, // <Add Exp>
-        SYMBOL_ANDEXP = 81, // <And Exp>
-        SYMBOL_ARGLIST = 82, // <Arg List>
-        SYMBOL_ARGLISTOPT = 83, // <Arg List Opt>
-        SYMBOL_ARGUMENT = 84, // <Argument>
-        SYMBOL_ARRAYINITIALIZER = 85, // <Array Initializer>
-        SYMBOL_ASSIGNTAIL = 86, // <Assign Tail>
-        SYMBOL_CATCHCLAUSE = 87, // <Catch Clause>
-        SYMBOL_CATCHCLAUSES = 88, // <Catch Clauses>
-        SYMBOL_CLASSBASEOPT = 89, // <Class Base Opt>
-        SYMBOL_CLASSDECL = 90, // <Class Decl>
-        SYMBOL_CLASSITEM = 91, // <Class Item>
-        SYMBOL_CLASSITEMDECSOPT = 92, // <Class Item Decs Opt>
-        SYMBOL_CLASSSIZEOPT = 93, // <Class Size Opt>
-        SYMBOL_COMPAREEXP = 94, // <Compare Exp>
-        SYMBOL_CONSTRUCTORDEC = 95, // <Constructor Dec>
-        SYMBOL_CONSTRUCTORINITSTMS = 96, // <Constructor Init Stms>
-        SYMBOL_DESTRUCTORDEC = 97, // <Destructor Dec>
-        SYMBOL_EQUALITYEXP = 98, // <Equality Exp>
-        SYMBOL_EXPRESSION = 99, // <Expression>
-        SYMBOL_EXPRESSIONOPT = 100, // <Expression Opt>
-        SYMBOL_FIELDDEC = 101, // <Field Dec>
-        SYMBOL_FINALLYCLAUSEOPT = 102, // <Finally Clause Opt>
-        SYMBOL_FORMALPARAM = 103, // <Formal Param>
-        SYMBOL_FORMALPARAMLIST = 104, // <Formal Param List>
-        SYMBOL_FORMALPARAMLISTOPT = 105, // <Formal Param List Opt>
-        SYMBOL_IMPORT2 = 106, // <Import>
-        SYMBOL_LITERAL = 107, // <Literal>
-        SYMBOL_LOCALVARDECL = 108, // <Local Var Decl>
-        SYMBOL_LOGICALANDEXP = 109, // <Logical And Exp>
-        SYMBOL_LOGICALOREXP = 110, // <Logical Or Exp>
-        SYMBOL_LOGICALXOREXP = 111, // <Logical Xor Exp>
-        SYMBOL_MEMBERLIST = 112, // <Member List>
-        SYMBOL_METHODCALL = 113, // <Method Call>
-        SYMBOL_METHODCALLS = 114, // <Method Calls>
-        SYMBOL_METHODDEC = 115, // <Method Dec>
-        SYMBOL_MODIFIER = 116, // <Modifier>
-        SYMBOL_MODIFIERS = 117, // <Modifiers>
-        SYMBOL_MULTEXP = 118, // <Mult Exp>
-        SYMBOL_NL = 119, // <NL>
-        SYMBOL_NLOREOF = 120, // <NL Or EOF>
-        SYMBOL_NONARRAYTYPE = 121, // <Non Array Type>
-        SYMBOL_NORMALSTM = 122, // <Normal Stm>
-        SYMBOL_OBJECTS = 123, // <Objects>
-        SYMBOL_OREXP = 124, // <Or Exp>
-        SYMBOL_PACKAGE2 = 125, // <Package>
-        SYMBOL_QUALIFIEDID = 126, // <Qualified ID>
-        SYMBOL_RANKSPECIFIER = 127, // <Rank Specifier>
-        SYMBOL_RANKSPECIFIERS = 128, // <Rank Specifiers>
-        SYMBOL_SHIFTEXP = 129, // <Shift Exp>
-        SYMBOL_START = 130, // <Start>
-        SYMBOL_STATEMENT = 131, // <Statement>
-        SYMBOL_STATEMENTEXP = 132, // <Statement Exp>
-        SYMBOL_STMLIST = 133, // <Stm List>
-        SYMBOL_SWITCHLABEL = 134, // <Switch Label>
-        SYMBOL_SWITCHSECTIONSOPT = 135, // <Switch Sections Opt>
-        SYMBOL_TYPE = 136, // <Type>
-        SYMBOL_TYPEDECL = 137, // <Type Decl>
-        SYMBOL_TYPEDECLOPT = 138, // <Type Decl Opt>
-        SYMBOL_TYPECASTEXP = 139, // <Typecast Exp>
-        SYMBOL_UNARYEXP = 140, // <Unary Exp>
-        SYMBOL_VALIDID = 141, // <Valid ID>
-        SYMBOL_VALUE = 142, // <Value>
-        SYMBOL_VARIABLEDECLARATOR = 143, // <Variable Declarator>
-        SYMBOL_VARIABLEDECLARATORBASE = 144, // <Variable Declarator Base>
-        SYMBOL_VARIABLEINITIALIZER = 145, // <Variable Initializer>
-        SYMBOL_VARIABLEINITIALIZERLIST = 146, // <Variable Initializer List>
-        SYMBOL_VARIABLEINITIALIZERLISTOPT = 147  // <Variable Initializer List Opt>
+        SYMBOL_NAMEOF = 60, // nameof
+        SYMBOL_NEW = 61, // new
+        SYMBOL_NEWLINE = 62, // NewLine
+        SYMBOL_NULL = 63, // null
+        SYMBOL_OVERRIDE = 64, // override
+        SYMBOL_PACKAGE = 65, // package
+        SYMBOL_PRIVATE = 66, // private
+        SYMBOL_PROTECTED = 67, // protected
+        SYMBOL_PUBLIC = 68, // public
+        SYMBOL_REALLITERAL = 69, // RealLiteral
+        SYMBOL_RETURN = 70, // return
+        SYMBOL_SEALED = 71, // sealed
+        SYMBOL_STATIC = 72, // static
+        SYMBOL_STRINGLITERAL = 73, // StringLiteral
+        SYMBOL_SWITCH = 74, // switch
+        SYMBOL_THIS = 75, // this
+        SYMBOL_THROW = 76, // throw
+        SYMBOL_TRUE = 77, // true
+        SYMBOL_TRY = 78, // try
+        SYMBOL_WHILE = 79, // while
+        SYMBOL_ACCESS = 80, // <Access>
+        SYMBOL_ADDEXP = 81, // <Add Exp>
+        SYMBOL_ANDEXP = 82, // <And Exp>
+        SYMBOL_ARGLIST = 83, // <Arg List>
+        SYMBOL_ARGLISTOPT = 84, // <Arg List Opt>
+        SYMBOL_ARGUMENT = 85, // <Argument>
+        SYMBOL_ARRAYINITIALIZER = 86, // <Array Initializer>
+        SYMBOL_ASSIGNTAIL = 87, // <Assign Tail>
+        SYMBOL_CATCHCLAUSE = 88, // <Catch Clause>
+        SYMBOL_CATCHCLAUSES = 89, // <Catch Clauses>
+        SYMBOL_CLASSBASEOPT = 90, // <Class Base Opt>
+        SYMBOL_CLASSDECL = 91, // <Class Decl>
+        SYMBOL_CLASSITEM = 92, // <Class Item>
+        SYMBOL_CLASSITEMDECSOPT = 93, // <Class Item Decs Opt>
+        SYMBOL_CLASSSIZEOPT = 94, // <Class Size Opt>
+        SYMBOL_COMPAREEXP = 95, // <Compare Exp>
+        SYMBOL_CONSTRUCTORDEC = 96, // <Constructor Dec>
+        SYMBOL_CONSTRUCTORINITSTMS = 97, // <Constructor Init Stms>
+        SYMBOL_DESTRUCTORDEC = 98, // <Destructor Dec>
+        SYMBOL_EQUALITYEXP = 99, // <Equality Exp>
+        SYMBOL_EXPRESSION = 100, // <Expression>
+        SYMBOL_EXPRESSIONOPT = 101, // <Expression Opt>
+        SYMBOL_FIELDDEC = 102, // <Field Dec>
+        SYMBOL_FINALLYCLAUSEOPT = 103, // <Finally Clause Opt>
+        SYMBOL_FORMALPARAM = 104, // <Formal Param>
+        SYMBOL_FORMALPARAMLIST = 105, // <Formal Param List>
+        SYMBOL_FORMALPARAMLISTOPT = 106, // <Formal Param List Opt>
+        SYMBOL_IMPORT2 = 107, // <Import>
+        SYMBOL_LITERAL = 108, // <Literal>
+        SYMBOL_LOCALVARDECL = 109, // <Local Var Decl>
+        SYMBOL_LOGICALANDEXP = 110, // <Logical And Exp>
+        SYMBOL_LOGICALOREXP = 111, // <Logical Or Exp>
+        SYMBOL_LOGICALXOREXP = 112, // <Logical Xor Exp>
+        SYMBOL_MEMBERLIST = 113, // <Member List>
+        SYMBOL_METHODCALL = 114, // <Method Call>
+        SYMBOL_METHODCALLS = 115, // <Method Calls>
+        SYMBOL_METHODDEC = 116, // <Method Dec>
+        SYMBOL_MODIFIER = 117, // <Modifier>
+        SYMBOL_MODIFIERS = 118, // <Modifiers>
+        SYMBOL_MULTEXP = 119, // <Mult Exp>
+        SYMBOL_NL = 120, // <NL>
+        SYMBOL_NLOREOF = 121, // <NL Or EOF>
+        SYMBOL_NONARRAYTYPE = 122, // <Non Array Type>
+        SYMBOL_NORMALSTM = 123, // <Normal Stm>
+        SYMBOL_OBJECTS = 124, // <Objects>
+        SYMBOL_OREXP = 125, // <Or Exp>
+        SYMBOL_PACKAGE2 = 126, // <Package>
+        SYMBOL_QUALIFIEDID = 127, // <Qualified ID>
+        SYMBOL_RANKSPECIFIER = 128, // <Rank Specifier>
+        SYMBOL_RANKSPECIFIERS = 129, // <Rank Specifiers>
+        SYMBOL_SHIFTEXP = 130, // <Shift Exp>
+        SYMBOL_START = 131, // <Start>
+        SYMBOL_STATEMENT = 132, // <Statement>
+        SYMBOL_STATEMENTEXP = 133, // <Statement Exp>
+        SYMBOL_STMLIST = 134, // <Stm List>
+        SYMBOL_SWITCHLABEL = 135, // <Switch Label>
+        SYMBOL_SWITCHSECTIONSOPT = 136, // <Switch Sections Opt>
+        SYMBOL_TYPE = 137, // <Type>
+        SYMBOL_TYPEDECL = 138, // <Type Decl>
+        SYMBOL_TYPEDECLOPT = 139, // <Type Decl Opt>
+        SYMBOL_TYPECASTEXP = 140, // <Typecast Exp>
+        SYMBOL_UNARYEXP = 141, // <Unary Exp>
+        SYMBOL_VALIDID = 142, // <Valid ID>
+        SYMBOL_VALUE = 143, // <Value>
+        SYMBOL_VARIABLEDECLARATOR = 144, // <Variable Declarator>
+        SYMBOL_VARIABLEDECLARATORBASE = 145, // <Variable Declarator Base>
+        SYMBOL_VARIABLEINITIALIZER = 146, // <Variable Initializer>
+        SYMBOL_VARIABLEINITIALIZERLIST = 147, // <Variable Initializer List>
+        SYMBOL_VARIABLEINITIALIZERLISTOPT = 148  // <Variable Initializer List Opt>
     };
 
     enum RuleConstants : int {
@@ -278,95 +279,96 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
         RULE_VALUE_LPARAN_RPARAN = 81, // <Value> ::= '(' <Expression> ')'
         RULE_VALUE = 82, // <Value> ::= <Literal>
         RULE_VALUE2 = 83, // <Value> ::= <Statement Exp>
-        RULE_VALUE_NEW_LPARAN_RPARAN = 84, // <Value> ::= new <Qualified ID> '(' <Arg List Opt> ')'
-        RULE_ARGLISTOPT = 85, // <Arg List Opt> ::= <Arg List>
-        RULE_ARGLISTOPT2 = 86, // <Arg List Opt> ::= 
-        RULE_ARGLIST_COMMA = 87, // <Arg List> ::= <Arg List> ',' <Argument>
-        RULE_ARGLIST = 88, // <Arg List> ::= <Argument>
-        RULE_ARGUMENT = 89, // <Argument> ::= <Expression>
-        RULE_STMLIST = 90, // <Stm List> ::= <Stm List> <Statement>
-        RULE_STMLIST2 = 91, // <Stm List> ::= 
-        RULE_STATEMENT = 92, // <Statement> ::= <Local Var Decl>
-        RULE_STATEMENT_IF_END = 93, // <Statement> ::= if <Expression> <NL> <Stm List> end <NL>
-        RULE_STATEMENT_ELSE_END = 94, // <Statement> ::= else <NL> <Stm List> end <NL>
-        RULE_STATEMENT_ELSEIF_END = 95, // <Statement> ::= elseif <Expression> <NL> <Stm List> end <NL>
-        RULE_STATEMENT_FOREACH_IDENTIFIER_IN_END = 96, // <Statement> ::= foreach <Qualified ID> Identifier in <Expression> <NL> <Stm List> end <NL>
-        RULE_STATEMENT_FOREACH_IDENTIFIER_IN_END2 = 97, // <Statement> ::= foreach <Qualified ID> <Rank Specifiers> Identifier in <Expression> <NL> <Stm List> end <NL>
-        RULE_STATEMENT_WHILE_END = 98, // <Statement> ::= while <Expression> <NL> <Stm List> end <NL>
-        RULE_STATEMENT2 = 99, // <Statement> ::= <Normal Stm>
-        RULE_NORMALSTM_SWITCH_END = 100, // <Normal Stm> ::= switch <Expression> <NL> <Switch Sections Opt> end <NL>
-        RULE_NORMALSTM_TRY_END = 101, // <Normal Stm> ::= try <NL> <Stm List> end <NL>
-        RULE_NORMALSTM = 102, // <Normal Stm> ::= <Catch Clauses>
-        RULE_NORMALSTM2 = 103, // <Normal Stm> ::= <Finally Clause Opt>
-        RULE_NORMALSTM_BREAK = 104, // <Normal Stm> ::= break <NL>
-        RULE_NORMALSTM_CONTINUE = 105, // <Normal Stm> ::= continue <NL>
-        RULE_NORMALSTM_RETURN = 106, // <Normal Stm> ::= return <Expression Opt> <NL>
-        RULE_NORMALSTM_THROW = 107, // <Normal Stm> ::= throw <Expression Opt> <NL>
-        RULE_NORMALSTM_DELETE = 108, // <Normal Stm> ::= delete <Expression> <NL>
-        RULE_NORMALSTM3 = 109, // <Normal Stm> ::= <Expression> <NL>
-        RULE_NORMALSTM4 = 110, // <Normal Stm> ::= <Constructor Init Stms> <NL>
-        RULE_CONSTRUCTORINITSTMS_INIT_BASE_LPARAN_RPARAN = 111, // <Constructor Init Stms> ::= init base '(' <Arg List Opt> ')'
-        RULE_CONSTRUCTORINITSTMS_INIT_THIS_LPARAN_RPARAN = 112, // <Constructor Init Stms> ::= init this '(' <Arg List Opt> ')'
-        RULE_VARIABLEDECLARATORBASE_IDENTIFIER = 113, // <Variable Declarator Base> ::= <Qualified ID> Identifier
-        RULE_VARIABLEDECLARATORBASE_IDENTIFIER2 = 114, // <Variable Declarator Base> ::= <Qualified ID> <Rank Specifiers> Identifier
-        RULE_VARIABLEDECLARATORBASE_IDENTIFIER_EQ = 115, // <Variable Declarator Base> ::= <Qualified ID> Identifier '=' <Variable Initializer>
-        RULE_VARIABLEDECLARATORBASE_IDENTIFIER_EQ2 = 116, // <Variable Declarator Base> ::= <Qualified ID> <Rank Specifiers> Identifier '=' <Variable Initializer>
-        RULE_VARIABLEDECLARATOR = 117, // <Variable Declarator> ::= <Variable Declarator Base> <NL>
-        RULE_VARIABLEINITIALIZER = 118, // <Variable Initializer> ::= <Expression>
-        RULE_VARIABLEINITIALIZER2 = 119, // <Variable Initializer> ::= <Array Initializer>
-        RULE_SWITCHSECTIONSOPT = 120, // <Switch Sections Opt> ::= <Switch Sections Opt> <Switch Label>
-        RULE_SWITCHSECTIONSOPT2 = 121, // <Switch Sections Opt> ::= 
-        RULE_SWITCHLABEL_CASE_END = 122, // <Switch Label> ::= case <Expression> <NL> <Stm List> end <NL>
-        RULE_SWITCHLABEL_DEFAULT_END = 123, // <Switch Label> ::= default <NL> <Stm List> end <NL>
-        RULE_CATCHCLAUSES = 124, // <Catch Clauses> ::= <Catch Clause> <Catch Clauses>
-        RULE_CATCHCLAUSES2 = 125, // <Catch Clauses> ::= 
-        RULE_CATCHCLAUSE_CATCH_IDENTIFIER_END = 126, // <Catch Clause> ::= catch <Qualified ID> Identifier <NL> <Stm List> end <NL>
-        RULE_CATCHCLAUSE_CATCH_END = 127, // <Catch Clause> ::= catch <Qualified ID> <NL> <Stm List> end <NL>
-        RULE_CATCHCLAUSE_CATCH_END2 = 128, // <Catch Clause> ::= catch <NL> <Stm List> end <NL>
-        RULE_FINALLYCLAUSEOPT_FINALLY_END = 129, // <Finally Clause Opt> ::= finally <NL> <Stm List> end <NL>
-        RULE_FINALLYCLAUSEOPT = 130, // <Finally Clause Opt> ::= <NL>
-        RULE_ACCESS_PRIVATE = 131, // <Access> ::= private
-        RULE_ACCESS_PROTECTED = 132, // <Access> ::= protected
-        RULE_ACCESS_PUBLIC = 133, // <Access> ::= public
-        RULE_ACCESS_INTERNAL = 134, // <Access> ::= internal
-        RULE_MODIFIER_ABSTRACT = 135, // <Modifier> ::= abstract
-        RULE_MODIFIER_OVERRIDE = 136, // <Modifier> ::= override
-        RULE_MODIFIER_SEALED = 137, // <Modifier> ::= sealed
-        RULE_MODIFIER_STATIC = 138, // <Modifier> ::= static
-        RULE_MODIFIER = 139, // <Modifier> ::= <Access>
-        RULE_MODIFIERS = 140, // <Modifiers> ::= <Modifier> <Modifiers>
-        RULE_MODIFIERS2 = 141, // <Modifiers> ::= 
-        RULE_CLASSDECL_CLASS_IDENTIFIER_END = 142, // <Class Decl> ::= <Modifiers> class Identifier <Class Size Opt> <Class Base Opt> <NL> <Class Item Decs Opt> end <NL Or EOF>
-        RULE_CLASSSIZEOPT_LBRACKET_DECIMALLITERAL_RBRACKET = 143, // <Class Size Opt> ::= '[' DecimalLiteral ']'
-        RULE_CLASSSIZEOPT = 144, // <Class Size Opt> ::= 
-        RULE_CLASSBASEOPT_INHERITS = 145, // <Class Base Opt> ::= inherits <Non Array Type>
-        RULE_CLASSBASEOPT = 146, // <Class Base Opt> ::= 
-        RULE_CLASSITEMDECSOPT = 147, // <Class Item Decs Opt> ::= <Class Item Decs Opt> <Class Item>
-        RULE_CLASSITEMDECSOPT2 = 148, // <Class Item Decs Opt> ::= 
-        RULE_CLASSITEM = 149, // <Class Item> ::= <Method Dec>
-        RULE_CLASSITEM2 = 150, // <Class Item> ::= <Constructor Dec>
-        RULE_CLASSITEM3 = 151, // <Class Item> ::= <Destructor Dec>
-        RULE_CLASSITEM4 = 152, // <Class Item> ::= <Type Decl>
-        RULE_CLASSITEM5 = 153, // <Class Item> ::= <Field Dec>
-        RULE_FIELDDEC_IDENTIFIER = 154, // <Field Dec> ::= <Modifiers> <Type> Identifier <NL>
-        RULE_FIELDDEC_IDENTIFIER_EQ = 155, // <Field Dec> ::= <Modifiers> <Type> Identifier '=' <Expression> <NL>
-        RULE_METHODDEC_IDENTIFIER_LPARAN_RPARAN_END = 156, // <Method Dec> ::= <Modifiers> <Type> Identifier '(' <Formal Param List Opt> ')' <NL> <Stm List> end <NL>
-        RULE_FORMALPARAMLISTOPT = 157, // <Formal Param List Opt> ::= <Formal Param List>
-        RULE_FORMALPARAMLISTOPT2 = 158, // <Formal Param List Opt> ::= 
-        RULE_FORMALPARAMLIST = 159, // <Formal Param List> ::= <Formal Param>
-        RULE_FORMALPARAMLIST_COMMA = 160, // <Formal Param List> ::= <Formal Param List> ',' <Formal Param>
-        RULE_FORMALPARAM_IDENTIFIER = 161, // <Formal Param> ::= <Type> Identifier
-        RULE_TYPEDECL = 162, // <Type Decl> ::= <Class Decl>
-        RULE_TYPEDECLOPT = 163, // <Type Decl Opt> ::= <Type Decl>
-        RULE_TYPEDECLOPT2 = 164, // <Type Decl Opt> ::= <NL>
-        RULE_CONSTRUCTORDEC_CTOR_IDENTIFIER_LPARAN_RPARAN_END = 165, // <Constructor Dec> ::= <Modifiers> ctor Identifier '(' <Formal Param List Opt> ')' <NL> <Stm List> end <NL>
-        RULE_DESTRUCTORDEC_DCTOR_IDENTIFIER_LPARAN_RPARAN_END = 166, // <Destructor Dec> ::= <Modifiers> dctor Identifier '(' ')' <NL> <Stm List> end <NL>
-        RULE_ARRAYINITIALIZER_LBRACKET_RBRACKET = 167, // <Array Initializer> ::= '[' <Variable Initializer List Opt> ']'
-        RULE_ARRAYINITIALIZER_LBRACKET_COMMA_RBRACKET = 168, // <Array Initializer> ::= '[' <Variable Initializer List> ',' ']'
-        RULE_VARIABLEINITIALIZERLISTOPT = 169, // <Variable Initializer List Opt> ::= <Variable Initializer List>
-        RULE_VARIABLEINITIALIZERLISTOPT2 = 170, // <Variable Initializer List Opt> ::= 
-        RULE_VARIABLEINITIALIZERLIST = 171, // <Variable Initializer List> ::= <Variable Initializer>
-        RULE_VARIABLEINITIALIZERLIST_COMMA = 172  // <Variable Initializer List> ::= <Variable Initializer List> ',' <Variable Initializer>
+        RULE_VALUE_NAMEOF_LPARAN_RPARAN = 84, // <Value> ::= nameof '(' <Qualified ID> ')'
+        RULE_VALUE_NEW_LPARAN_RPARAN = 85, // <Value> ::= new <Qualified ID> '(' <Arg List Opt> ')'
+        RULE_ARGLISTOPT = 86, // <Arg List Opt> ::= <Arg List>
+        RULE_ARGLISTOPT2 = 87, // <Arg List Opt> ::= 
+        RULE_ARGLIST_COMMA = 88, // <Arg List> ::= <Arg List> ',' <Argument>
+        RULE_ARGLIST = 89, // <Arg List> ::= <Argument>
+        RULE_ARGUMENT = 90, // <Argument> ::= <Expression>
+        RULE_STMLIST = 91, // <Stm List> ::= <Stm List> <Statement>
+        RULE_STMLIST2 = 92, // <Stm List> ::= 
+        RULE_STATEMENT = 93, // <Statement> ::= <Local Var Decl>
+        RULE_STATEMENT_IF_END = 94, // <Statement> ::= if <Expression> <NL> <Stm List> end <NL>
+        RULE_STATEMENT_ELSE_END = 95, // <Statement> ::= else <NL> <Stm List> end <NL>
+        RULE_STATEMENT_ELSEIF_END = 96, // <Statement> ::= elseif <Expression> <NL> <Stm List> end <NL>
+        RULE_STATEMENT_FOREACH_IDENTIFIER_IN_END = 97, // <Statement> ::= foreach <Qualified ID> Identifier in <Expression> <NL> <Stm List> end <NL>
+        RULE_STATEMENT_FOREACH_IDENTIFIER_IN_END2 = 98, // <Statement> ::= foreach <Qualified ID> <Rank Specifiers> Identifier in <Expression> <NL> <Stm List> end <NL>
+        RULE_STATEMENT_WHILE_END = 99, // <Statement> ::= while <Expression> <NL> <Stm List> end <NL>
+        RULE_STATEMENT2 = 100, // <Statement> ::= <Normal Stm>
+        RULE_NORMALSTM_SWITCH_END = 101, // <Normal Stm> ::= switch <Expression> <NL> <Switch Sections Opt> end <NL>
+        RULE_NORMALSTM_TRY_END = 102, // <Normal Stm> ::= try <NL> <Stm List> end <NL>
+        RULE_NORMALSTM = 103, // <Normal Stm> ::= <Catch Clauses>
+        RULE_NORMALSTM2 = 104, // <Normal Stm> ::= <Finally Clause Opt>
+        RULE_NORMALSTM_BREAK = 105, // <Normal Stm> ::= break <NL>
+        RULE_NORMALSTM_CONTINUE = 106, // <Normal Stm> ::= continue <NL>
+        RULE_NORMALSTM_RETURN = 107, // <Normal Stm> ::= return <Expression Opt> <NL>
+        RULE_NORMALSTM_THROW = 108, // <Normal Stm> ::= throw <Expression Opt> <NL>
+        RULE_NORMALSTM_DELETE = 109, // <Normal Stm> ::= delete <Expression> <NL>
+        RULE_NORMALSTM3 = 110, // <Normal Stm> ::= <Expression> <NL>
+        RULE_NORMALSTM4 = 111, // <Normal Stm> ::= <Constructor Init Stms> <NL>
+        RULE_CONSTRUCTORINITSTMS_INIT_BASE_LPARAN_RPARAN = 112, // <Constructor Init Stms> ::= init base '(' <Arg List Opt> ')'
+        RULE_CONSTRUCTORINITSTMS_INIT_THIS_LPARAN_RPARAN = 113, // <Constructor Init Stms> ::= init this '(' <Arg List Opt> ')'
+        RULE_VARIABLEDECLARATORBASE_IDENTIFIER = 114, // <Variable Declarator Base> ::= <Qualified ID> Identifier
+        RULE_VARIABLEDECLARATORBASE_IDENTIFIER2 = 115, // <Variable Declarator Base> ::= <Qualified ID> <Rank Specifiers> Identifier
+        RULE_VARIABLEDECLARATORBASE_IDENTIFIER_EQ = 116, // <Variable Declarator Base> ::= <Qualified ID> Identifier '=' <Variable Initializer>
+        RULE_VARIABLEDECLARATORBASE_IDENTIFIER_EQ2 = 117, // <Variable Declarator Base> ::= <Qualified ID> <Rank Specifiers> Identifier '=' <Variable Initializer>
+        RULE_VARIABLEDECLARATOR = 118, // <Variable Declarator> ::= <Variable Declarator Base> <NL>
+        RULE_VARIABLEINITIALIZER = 119, // <Variable Initializer> ::= <Expression>
+        RULE_VARIABLEINITIALIZER2 = 120, // <Variable Initializer> ::= <Array Initializer>
+        RULE_SWITCHSECTIONSOPT = 121, // <Switch Sections Opt> ::= <Switch Sections Opt> <Switch Label>
+        RULE_SWITCHSECTIONSOPT2 = 122, // <Switch Sections Opt> ::= 
+        RULE_SWITCHLABEL_CASE_END = 123, // <Switch Label> ::= case <Expression> <NL> <Stm List> end <NL>
+        RULE_SWITCHLABEL_DEFAULT_END = 124, // <Switch Label> ::= default <NL> <Stm List> end <NL>
+        RULE_CATCHCLAUSES = 125, // <Catch Clauses> ::= <Catch Clause> <Catch Clauses>
+        RULE_CATCHCLAUSES2 = 126, // <Catch Clauses> ::= 
+        RULE_CATCHCLAUSE_CATCH_IDENTIFIER_END = 127, // <Catch Clause> ::= catch <Qualified ID> Identifier <NL> <Stm List> end <NL>
+        RULE_CATCHCLAUSE_CATCH_END = 128, // <Catch Clause> ::= catch <Qualified ID> <NL> <Stm List> end <NL>
+        RULE_CATCHCLAUSE_CATCH_END2 = 129, // <Catch Clause> ::= catch <NL> <Stm List> end <NL>
+        RULE_FINALLYCLAUSEOPT_FINALLY_END = 130, // <Finally Clause Opt> ::= finally <NL> <Stm List> end <NL>
+        RULE_FINALLYCLAUSEOPT = 131, // <Finally Clause Opt> ::= <NL>
+        RULE_ACCESS_PRIVATE = 132, // <Access> ::= private
+        RULE_ACCESS_PROTECTED = 133, // <Access> ::= protected
+        RULE_ACCESS_PUBLIC = 134, // <Access> ::= public
+        RULE_ACCESS_INTERNAL = 135, // <Access> ::= internal
+        RULE_MODIFIER_ABSTRACT = 136, // <Modifier> ::= abstract
+        RULE_MODIFIER_OVERRIDE = 137, // <Modifier> ::= override
+        RULE_MODIFIER_SEALED = 138, // <Modifier> ::= sealed
+        RULE_MODIFIER_STATIC = 139, // <Modifier> ::= static
+        RULE_MODIFIER = 140, // <Modifier> ::= <Access>
+        RULE_MODIFIERS = 141, // <Modifiers> ::= <Modifier> <Modifiers>
+        RULE_MODIFIERS2 = 142, // <Modifiers> ::= 
+        RULE_CLASSDECL_CLASS_IDENTIFIER_END = 143, // <Class Decl> ::= <Modifiers> class Identifier <Class Size Opt> <Class Base Opt> <NL> <Class Item Decs Opt> end <NL Or EOF>
+        RULE_CLASSSIZEOPT_LBRACKET_DECIMALLITERAL_RBRACKET = 144, // <Class Size Opt> ::= '[' DecimalLiteral ']'
+        RULE_CLASSSIZEOPT = 145, // <Class Size Opt> ::= 
+        RULE_CLASSBASEOPT_INHERITS = 146, // <Class Base Opt> ::= inherits <Non Array Type>
+        RULE_CLASSBASEOPT = 147, // <Class Base Opt> ::= 
+        RULE_CLASSITEMDECSOPT = 148, // <Class Item Decs Opt> ::= <Class Item Decs Opt> <Class Item>
+        RULE_CLASSITEMDECSOPT2 = 149, // <Class Item Decs Opt> ::= 
+        RULE_CLASSITEM = 150, // <Class Item> ::= <Method Dec>
+        RULE_CLASSITEM2 = 151, // <Class Item> ::= <Constructor Dec>
+        RULE_CLASSITEM3 = 152, // <Class Item> ::= <Destructor Dec>
+        RULE_CLASSITEM4 = 153, // <Class Item> ::= <Type Decl>
+        RULE_CLASSITEM5 = 154, // <Class Item> ::= <Field Dec>
+        RULE_FIELDDEC_IDENTIFIER = 155, // <Field Dec> ::= <Modifiers> <Type> Identifier <NL>
+        RULE_FIELDDEC_IDENTIFIER_EQ = 156, // <Field Dec> ::= <Modifiers> <Type> Identifier '=' <Expression> <NL>
+        RULE_METHODDEC_IDENTIFIER_LPARAN_RPARAN_END = 157, // <Method Dec> ::= <Modifiers> <Type> Identifier '(' <Formal Param List Opt> ')' <NL> <Stm List> end <NL>
+        RULE_FORMALPARAMLISTOPT = 158, // <Formal Param List Opt> ::= <Formal Param List>
+        RULE_FORMALPARAMLISTOPT2 = 159, // <Formal Param List Opt> ::= 
+        RULE_FORMALPARAMLIST = 160, // <Formal Param List> ::= <Formal Param>
+        RULE_FORMALPARAMLIST_COMMA = 161, // <Formal Param List> ::= <Formal Param List> ',' <Formal Param>
+        RULE_FORMALPARAM_IDENTIFIER = 162, // <Formal Param> ::= <Type> Identifier
+        RULE_TYPEDECL = 163, // <Type Decl> ::= <Class Decl>
+        RULE_TYPEDECLOPT = 164, // <Type Decl Opt> ::= <Type Decl>
+        RULE_TYPEDECLOPT2 = 165, // <Type Decl Opt> ::= <NL>
+        RULE_CONSTRUCTORDEC_CTOR_IDENTIFIER_LPARAN_RPARAN_END = 166, // <Constructor Dec> ::= <Modifiers> ctor Identifier '(' <Formal Param List Opt> ')' <NL> <Stm List> end <NL>
+        RULE_DESTRUCTORDEC_DCTOR_IDENTIFIER_LPARAN_RPARAN_END = 167, // <Destructor Dec> ::= <Modifiers> dctor Identifier '(' ')' <NL> <Stm List> end <NL>
+        RULE_ARRAYINITIALIZER_LBRACKET_RBRACKET = 168, // <Array Initializer> ::= '[' <Variable Initializer List Opt> ']'
+        RULE_ARRAYINITIALIZER_LBRACKET_COMMA_RBRACKET = 169, // <Array Initializer> ::= '[' <Variable Initializer List> ',' ']'
+        RULE_VARIABLEINITIALIZERLISTOPT = 170, // <Variable Initializer List Opt> ::= <Variable Initializer List>
+        RULE_VARIABLEINITIALIZERLISTOPT2 = 171, // <Variable Initializer List Opt> ::= 
+        RULE_VARIABLEINITIALIZERLIST = 172, // <Variable Initializer List> ::= <Variable Initializer>
+        RULE_VARIABLEINITIALIZERLIST_COMMA = 173  // <Variable Initializer List> ::= <Variable Initializer List> ',' <Variable Initializer>
     };
 
     internal class GrapeSkeletonParser {
@@ -758,6 +760,22 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             return null;
         }
 
+        private TerminalToken GetLastTerminalToken(Token[] tokens) {
+            for (int index = tokens.Length - 1; index >= 0; index--) {
+                Token token = tokens[index];
+                if (token is TerminalToken) {
+                    return token as TerminalToken;
+                } else if (token is NonterminalToken) {
+                    TerminalToken recursiveToken = GetFirstTerminalToken((token as NonterminalToken).Tokens);
+                    if (recursiveToken != null) {
+                        return recursiveToken;
+                    }
+                }
+            }
+
+            return null;
+        }
+
         private GrapeExpression CreateExpression(NonterminalToken token) {
             TerminalToken dummyToken = null;
             return CreateExpression(token, ref dummyToken);
@@ -765,7 +783,6 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
 
         private GrapeExpression CreateExpression(NonterminalToken token, ref TerminalToken lastToken) {
             GrapeExpression expression = null;
-
             GrapeConditionalExpression conditionalExpression = null;
             GrapeUnaryExpression unaryExpression = null;
             GrapeAddExpression addExpression = null;
@@ -777,6 +794,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             GrapeTypecastExpression typecastExpression = null;
             GrapeMemberExpression memberExpression = null;
             GrapeStackExpression stackExpression = null;
+            GrapeNameofExpression nameofExpression = null;
             if (token != null) {
                 processedExpressionTokens.Add(token);
                 if (token.Tokens.Length > 1 || (token.Tokens.Length == 1 && token.Tokens[0] is TerminalToken)) {
@@ -893,6 +911,17 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                                         expression = setExpression;
                                     }
                                 }
+                            }
+
+                            break;
+                        // Represents a nameof expression. nameof((qualified ID))
+                        case (int)RuleConstants.RULE_VALUE_NAMEOF_LPARAN_RPARAN:
+                            expression = new GrapeNameofExpression();
+                            expression.FileName = currentFileName;
+                            nameofExpression = expression as GrapeNameofExpression;
+                            NonterminalToken valueToken = token.Tokens[2] as NonterminalToken;
+                            if (valueToken != null) {
+                                nameofExpression.Value = CreateExpression(valueToken, ref lastToken);
                             }
 
                             break;
@@ -1175,14 +1204,15 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
 
             if (expression != null) {
                 expression.FileName = currentFileName;
-                TerminalToken randomTerminalToken = GetFirstTerminalToken(token.Tokens);
-                if (randomTerminalToken != null) {
-                    expression.StartLine = randomTerminalToken.Location.LineNr;
-                    expression.StartColumn = randomTerminalToken.Location.ColumnNr;
-                    expression.EndLine = randomTerminalToken.Location.LineNr;
-                    expression.EndColumn = randomTerminalToken.Location.ColumnNr + 1;
-                    expression.Offset = randomTerminalToken.Location.Position;
-                    expression.Length = 1;
+                TerminalToken firstTerminalToken = GetFirstTerminalToken(token.Tokens);
+                TerminalToken lastTerminalToken = GetLastTerminalToken(token.Tokens);
+                if (firstTerminalToken != null && lastTerminalToken != null) {
+                    expression.StartLine = firstTerminalToken.Location.LineNr;
+                    expression.StartColumn = firstTerminalToken.Location.ColumnNr;
+                    expression.EndLine = lastTerminalToken.Location.LineNr;
+                    expression.EndColumn = lastTerminalToken.Location.ColumnNr;
+                    expression.Offset = firstTerminalToken.Location.Position;
+                    expression.Length = lastTerminalToken.Location.Position - firstTerminalToken.Location.Position;
                 }
             }
 

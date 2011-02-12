@@ -221,6 +221,7 @@ Comment End = '*/'
     ::= '(' <Expression> ')'
      |  <Literal>
      |  <Statement Exp>
+     |  nameof '(' <Qualified ID> ')'
      |  new <Qualified ID> '(' <Arg List Opt> ')'
 
 ! Arguments

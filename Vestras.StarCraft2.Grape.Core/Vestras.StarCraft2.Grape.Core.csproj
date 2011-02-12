@@ -62,6 +62,7 @@
     <Compile Include="Ast\GrapeLiteralExpression.cs" />
     <Compile Include="Ast\GrapeMemberExpression.cs" />
     <Compile Include="Ast\GrapeMultiplicationExpression.cs" />
+    <Compile Include="Ast\GrapeNameofExpression.cs" />
     <Compile Include="Ast\GrapeObjectCreationExpression.cs" />
     <Compile Include="Ast\GrapeReturnStatement.cs" />
     <Compile Include="Ast\GrapeSetExpression.cs" />

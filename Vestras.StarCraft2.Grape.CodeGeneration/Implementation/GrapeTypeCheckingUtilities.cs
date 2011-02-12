@@ -340,6 +340,10 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
         }
 
         public IEnumerable<GrapeEntity> GetEntitiesForMemberExpression(GrapeCodeGeneratorConfiguration config, GrapeMemberExpression memberExpression, GrapeEntity parent, out string errorMessage) {
+            return GetEntitiesForMemberExpression(config, memberExpression, parent, out errorMessage, true);
+        }
+
+        public IEnumerable<GrapeEntity> GetEntitiesForMemberExpression(GrapeCodeGeneratorConfiguration config, GrapeMemberExpression memberExpression, GrapeEntity parent, out string errorMessage, bool detectFunctionsUsedAsTypesOrVars) {
             errorMessage = "";
             string memberExpressionQualifiedId = memberExpression.GetMemberExpressionQualifiedId();
             if (memberExpressionQualifiedId == "this") {
@@ -438,7 +442,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         break;
                     }
 
-                    if (lastParent is GrapeFunction && !(currentExpression is GrapeCallExpression) && !(memberExpression is GrapeCallExpression) && !(parent is GrapeCallExpression)) {
+                    if (lastParent is GrapeFunction && !(currentExpression is GrapeCallExpression) && !(memberExpression is GrapeCallExpression) && !(parent is GrapeCallExpression) && detectFunctionsUsedAsTypesOrVars) {
                         errorMessage = "Cannot use function '" + lastExpressionWithoutNext.GetMemberExpressionQualifiedId() + "' as a variable or type.";
                         return new GrapeEntity[] { null };
                     }
@@ -572,7 +576,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         break;
                     }
 
-                    if (lastEntity is GrapeFunction && !(currentExpression is GrapeCallExpression) && !(memberExpression is GrapeCallExpression) && !(parent is GrapeCallExpression)) {
+                    if (lastEntity is GrapeFunction && !(currentExpression is GrapeCallExpression) && !(memberExpression is GrapeCallExpression) && !(parent is GrapeCallExpression) && detectFunctionsUsedAsTypesOrVars) {
                         errorMessage = "Cannot use function '" + expressionWithoutNextQualifiedId + "' as a variable or type.";
                         return new GrapeEntity[] { null };
                     }
@@ -790,6 +794,63 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         }
                     }
                 }
+            } else if (expression is GrapeNameofExpression) {
+                GrapeNameofExpression nameofExpression = expression as GrapeNameofExpression;
+                if (nameofExpression.Value.GetType() != typeof(GrapeMemberExpression)) {
+                    errorMessage = "Cannot resolve expression to type, field or function.";
+                    if (!config.ContinueOnError) {
+                        return false;
+                    }
+                }
+
+                string qualifiedId = (nameofExpression.Value as GrapeMemberExpression).GetMemberExpressionQualifiedId();
+                GrapeEntity valueEntity = (new List<GrapeEntity>(GetEntitiesForMemberExpression(config, nameofExpression.Value as GrapeMemberExpression, expression, out errorMessage, false)))[0];
+                if (valueEntity == null) {
+                    errorMessage = "Cannot find entity for expression '" + qualifiedId + "'. " + errorMessage;
+                    if (!config.ContinueOnError) {
+                        return false;
+                    }
+                }
+
+                GrapeClass c = expression.GetLogicalParentOfEntityType<GrapeClass>();
+                string[] modifiers = c.GetAppropriateModifiersForEntityAccess(config, valueEntity);
+                string potentialModifiers = valueEntity.GetPotentialModifiersOfEntity();
+                bool invalidModifiers = false;
+                if (modifiers != null) {
+                    if (potentialModifiers == null) {
+                        if (modifiers.Length == 1 && modifiers[0] == "public") {
+                            invalidModifiers = false;
+                        } else {
+                            invalidModifiers = true;
+                        }
+                    } else {
+                        foreach (string modifier in modifiers) {
+                            bool hasModifier = false;
+                            foreach (string entityModifier in potentialModifiers.Split(' ')) {
+                                if (entityModifier == modifier) {
+                                    hasModifier = true;
+                                    break;
+                                }
+                            }
+
+                            if (!hasModifier) {
+                                invalidModifiers = true;
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    invalidModifiers = true;
+                }
+
+                if (invalidModifiers) {
+                    errorMessage = "Cannot access member '" + qualifiedId + "'.";
+                    if (!config.ContinueOnError) {
+                        return false;
+                    }
+                }
+
+                return typeName == "string_base";
             } else if (expression is GrapeAddExpression) {
                 GrapeAddExpression addExpression = expression as GrapeAddExpression;
                 string leftType = GetTypeNameForTypeAccessExpression(config, addExpression.Left, ref errorMessage);
