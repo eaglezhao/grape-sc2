@@ -2,7 +2,7 @@
 using Vestras.StarCraft2.Grape.Core;
 
 namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
-    internal struct GrapeCodeGeneratorConfiguration {
+    internal class GrapeCodeGeneratorConfiguration {
         private GrapeAst ast;
         private bool outputErrors;
         private bool continueOnError;

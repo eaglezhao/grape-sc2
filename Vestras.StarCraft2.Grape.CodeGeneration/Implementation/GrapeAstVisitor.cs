@@ -47,6 +47,14 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
 
                         if (config.GenerateCode) {
                             nodeVisitor.VisitNode(entity);
+                            GrapeBlock logicalBlockParent = entity.GetLogicalParentOfEntityType<GrapeBlock>();
+                            if (logicalBlockParent != null) {
+                                if (logicalBlockParent.Children.FindLast(new Predicate<GrapeEntity>(delegate(GrapeEntity e) {
+                                    return e == entity;
+                                })) == entity) {
+                                    config.OutputCode += Environment.NewLine + "}" + Environment.NewLine;
+                                }
+                            }
                         } else {
                             nodeVisitor.Validator.ValidateNode(entity);
                         }
@@ -71,6 +79,14 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
 
         public void VisitNodes(GrapeCodeGeneratorConfiguration config) {
             this.config = config;
+            foreach (IAstNodeVisitor visitor in nodeVisitors) {
+                visitor.Config = config;
+            }
+
+            foreach (IAstNodeValidator validator in nodeValidators) {
+                validator.Config = config;
+            }
+
             VisitNodesForEntityList(config.Ast.Children);
         }
     }

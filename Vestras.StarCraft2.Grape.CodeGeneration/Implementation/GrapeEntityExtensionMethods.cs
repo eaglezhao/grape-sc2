@@ -17,6 +17,20 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
             return null;
         }
 
+        public static string GetPotentialEntityName(this GrapeEntity entity) {
+            if (entity is GrapeFunction) {
+                return ((GrapeFunction)entity).Name;
+            } else if (entity is GrapeVariable) {
+                return ((GrapeVariable)entity).Name;
+            } else if (entity is GrapeClass) {
+                return ((GrapeClass)entity).Name;
+            } else if (entity is GrapePackageDeclaration) {
+                return ((GrapePackageDeclaration)entity).PackageName;
+            }
+
+            return "";
+        }
+
         public static GrapeClass GetBaseClass(this GrapeClass c, GrapeAst ast) {
             if (c.Inherits == null) {
                 return null;

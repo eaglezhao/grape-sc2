@@ -4168,11 +4168,6 @@
     <Compile Include="native_api\functions\DataTableValueName.cs" />
     <Compile Include="native_api\functions\DataTableValueRemove.cs" />
     <Compile Include="native_api\functions\DataTableValueType.cs" />
-    <Compile Include="native_api\functions\DebugFixed.cs" />
-    <Compile Include="native_api\functions\DebugInt.cs" />
-    <Compile Include="native_api\functions\DebugPoint.cs" />
-    <Compile Include="native_api\functions\DebugString.cs" />
-    <Compile Include="native_api\functions\DebugUnit.cs" />
     <Compile Include="native_api\functions\DialogClearSubtitlePositionOverride.cs" />
     <Compile Include="native_api\functions\DialogControlAddItem.cs" />
     <Compile Include="native_api\functions\DialogControlCreate.cs" />

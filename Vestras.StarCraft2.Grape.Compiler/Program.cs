@@ -50,7 +50,6 @@ namespace Vestras.StarCraft2.Grape.Compiler {
                     error = true;
                     break;
                 }
-
                 processedArgs.Add(new Argument(splitArg[0], splitArg[1]));
             }
 
