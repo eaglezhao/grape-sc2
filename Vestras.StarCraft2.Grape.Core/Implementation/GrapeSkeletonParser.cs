@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Runtime.Serialization;
-using com.calitha.goldparser;
-using com.calitha.goldparser.lalr;
-using com.calitha.commons;
+
+using bsn.GoldParser.Grammar;
+using bsn.GoldParser.Parser;
+
 using Vestras.StarCraft2.Grape.Core.Ast;
 
 namespace Vestras.StarCraft2.Grape.Core.Implementation {
@@ -372,9 +372,9 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
     };
 
     internal class GrapeSkeletonParser {
-        private LALRParser parser;
+        private LalrProcessor parser;
         private GrapeParserConfiguration config;
-        private List<NonterminalToken> processedExpressionTokens = new List<NonterminalToken>();
+        private List<Reduction> processedExpressionTokens = new List<Reduction>();
         internal GrapeErrorSink errorSink;
         internal string currentFileName;
         internal static Dictionary<Type, List<GrapeEntity>> allEntities = new Dictionary<Type, List<GrapeEntity>>();
@@ -382,17 +382,22 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
 
         public GrapeSkeletonParser(string filename, GrapeParserConfiguration config) {
             this.config = config;
-            FileStream stream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
-            Init(stream);
-            stream.Close();
+            using (FileStream stream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read)) {
+            	Init(stream);
+            }
         }
 
         public GrapeSkeletonParser(string baseName, string resourceName, GrapeParserConfiguration config) {
             this.config = config;
-            byte[] buffer = ResourceUtil.GetByteArrayResource(GetType().Assembly, baseName, resourceName);
-            MemoryStream stream = new MemoryStream(buffer);
+					if (!string.IsNullOrEmpty(baseName)) {
+						resourceName = baseName+Type.Delimiter+resourceName;
+					}
+					using (Stream stream = GetType().Assembly.GetManifestResourceStream(resourceName)) {
+						if (stream== null) {
+							throw new FileNotFoundException(string.Format("The embedded resource file {0} does not exist in the assembly {1}", resourceName, GetType().Assembly.FullName));
+						}
             Init(stream);
-            stream.Close();
+					}
         }
 
         public GrapeSkeletonParser(Stream stream, GrapeParserConfiguration config) {
@@ -401,17 +406,28 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
         }
 
         private void Init(Stream stream) {
-            CGTReader reader = new CGTReader(stream);
-            parser = reader.CreateNewParser();
-            parser.TrimReductions = false;
-            parser.StoreTokens = LALRParser.StoreTokensMode.NoUserObject;
-            parser.OnAccept += new LALRParser.AcceptHandler(AcceptEvent);
-            parser.OnTokenError += new LALRParser.TokenErrorHandler(TokenErrorEvent);
-            parser.OnParseError += new LALRParser.ParseErrorHandler(ParseErrorEvent);
+            grammar = CompiledGrammar.Load(stream);
         }
 
         public void Parse(string source) {
-            parser.Parse(source);
+					using (StringReader reader = new StringReader(source)) {
+						LalrProcessor processor = new LalrProcessor(new Tokenizer(reader, grammar), false);
+						// TODO: implement the continue parsing on error (requires inheriting from the LalrProcessor)
+						bool continueParsing;
+						switch (processor.ParseAll()) {
+						case ParseMessage.Accept:
+							AcceptEvent((Reduction)processor.CurrentToken);
+							break;
+						case ParseMessage.LexicalError:
+							TokenErrorEvent(processor, out continueParsing);
+							break;
+						case ParseMessage.SyntaxError:
+							ParseErrorEvent(processor, out continueParsing);
+							break;
+						default:
+							throw new InvalidOperationException("The parser returned an unexpected result");
+						}
+					}
         }
 
         private GrapePackageDeclaration currentPackageDeclaration;
@@ -474,42 +490,42 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             }
         }
 
-        private string GetQualifiedIdText(NonterminalToken qualifiedIdToken, out TerminalToken lastToken) {
-            TerminalToken dummyToken = null;
+        private string GetQualifiedIdText(Reduction qualifiedIdToken, out TextToken lastToken) {
+            TextToken dummyToken = null;
             return GetQualifiedIdText(qualifiedIdToken, ref dummyToken, out lastToken);
         }
 
-        private string GetQualifiedIdText(NonterminalToken qualifiedIdToken, ref TerminalToken firstToken, out TerminalToken lastToken) {
+        private string GetQualifiedIdText(Reduction qualifiedIdToken, ref TextToken firstToken, out TextToken lastToken) {
             string qualifiedIdText = "";
             return GetQualifiedIdText(qualifiedIdToken, ref firstToken, ref qualifiedIdText, out lastToken);
         }
 
-        private string GetQualifiedIdText(NonterminalToken qualifiedIdToken, ref TerminalToken firstToken, ref string qualifiedIdText, out TerminalToken lastToken) {
+        private string GetQualifiedIdText(Reduction qualifiedIdToken, ref TextToken firstToken, ref string qualifiedIdText, out TextToken lastToken) {
             lastToken = null;
-            foreach (Token childNormalToken in qualifiedIdToken.Tokens) {
-                NonterminalToken childToken = childNormalToken as NonterminalToken;
-                TerminalToken childTerminalToken = childNormalToken as TerminalToken;
-                if (childToken != null && childToken.Tokens.Length >= 1) {
-                    foreach (Token terminalNormalToken in childToken.Tokens) {
-                        TerminalToken terminalToken = terminalNormalToken as TerminalToken;
-                        NonterminalToken nonterminalToken = terminalNormalToken as NonterminalToken;
+            foreach (Token childNormalToken in qualifiedIdToken.Children) {
+                Reduction childToken = childNormalToken as Reduction;
+                TextToken childTerminalToken = childNormalToken as TextToken;
+                if (childToken != null && childToken.Children.Count >= 1) {
+                    foreach (Token terminalNormalToken in childToken.Children) {
+                        TextToken terminalToken = terminalNormalToken as TextToken;
+                        Reduction nonterminalToken = terminalNormalToken as Reduction;
                         if (terminalToken != null) {
                             if (firstToken == null) {
                                 firstToken = terminalToken;
-                            } else if (terminalToken.Location.Position < terminalToken.Location.Position) {
+                            } else if (terminalToken.Position.Index < terminalToken.Position.Index) {
                                 firstToken = terminalToken;
                             }
 
                             qualifiedIdText += terminalToken.Text;
                             lastToken = terminalToken;
-                        } else if (nonterminalToken != null && nonterminalToken.Rule.Id != (int)RuleConstants.RULE_MEMBERLIST) {
+                        } else if (nonterminalToken != null && nonterminalToken.Symbol.Index != (int)RuleConstants.RULE_MEMBERLIST) {
                             GetQualifiedIdText(nonterminalToken, ref firstToken, ref qualifiedIdText, out lastToken);
                         }
                     }
                 } else if (childTerminalToken != null) {
                     if (firstToken == null) {
                         firstToken = childTerminalToken;
-                    } else if (childTerminalToken.Location.Position < childTerminalToken.Location.Position) {
+                    } else if (childTerminalToken.Position.Index < childTerminalToken.Position.Index) {
                         firstToken = childTerminalToken;
                     }
 
@@ -527,7 +543,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             "internal"
         };
 
-        private string GetModifiers(NonterminalToken modifiers, out TerminalToken firstToken) {
+        private string GetModifiers(Reduction modifiers, out TextToken firstToken) {
             string foundModifiers = GetModifiers(modifiers, out firstToken, true);
             if (foundModifiers.Trim() == "") {
                 return "public";
@@ -536,25 +552,25 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             return foundModifiers;
         }
 
-        private string GetModifiers(NonterminalToken modifiers, out TerminalToken firstToken, bool dummyArgument) {
+        private string GetModifiers(Reduction modifiers, out TextToken firstToken, bool dummyArgument) {
             string result = "";
             firstToken = null;
-            if (modifiers.Tokens.Length >= 1) {
+            if (modifiers.Children.Count >= 1) {
                 int index = 0;
-                foreach (Token token in modifiers.Tokens) {
-                    NonterminalToken nonterminalToken = token as NonterminalToken;
+                foreach (Token token in modifiers.Children) {
+                    Reduction nonterminalToken = token as Reduction;
                     if (nonterminalToken != null) {
-                        int id = nonterminalToken.Rule.Id;
+                        int id = nonterminalToken.Symbol.Index;
                         if (id == (int)RuleConstants.RULE_MODIFIER || id == (int)RuleConstants.RULE_MODIFIER_ABSTRACT || id == (int)RuleConstants.RULE_MODIFIER_OVERRIDE || id == (int)RuleConstants.RULE_MODIFIER_SEALED || id == (int)RuleConstants.RULE_MODIFIER_STATIC) {
                             int childIndex = 0;
-                            foreach (Token childToken in nonterminalToken.Tokens) {
-                                NonterminalToken childNonterminalToken = childToken as NonterminalToken;
-                                TerminalToken terminalToken = childToken as TerminalToken;
+                            foreach (Token childToken in nonterminalToken.Children) {
+                                Reduction childNonterminalToken = childToken as Reduction;
+                                TextToken terminalToken = childToken as TextToken;
                                 if (terminalToken != null) {
                                     if (firstToken == null) {
                                         firstToken = terminalToken;
                                     } else {
-                                        if (terminalToken.Location.Position < firstToken.Location.Position) {
+                                        if (terminalToken.Position.Index < firstToken.Position.Index) {
                                             firstToken = terminalToken;
                                         }
                                     }
@@ -562,19 +578,19 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                                     result += terminalToken.Text;
                                 } else if (childNonterminalToken != null) {
                                     int childChildIndex = 0;
-                                    foreach (Token childChildToken in childNonterminalToken.Tokens) {
-                                        TerminalToken childTerminalToken = childChildToken as TerminalToken;
+                                    foreach (Token childChildToken in childNonterminalToken.Children) {
+                                        TextToken childTerminalToken = childChildToken as TextToken;
                                         if (childTerminalToken != null) {
                                             if (firstToken == null) {
                                                 firstToken = childTerminalToken;
                                             } else {
-                                                if (childTerminalToken.Location.Position < firstToken.Location.Position) {
+                                                if (childTerminalToken.Position.Index < firstToken.Position.Index) {
                                                     firstToken = childTerminalToken;
                                                 }
                                             }
 
                                             result += childTerminalToken.Text;
-                                            if (childChildIndex < childNonterminalToken.Tokens.Length - 1) {
+                                            if (childChildIndex < childNonterminalToken.Children.Count - 1) {
                                                 result += " ";
                                             }
 
@@ -583,19 +599,19 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                                     }
                                 }
 
-                                if (childIndex < nonterminalToken.Tokens.Length - 1) {
+                                if (childIndex < nonterminalToken.Children.Count - 1) {
                                     result += " ";
                                 }
 
                                 childIndex++;
                             }
 
-                            if (index < modifiers.Tokens.Length - 1) {
+                            if (index < modifiers.Children.Count - 1) {
                                 result += " ";
                             }
                         } else if (id == (int)RuleConstants.RULE_MODIFIERS || id == (int)RuleConstants.RULE_MODIFIERS2) {
                             result += GetModifiers(nonterminalToken, out firstToken, true);
-                            if (index < modifiers.Tokens.Length - 1) {
+                            if (index < modifiers.Children.Count - 1) {
                                 result += " ";
                             }
                         }
@@ -608,17 +624,17 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             return result;
         }
 
-        private string AddRankSpecifiersToQualifiedId(string qualifiedId, Token[] tokens, int currentIndex, ref int endTypeTokenIndex) {
+        private string AddRankSpecifiersToQualifiedId(string qualifiedId, IList<Token> tokens, int currentIndex, ref int endTypeTokenIndex) {
             string newQualifiedId = qualifiedId;
-            if (tokens.Length > currentIndex + 1) {
-                NonterminalToken suspectedRankSpecifierToken = tokens[currentIndex + 1] as NonterminalToken;
+            if (tokens.Count > currentIndex + 1) {
+                Reduction suspectedRankSpecifierToken = tokens[currentIndex + 1] as Reduction;
                 if (suspectedRankSpecifierToken != null) {
                     endTypeTokenIndex++;
-                    foreach (Token token in suspectedRankSpecifierToken.Tokens) {
-                        NonterminalToken rankSpecifierToken = token as NonterminalToken;
+                    foreach (Token token in suspectedRankSpecifierToken.Children) {
+                        Reduction rankSpecifierToken = token as Reduction;
                         if (rankSpecifierToken != null) {
-                            foreach (Token childToken in rankSpecifierToken.Tokens) {
-                                TerminalToken terminalToken = childToken as TerminalToken;
+                            foreach (Token childToken in rankSpecifierToken.Children) {
+                                TextToken terminalToken = childToken as TextToken;
                                 if (terminalToken != null) {
                                     newQualifiedId += terminalToken.Text;
                                 }
@@ -631,28 +647,28 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             return newQualifiedId;
         }
 
-        private GrapeExpression GetTypeFromTypeToken(Token[] tokens, GrapeEntity parent) {
+        private GrapeExpression GetTypeFromTypeToken(IList<Token> tokens, GrapeEntity parent) {
             GrapeExpression expression = null;
             int currentIndex = 0;
             foreach (Token token in tokens) {
-                NonterminalToken nonterminalToken = token as NonterminalToken;
-                if (nonterminalToken != null && ((nonterminalToken.Rule.Id == (int)RuleConstants.RULE_TYPE || nonterminalToken.Rule.Id == (int)RuleConstants.RULE_TYPE2) || nonterminalToken.Rule.Id == (int)RuleConstants.RULE_QUALIFIEDID)) {
-                    if (currentIndex + 1 < tokens.Length && tokens[currentIndex + 1] is NonterminalToken && ((NonterminalToken)tokens[currentIndex + 1]).Rule.Id == (int)RuleConstants.RULE_RANKSPECIFIERS) {
+                Reduction nonterminalToken = token as Reduction;
+                if (nonterminalToken != null && ((nonterminalToken.Symbol.Index == (int)RuleConstants.RULE_TYPE || nonterminalToken.Symbol.Index == (int)RuleConstants.RULE_TYPE2) || nonterminalToken.Symbol.Index == (int)RuleConstants.RULE_QUALIFIEDID)) {
+                    if (currentIndex + 1 < tokens.Count && tokens[currentIndex + 1] is Reduction && ((Reduction)tokens[currentIndex + 1]).Symbol.Index == (int)RuleConstants.RULE_RANKSPECIFIERS) {
                         expression = new GrapeArrayAccessExpression();
                         expression.FileName = currentFileName;
                         GrapeArrayAccessExpression arrayExpression = expression as GrapeArrayAccessExpression;
-                        arrayExpression.Member = CreateExpression(tokens[currentIndex] as NonterminalToken);
+                        arrayExpression.Member = CreateExpression(tokens[currentIndex] as Reduction);
                         if (arrayExpression.Member != null) {
                             arrayExpression.Member.FileName = currentFileName;
                         }
 
-                        NonterminalToken rankSpecifierToken = (tokens[currentIndex + 1] as NonterminalToken).Tokens[0] as NonterminalToken;
-                        NonterminalToken arrayExpressionToken = rankSpecifierToken.Tokens[1] as NonterminalToken;
+                        Reduction rankSpecifierToken = (tokens[currentIndex + 1] as Reduction).Children[0] as Reduction;
+                        Reduction arrayExpressionToken = rankSpecifierToken.Children[1] as Reduction;
                         arrayExpression.Array = CreateExpression(arrayExpressionToken);
-                    } else if (nonterminalToken.Rule.Id == (int)RuleConstants.RULE_TYPE || nonterminalToken.Rule.Id == (int)RuleConstants.RULE_TYPE2) {
-                        NonterminalToken nonArrayToken = nonterminalToken.Tokens[0] as NonterminalToken;
-                        NonterminalToken qualifiedIdToken = nonArrayToken.Tokens[0] as NonterminalToken;
-                        if (nonterminalToken.Tokens.Length > 1 && nonterminalToken.Tokens[1] is NonterminalToken && ((NonterminalToken)nonterminalToken.Tokens[1]).Rule.Id == (int)RuleConstants.RULE_RANKSPECIFIERS) {
+                    } else if (nonterminalToken.Symbol.Index == (int)RuleConstants.RULE_TYPE || nonterminalToken.Symbol.Index == (int)RuleConstants.RULE_TYPE2) {
+                        Reduction nonArrayToken = nonterminalToken.Children[0] as Reduction;
+                        Reduction qualifiedIdToken = nonArrayToken.Children[0] as Reduction;
+                        if (nonterminalToken.Children.Count > 1 && nonterminalToken.Children[1] is Reduction && ((Reduction)nonterminalToken.Children[1]).Symbol.Index == (int)RuleConstants.RULE_RANKSPECIFIERS) {
                             expression = new GrapeArrayAccessExpression();
                             expression.FileName = currentFileName;
                             GrapeArrayAccessExpression arrayExpression = expression as GrapeArrayAccessExpression;
@@ -661,8 +677,8 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                                 arrayExpression.Member.FileName = currentFileName;
                             }
 
-                            NonterminalToken rankSpecifierToken = (nonterminalToken.Tokens[1] as NonterminalToken).Tokens[0] as NonterminalToken;
-                            NonterminalToken arrayExpressionToken = rankSpecifierToken.Tokens[1] as NonterminalToken;
+                            Reduction rankSpecifierToken = (nonterminalToken.Children[1] as Reduction).Children[0] as Reduction;
+                            Reduction arrayExpressionToken = rankSpecifierToken.Children[1] as Reduction;
                             arrayExpression.Array = CreateExpression(arrayExpressionToken);
                         } else {
                             expression = CreateExpression(qualifiedIdToken);
@@ -683,49 +699,49 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             return expression;
         }
 
-        private TerminalToken GetEndToken(Token[] tokens) {
+        private TextToken GetEndToken(IList<Token> tokens) {
             foreach (Token token in tokens) {
-                if (token is TerminalToken && ((TerminalToken)token).Text == "end") {
-                    return token as TerminalToken;
+                if (token is TextToken && ((TextToken)token).Text == "end") {
+                    return token as TextToken;
                 }
             }
 
             return null;
         }
 
-        private void AddMethodCallsToExpression(GrapeMemberExpression expression, NonterminalToken token) {
-            foreach (Token childToken in token.Tokens) {
-                if (childToken is NonterminalToken && (((NonterminalToken)childToken).Rule.Id == (int)RuleConstants.RULE_METHODCALLS || ((NonterminalToken)childToken).Rule.Id == (int)RuleConstants.RULE_METHODCALLS2)) {
-                    NonterminalToken nonterminalToken = childToken as NonterminalToken;
+        private void AddMethodCallsToExpression(GrapeMemberExpression expression, Reduction token) {
+            foreach (Token childToken in token.Children) {
+                if (childToken is Reduction && (((Reduction)childToken).Symbol.Index == (int)RuleConstants.RULE_METHODCALLS || ((Reduction)childToken).Symbol.Index == (int)RuleConstants.RULE_METHODCALLS2)) {
+                    Reduction nonterminalToken = childToken as Reduction;
                     GrapeMemberExpression nextExpression = new GrapeMemberExpression();
                     GrapeIdentifierExpression identifierExpression = new GrapeIdentifierExpression();
                     identifierExpression.FileName = currentFileName;
                     processedExpressionTokens.Add(nonterminalToken);
-                    if (nonterminalToken.Tokens.Length > 0) {
-                        NonterminalToken methodCallToken = nonterminalToken.Tokens[0] as NonterminalToken;
-                        TerminalToken identifierToken = methodCallToken.Tokens[0] as TerminalToken;
+                    if (nonterminalToken.Children.Count > 0) {
+                        Reduction methodCallToken = nonterminalToken.Children[0] as Reduction;
+                        TextToken identifierToken = methodCallToken.Children[0] as TextToken;
                         identifierExpression.Identifier = identifierToken.Text.Trim('.');
-                        if (methodCallToken.Tokens.Length > 1) {
-                            TerminalToken bracketToken = methodCallToken.Tokens[1] as TerminalToken;
+                        if (methodCallToken.Children.Count > 1) {
+                            TextToken bracketToken = methodCallToken.Children[1] as TextToken;
                             if (bracketToken != null) {
                                 if (bracketToken.Text == "[") {
                                     GrapeArrayAccessExpression arrayExpression = new GrapeArrayAccessExpression();
                                     arrayExpression.FileName = currentFileName;
-                                    NonterminalToken expressionToken = methodCallToken.Tokens[2] as NonterminalToken;
+                                    Reduction expressionToken = methodCallToken.Children[2] as Reduction;
                                     arrayExpression.Array = CreateExpression(expressionToken);
                                     nextExpression = arrayExpression;
                                 } else if (bracketToken.Text == "(") {
                                     GrapeCallExpression callExpression = new GrapeCallExpression();
                                     callExpression.FileName = currentFileName;
-                                    NonterminalToken argListOptToken = methodCallToken.Tokens[2] as NonterminalToken;
-                                    if (argListOptToken != null && argListOptToken.Tokens.Length > 0) {
-                                        NonterminalToken argListToken = argListOptToken.Tokens[0] as NonterminalToken;
-                                        foreach (Token argNormalToken in argListToken.Tokens) {
-                                            NonterminalToken argToken = argNormalToken as NonterminalToken;
-                                            if (argToken != null && argToken.Tokens.Length > 0) {
-                                                NonterminalToken argumentToken = argToken.Tokens[0] as NonterminalToken;
-                                                if (argumentToken != null && argumentToken.Tokens.Length > 0) {
-                                                    NonterminalToken argExpressionToken = argumentToken.Tokens[0] as NonterminalToken;
+                                    Reduction argListOptToken = methodCallToken.Children[2] as Reduction;
+                                    if (argListOptToken != null && argListOptToken.Children.Count > 0) {
+                                        Reduction argListToken = argListOptToken.Children[0] as Reduction;
+                                        foreach (Token argNormalToken in argListToken.Children) {
+                                            Reduction argToken = argNormalToken as Reduction;
+                                            if (argToken != null && argToken.Children.Count > 0) {
+                                                Reduction argumentToken = argToken.Children[0] as Reduction;
+                                                if (argumentToken != null && argumentToken.Children.Count > 0) {
+                                                    Reduction argExpressionToken = argumentToken.Children[0] as Reduction;
                                                     callExpression.Parameters.Add(CreateExpression(argExpressionToken));
                                                 }
                                             }
@@ -745,12 +761,12 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             }
         }
 
-        private TerminalToken GetFirstTerminalToken(Token[] tokens) {
+        private TextToken GetFirstTerminalToken(IList<Token> tokens) {
             foreach (Token token in tokens) {
-                if (token is TerminalToken) {
-                    return token as TerminalToken;
-                } else if (token is NonterminalToken) {
-                    TerminalToken recursiveToken = GetFirstTerminalToken((token as NonterminalToken).Tokens);
+                if (token is TextToken) {
+                    return token as TextToken;
+                } else if (token is Reduction) {
+                    TextToken recursiveToken = GetFirstTerminalToken((token as Reduction).Children);
                     if (recursiveToken != null) {
                         return recursiveToken;
                     }
@@ -760,13 +776,13 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             return null;
         }
 
-        private TerminalToken GetLastTerminalToken(Token[] tokens) {
-            for (int index = tokens.Length - 1; index >= 0; index--) {
+        private TextToken GetLastTerminalToken(IList<Token> tokens) {
+            for (int index = tokens.Count - 1; index >= 0; index--) {
                 Token token = tokens[index];
-                if (token is TerminalToken) {
-                    return token as TerminalToken;
-                } else if (token is NonterminalToken) {
-                    TerminalToken recursiveToken = GetFirstTerminalToken((token as NonterminalToken).Tokens);
+                if (token is TextToken) {
+                    return token as TextToken;
+                } else if (token is Reduction) {
+                    TextToken recursiveToken = GetFirstTerminalToken((token as Reduction).Children);
                     if (recursiveToken != null) {
                         return recursiveToken;
                     }
@@ -776,12 +792,12 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             return null;
         }
 
-        private GrapeExpression CreateExpression(NonterminalToken token) {
-            TerminalToken dummyToken = null;
+        private GrapeExpression CreateExpression(Reduction token) {
+            TextToken dummyToken = null;
             return CreateExpression(token, ref dummyToken);
         }
 
-        private GrapeExpression CreateExpression(NonterminalToken token, ref TerminalToken lastToken) {
+        private GrapeExpression CreateExpression(Reduction token, ref TextToken lastToken) {
             GrapeExpression expression = null;
             GrapeConditionalExpression conditionalExpression = null;
             GrapeUnaryExpression unaryExpression = null;
@@ -797,21 +813,21 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             GrapeNameofExpression nameofExpression = null;
             if (token != null) {
                 processedExpressionTokens.Add(token);
-                if (token.Tokens.Length > 1 || (token.Tokens.Length == 1 && token.Tokens[0] is TerminalToken)) {
-                    switch (token.Rule.Id) {
+                if (token.Children.Count > 1 || (token.Children.Count == 1 && token.Children[0] is TextToken)) {
+                    switch (token.Symbol.Index) {
                         // Expression in brackets: ((expression))
                         case (int)RuleConstants.RULE_VALUE_LPARAN_RPARAN:
                             expression = new GrapeStackExpression();
                             expression.FileName = currentFileName;
                             stackExpression = expression as GrapeStackExpression;
-                            stackExpression.Child = CreateExpression(token.Tokens[1] as NonterminalToken);
+                            stackExpression.Child = CreateExpression(token.Children[1] as Reduction);
                             break;
                         // General statements (method calling, member accessing, variable accessing, etc.).
                         case (int)RuleConstants.RULE_STATEMENTEXP_LPARAN_RPARAN:
                         case (int)RuleConstants.RULE_STATEMENTEXP_LPARAN_RPARAN2:
                         case (int)RuleConstants.RULE_VALUE_NEW_LPARAN_RPARAN:
                             int startIndex = 0;
-                            if (token.Rule.Id == (int)RuleConstants.RULE_VALUE_NEW_LPARAN_RPARAN) {
+                            if (token.Symbol.Index == (int)RuleConstants.RULE_VALUE_NEW_LPARAN_RPARAN) {
                                 startIndex = 1;
                                 callExpression = new GrapeObjectCreationExpression();
                             } else {
@@ -819,7 +835,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                             }
 
                             callExpression.FileName = currentFileName;
-                            memberExpression = CreateExpression(token.Tokens[startIndex] as NonterminalToken, ref lastToken) as GrapeMemberExpression;
+                            memberExpression = CreateExpression(token.Children[startIndex] as Reduction, ref lastToken) as GrapeMemberExpression;
                             if (memberExpression != null) {
                                 memberExpression.Parent = callExpression;
                                 memberExpression.FileName = currentFileName;
@@ -838,7 +854,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                                 callExpression.Member = actualMember;
                                 actualMember.Parent = callExpression;
                                 int lastTokenIndex;
-                                NonterminalToken parametersToken = token.Tokens[startIndex + 2] as NonterminalToken;
+                                Reduction parametersToken = token.Children[startIndex + 2] as Reduction;
                                 if (parametersToken != null) {
                                     AddParametersToCallExpression(callExpression, parametersToken, 0, out lastTokenIndex);
                                 }
@@ -851,14 +867,14 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                                     expression = callExpression;
                                 }
 
-                                if (token.Tokens.Length > startIndex + 5) {
-                                    NonterminalToken assignTailToken = token.Tokens[startIndex + 5] as NonterminalToken;
-                                    if (assignTailToken != null && assignTailToken.Rule.Id == (int)RuleConstants.RULE_ASSIGNTAIL_EQ) {
+                                if (token.Children.Count > startIndex + 5) {
+                                    Reduction assignTailToken = token.Children[startIndex + 5] as Reduction;
+                                    if (assignTailToken != null && assignTailToken.Symbol.Index == (int)RuleConstants.RULE_ASSIGNTAIL_EQ) {
                                         processedExpressionTokens.Add(assignTailToken);
                                         GrapeSetExpression setExpression = new GrapeSetExpression();
                                         setExpression.FileName = currentFileName;
                                         setExpression.Member = callExpression;
-                                        setExpression.Value = CreateExpression(assignTailToken.Tokens[1] as NonterminalToken, ref lastToken);
+                                        setExpression.Value = CreateExpression(assignTailToken.Children[1] as Reduction, ref lastToken);
                                         expression = setExpression;
                                     }
                                 }
@@ -869,22 +885,22 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                         case (int)RuleConstants.RULE_STATEMENTEXP_LBRACKET_RBRACKET2:
                             startIndex = 0;
                             arrayExpression = new GrapeArrayAccessExpression();
-                            memberExpression = CreateExpression(token.Tokens[startIndex] as NonterminalToken, ref lastToken) as GrapeMemberExpression;
+                            memberExpression = CreateExpression(token.Children[startIndex] as Reduction, ref lastToken) as GrapeMemberExpression;
                             arrayExpression.FileName = currentFileName;
                             if (memberExpression != null) {
                                 memberExpression.FileName = currentFileName;
                                 arrayExpression.Member = memberExpression.Member;
-                                arrayExpression.Array = CreateExpression(token.Tokens[startIndex + 2] as NonterminalToken, ref lastToken);
+                                arrayExpression.Array = CreateExpression(token.Children[startIndex + 2] as Reduction, ref lastToken);
                                 AddMethodCallsToExpression(arrayExpression, token);
                                 expression = arrayExpression;
-                                if (token.Tokens.Length > 5) {
-                                    NonterminalToken assignTailToken = token.Tokens[startIndex + 5] as NonterminalToken;
-                                    if (assignTailToken != null && assignTailToken.Rule.Id == (int)RuleConstants.RULE_ASSIGNTAIL_EQ) {
+                                if (token.Children.Count > 5) {
+                                    Reduction assignTailToken = token.Children[startIndex + 5] as Reduction;
+                                    if (assignTailToken != null && assignTailToken.Symbol.Index == (int)RuleConstants.RULE_ASSIGNTAIL_EQ) {
                                         processedExpressionTokens.Add(assignTailToken);
                                         GrapeSetExpression setExpression = new GrapeSetExpression();
                                         setExpression.FileName = currentFileName;
                                         setExpression.Member = arrayExpression;
-                                        setExpression.Value = CreateExpression(assignTailToken.Tokens[1] as NonterminalToken, ref lastToken);
+                                        setExpression.Value = CreateExpression(assignTailToken.Children[1] as Reduction, ref lastToken);
                                         expression = setExpression;
                                     }
                                 }
@@ -894,20 +910,20 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                         case (int)RuleConstants.RULE_STATEMENTEXP:
                         case (int)RuleConstants.RULE_STATEMENTEXP2:
                         case (int)RuleConstants.RULE_STATEMENTEXP3:
-                            NonterminalToken qualifiedIdToken = token.Tokens[0] as NonterminalToken;
+                            Reduction qualifiedIdToken = token.Children[0] as Reduction;
                             GrapeMemberExpression member = CreateExpression(qualifiedIdToken, ref lastToken) as GrapeMemberExpression;
                             expression = member;
                             expression.FileName = currentFileName;
                             if (expression != null) {
                                 AddMethodCallsToExpression(expression as GrapeMemberExpression, token);
-                                if (token.Tokens.Length > 2) {
-                                    NonterminalToken assignTailToken = token.Tokens[2] as NonterminalToken;
-                                    if (assignTailToken != null && assignTailToken.Rule.Id == (int)RuleConstants.RULE_ASSIGNTAIL_EQ) {
+                                if (token.Children.Count > 2) {
+                                    Reduction assignTailToken = token.Children[2] as Reduction;
+                                    if (assignTailToken != null && assignTailToken.Symbol.Index == (int)RuleConstants.RULE_ASSIGNTAIL_EQ) {
                                         processedExpressionTokens.Add(assignTailToken);
                                         GrapeSetExpression setExpression = new GrapeSetExpression();
                                         setExpression.Member = member;
                                         setExpression.FileName = currentFileName;
-                                        setExpression.Value = CreateExpression(assignTailToken.Tokens[1] as NonterminalToken, ref lastToken);
+                                        setExpression.Value = CreateExpression(assignTailToken.Children[1] as Reduction, ref lastToken);
                                         expression = setExpression;
                                     }
                                 }
@@ -919,7 +935,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                             expression = new GrapeNameofExpression();
                             expression.FileName = currentFileName;
                             nameofExpression = expression as GrapeNameofExpression;
-                            NonterminalToken valueToken = token.Tokens[2] as NonterminalToken;
+                            Reduction valueToken = token.Children[2] as Reduction;
                             if (valueToken != null) {
                                 nameofExpression.Value = CreateExpression(valueToken, ref lastToken);
                             }
@@ -958,57 +974,57 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                             expression = new GrapeTypecastExpression();
                             expression.FileName = currentFileName;
                             typecastExpression = expression as GrapeTypecastExpression;
-                            typecastExpression.Value = CreateExpression(token.Tokens[0] as NonterminalToken, ref lastToken);
-                            typecastExpression.Type = CreateExpression(token.Tokens[2] as NonterminalToken, ref lastToken);
+                            typecastExpression.Value = CreateExpression(token.Children[0] as Reduction, ref lastToken);
+                            typecastExpression.Type = CreateExpression(token.Children[2] as Reduction, ref lastToken);
                             break;
                         // Literal expressions (hexadecimals, integers, reals, strings, true, false and null).
                         case (int)RuleConstants.RULE_LITERAL_DECIMALLITERAL:
                             expression = new GrapeLiteralExpression();
                             expression.FileName = currentFileName;
                             literalExpression = expression as GrapeLiteralExpression;
-                            literalExpression.Value = (token.Tokens[0] as TerminalToken).Text;
+                            literalExpression.Value = (token.Children[0] as TextToken).Text;
                             literalExpression.Type = GrapeLiteralExpression.GrapeLiteralExpressionType.Int;
                             break;
                         case (int)RuleConstants.RULE_LITERAL_HEXLITERAL:
                             expression = new GrapeLiteralExpression();
                             expression.FileName = currentFileName;
                             literalExpression = expression as GrapeLiteralExpression;
-                            literalExpression.Value = (token.Tokens[0] as TerminalToken).Text;
+                            literalExpression.Value = (token.Children[0] as TextToken).Text;
                             literalExpression.Type = GrapeLiteralExpression.GrapeLiteralExpressionType.Hexadecimal;
                             break;
                         case (int)RuleConstants.RULE_LITERAL_REALLITERAL:
                             expression = new GrapeLiteralExpression();
                             expression.FileName = currentFileName;
                             literalExpression = expression as GrapeLiteralExpression;
-                            literalExpression.Value = (token.Tokens[0] as TerminalToken).Text;
+                            literalExpression.Value = (token.Children[0] as TextToken).Text;
                             literalExpression.Type = GrapeLiteralExpression.GrapeLiteralExpressionType.Real;
                             break;
                         case (int)RuleConstants.RULE_LITERAL_STRINGLITERAL:
                             expression = new GrapeLiteralExpression();
                             expression.FileName = currentFileName;
                             literalExpression = expression as GrapeLiteralExpression;
-                            literalExpression.Value = (token.Tokens[0] as TerminalToken).Text;
+                            literalExpression.Value = (token.Children[0] as TextToken).Text;
                             literalExpression.Type = GrapeLiteralExpression.GrapeLiteralExpressionType.String;
                             break;
                         case (int)RuleConstants.RULE_LITERAL_FALSE:
                             expression = new GrapeLiteralExpression();
                             expression.FileName = currentFileName;
                             literalExpression = expression as GrapeLiteralExpression;
-                            literalExpression.Value = (token.Tokens[0] as TerminalToken).Text;
+                            literalExpression.Value = (token.Children[0] as TextToken).Text;
                             literalExpression.Type = GrapeLiteralExpression.GrapeLiteralExpressionType.False;
                             break;
                         case (int)RuleConstants.RULE_LITERAL_TRUE:
                             expression = new GrapeLiteralExpression();
                             expression.FileName = currentFileName;
                             literalExpression = expression as GrapeLiteralExpression;
-                            literalExpression.Value = (token.Tokens[0] as TerminalToken).Text;
+                            literalExpression.Value = (token.Children[0] as TextToken).Text;
                             literalExpression.Type = GrapeLiteralExpression.GrapeLiteralExpressionType.True;
                             break;
                         case (int)RuleConstants.RULE_LITERAL_NULL:
                             expression = new GrapeLiteralExpression();
                             expression.FileName = currentFileName;
                             literalExpression = expression as GrapeLiteralExpression;
-                            literalExpression.Value = (token.Tokens[0] as TerminalToken).Text;
+                            literalExpression.Value = (token.Children[0] as TextToken).Text;
                             literalExpression.Type = GrapeLiteralExpression.GrapeLiteralExpressionType.Null;
                             break;
                         // Conditional expressions, such as (expression) && (expression), (expression) ^ (expression), etc.
@@ -1017,8 +1033,8 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                             expression = new GrapeConditionalExpression();
                             expression.FileName = currentFileName;
                             conditionalExpression = expression as GrapeConditionalExpression;
-                            conditionalExpression.Left = CreateExpression(token.Tokens[0] as NonterminalToken, ref lastToken);
-                            conditionalExpression.Right = CreateExpression(token.Tokens[2] as NonterminalToken, ref lastToken);
+                            conditionalExpression.Left = CreateExpression(token.Children[0] as Reduction, ref lastToken);
+                            conditionalExpression.Right = CreateExpression(token.Children[2] as Reduction, ref lastToken);
                             conditionalExpression.Type = GrapeConditionalExpression.GrapeConditionalExpressionType.LogicalAnd;
                             break;
                         case (int)RuleConstants.RULE_OREXP:
@@ -1026,8 +1042,8 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                             expression = new GrapeConditionalExpression();
                             expression.FileName = currentFileName;
                             conditionalExpression = expression as GrapeConditionalExpression;
-                            conditionalExpression.Left = CreateExpression(token.Tokens[0] as NonterminalToken, ref lastToken);
-                            conditionalExpression.Right = CreateExpression(token.Tokens[2] as NonterminalToken, ref lastToken);
+                            conditionalExpression.Left = CreateExpression(token.Children[0] as Reduction, ref lastToken);
+                            conditionalExpression.Right = CreateExpression(token.Children[2] as Reduction, ref lastToken);
                             conditionalExpression.Type = GrapeConditionalExpression.GrapeConditionalExpressionType.LogicalOr;
                             break;
                         case (int)RuleConstants.RULE_LOGICALANDEXP:
@@ -1035,8 +1051,8 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                             expression = new GrapeConditionalExpression();
                             expression.FileName = currentFileName;
                             conditionalExpression = expression as GrapeConditionalExpression;
-                            conditionalExpression.Left = CreateExpression(token.Tokens[0] as NonterminalToken, ref lastToken);
-                            conditionalExpression.Right = CreateExpression(token.Tokens[2] as NonterminalToken, ref lastToken);
+                            conditionalExpression.Left = CreateExpression(token.Children[0] as Reduction, ref lastToken);
+                            conditionalExpression.Right = CreateExpression(token.Children[2] as Reduction, ref lastToken);
                             conditionalExpression.Type = GrapeConditionalExpression.GrapeConditionalExpressionType.BinaryAnd;
                             break;
                         case (int)RuleConstants.RULE_LOGICALOREXP:
@@ -1044,8 +1060,8 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                             expression = new GrapeConditionalExpression();
                             expression.FileName = currentFileName;
                             conditionalExpression = expression as GrapeConditionalExpression;
-                            conditionalExpression.Left = CreateExpression(token.Tokens[0] as NonterminalToken, ref lastToken);
-                            conditionalExpression.Right = CreateExpression(token.Tokens[2] as NonterminalToken, ref lastToken);
+                            conditionalExpression.Left = CreateExpression(token.Children[0] as Reduction, ref lastToken);
+                            conditionalExpression.Right = CreateExpression(token.Children[2] as Reduction, ref lastToken);
                             conditionalExpression.Type = GrapeConditionalExpression.GrapeConditionalExpressionType.BinaryOr;
                             break;
                         case (int)RuleConstants.RULE_LOGICALXOREXP:
@@ -1053,8 +1069,8 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                             expression = new GrapeConditionalExpression();
                             expression.FileName = currentFileName;
                             conditionalExpression = expression as GrapeConditionalExpression;
-                            conditionalExpression.Left = CreateExpression(token.Tokens[0] as NonterminalToken, ref lastToken);
-                            conditionalExpression.Right = CreateExpression(token.Tokens[2] as NonterminalToken, ref lastToken);
+                            conditionalExpression.Left = CreateExpression(token.Children[0] as Reduction, ref lastToken);
+                            conditionalExpression.Right = CreateExpression(token.Children[2] as Reduction, ref lastToken);
                             conditionalExpression.Type = GrapeConditionalExpression.GrapeConditionalExpressionType.LogicalXor;
                             break;
                         // Equal and not equal expressions: (expression) == (expression), (expression) != (expression).
@@ -1063,9 +1079,9 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                             expression = new GrapeConditionalExpression();
                             expression.FileName = currentFileName;
                             conditionalExpression = expression as GrapeConditionalExpression;
-                            conditionalExpression.Left = CreateExpression(token.Tokens[0] as NonterminalToken, ref lastToken);
-                            conditionalExpression.Right = CreateExpression(token.Tokens[2] as NonterminalToken, ref lastToken);
-                            if (token.Rule.Id == (int)RuleConstants.RULE_EQUALITYEXP_EQEQ) {
+                            conditionalExpression.Left = CreateExpression(token.Children[0] as Reduction, ref lastToken);
+                            conditionalExpression.Right = CreateExpression(token.Children[2] as Reduction, ref lastToken);
+                            if (token.Symbol.Index == (int)RuleConstants.RULE_EQUALITYEXP_EQEQ) {
                                 conditionalExpression.Type = GrapeConditionalExpression.GrapeConditionalExpressionType.Equal;
                             } else {
                                 conditionalExpression.Type = GrapeConditionalExpression.GrapeConditionalExpressionType.NotEqual;
@@ -1077,32 +1093,32 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                             expression = new GrapeConditionalExpression();
                             expression.FileName = currentFileName;
                             conditionalExpression = expression as GrapeConditionalExpression;
-                            conditionalExpression.Left = CreateExpression(token.Tokens[0] as NonterminalToken, ref lastToken);
-                            conditionalExpression.Right = CreateExpression(token.Tokens[2] as NonterminalToken, ref lastToken);
+                            conditionalExpression.Left = CreateExpression(token.Children[0] as Reduction, ref lastToken);
+                            conditionalExpression.Right = CreateExpression(token.Children[2] as Reduction, ref lastToken);
                             conditionalExpression.Type = GrapeConditionalExpression.GrapeConditionalExpressionType.GreaterThan;
                             break;
                         case (int)RuleConstants.RULE_COMPAREEXP_GTEQ:
                             expression = new GrapeConditionalExpression();
                             expression.FileName = currentFileName;
                             conditionalExpression = expression as GrapeConditionalExpression;
-                            conditionalExpression.Left = CreateExpression(token.Tokens[0] as NonterminalToken, ref lastToken);
-                            conditionalExpression.Right = CreateExpression(token.Tokens[2] as NonterminalToken, ref lastToken);
+                            conditionalExpression.Left = CreateExpression(token.Children[0] as Reduction, ref lastToken);
+                            conditionalExpression.Right = CreateExpression(token.Children[2] as Reduction, ref lastToken);
                             conditionalExpression.Type = GrapeConditionalExpression.GrapeConditionalExpressionType.GreaterThanOrEqual;
                             break;
                         case (int)RuleConstants.RULE_COMPAREEXP_LT:
                             expression = new GrapeConditionalExpression();
                             expression.FileName = currentFileName;
                             conditionalExpression = expression as GrapeConditionalExpression;
-                            conditionalExpression.Left = CreateExpression(token.Tokens[0] as NonterminalToken, ref lastToken);
-                            conditionalExpression.Right = CreateExpression(token.Tokens[2] as NonterminalToken, ref lastToken);
+                            conditionalExpression.Left = CreateExpression(token.Children[0] as Reduction, ref lastToken);
+                            conditionalExpression.Right = CreateExpression(token.Children[2] as Reduction, ref lastToken);
                             conditionalExpression.Type = GrapeConditionalExpression.GrapeConditionalExpressionType.LessThan;
                             break;
                         case (int)RuleConstants.RULE_COMPAREEXP_LTEQ:
                             expression = new GrapeConditionalExpression();
                             expression.FileName = currentFileName;
                             conditionalExpression = expression as GrapeConditionalExpression;
-                            conditionalExpression.Left = CreateExpression(token.Tokens[0] as NonterminalToken, ref lastToken);
-                            conditionalExpression.Right = CreateExpression(token.Tokens[2] as NonterminalToken, ref lastToken);
+                            conditionalExpression.Left = CreateExpression(token.Children[0] as Reduction, ref lastToken);
+                            conditionalExpression.Right = CreateExpression(token.Children[2] as Reduction, ref lastToken);
                             conditionalExpression.Type = GrapeConditionalExpression.GrapeConditionalExpressionType.LessThanOrEqual;
                             break;
                         // Mathematical expressions, e.g (expression) + (expression), (expression) % (expression), ~(expression), etc.
@@ -1112,33 +1128,33 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                             expression = new GrapeAddExpression();
                             expression.FileName = currentFileName;
                             addExpression = expression as GrapeAddExpression;
-                            addExpression.Left = CreateExpression(token.Tokens[0] as NonterminalToken, ref lastToken);
-                            addExpression.Right = CreateExpression(token.Tokens[2] as NonterminalToken, ref lastToken);
-                            addExpression.Type = token.Rule.Id == (int)RuleConstants.RULE_ADDEXP_MINUS ? GrapeAddExpression.GrapeAddExpressionType.Subtraction : GrapeAddExpression.GrapeAddExpressionType.Addition;
+                            addExpression.Left = CreateExpression(token.Children[0] as Reduction, ref lastToken);
+                            addExpression.Right = CreateExpression(token.Children[2] as Reduction, ref lastToken);
+                            addExpression.Type = token.Symbol.Index == (int)RuleConstants.RULE_ADDEXP_MINUS ? GrapeAddExpression.GrapeAddExpressionType.Subtraction : GrapeAddExpression.GrapeAddExpressionType.Addition;
                             break;
                         // Multiplication expressions: (expression) * (expression), (expression) / (expression), (expression) % (expression).
                         case (int)RuleConstants.RULE_MULTEXP_DIV:
                             expression = new GrapeMultiplicationExpression();
                             expression.FileName = currentFileName;
                             multiplicationExpression = expression as GrapeMultiplicationExpression;
-                            multiplicationExpression.Left = CreateExpression(token.Tokens[0] as NonterminalToken, ref lastToken);
-                            multiplicationExpression.Right = CreateExpression(token.Tokens[2] as NonterminalToken, ref lastToken);
+                            multiplicationExpression.Left = CreateExpression(token.Children[0] as Reduction, ref lastToken);
+                            multiplicationExpression.Right = CreateExpression(token.Children[2] as Reduction, ref lastToken);
                             multiplicationExpression.Type = GrapeMultiplicationExpression.GrapeMultiplicationExpressionType.Division;
                             break;
                         case (int)RuleConstants.RULE_MULTEXP_PERCENT:
                             expression = new GrapeMultiplicationExpression();
                             expression.FileName = currentFileName;
                             multiplicationExpression = expression as GrapeMultiplicationExpression;
-                            multiplicationExpression.Left = CreateExpression(token.Tokens[0] as NonterminalToken, ref lastToken);
-                            multiplicationExpression.Right = CreateExpression(token.Tokens[2] as NonterminalToken, ref lastToken);
+                            multiplicationExpression.Left = CreateExpression(token.Children[0] as Reduction, ref lastToken);
+                            multiplicationExpression.Right = CreateExpression(token.Children[2] as Reduction, ref lastToken);
                             multiplicationExpression.Type = GrapeMultiplicationExpression.GrapeMultiplicationExpressionType.Mod;
                             break;
                         case (int)RuleConstants.RULE_MULTEXP_TIMES:
                             expression = new GrapeMultiplicationExpression();
                             expression.FileName = currentFileName;
                             multiplicationExpression = expression as GrapeMultiplicationExpression;
-                            multiplicationExpression.Left = CreateExpression(token.Tokens[0] as NonterminalToken, ref lastToken);
-                            multiplicationExpression.Right = CreateExpression(token.Tokens[2] as NonterminalToken, ref lastToken);
+                            multiplicationExpression.Left = CreateExpression(token.Children[0] as Reduction, ref lastToken);
+                            multiplicationExpression.Right = CreateExpression(token.Children[2] as Reduction, ref lastToken);
                             multiplicationExpression.Type = GrapeMultiplicationExpression.GrapeMultiplicationExpressionType.Multiplication;
                             break;
                         // Shift expressions: (expression) << (expression), (expression) >> (expression).
@@ -1146,16 +1162,16 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                             expression = new GrapeShiftExpression();
                             expression.FileName = currentFileName;
                             shiftExpression = expression as GrapeShiftExpression;
-                            shiftExpression.Left = CreateExpression(token.Tokens[0] as NonterminalToken, ref lastToken);
-                            shiftExpression.Right = CreateExpression(token.Tokens[2] as NonterminalToken, ref lastToken);
+                            shiftExpression.Left = CreateExpression(token.Children[0] as Reduction, ref lastToken);
+                            shiftExpression.Right = CreateExpression(token.Children[2] as Reduction, ref lastToken);
                             shiftExpression.Type = GrapeShiftExpression.GrapeShiftExpressionType.ShiftRight;
                             break;
                         case (int)RuleConstants.RULE_SHIFTEXP_LTLT:
                             expression = new GrapeShiftExpression();
                             expression.FileName = currentFileName;
                             shiftExpression = expression as GrapeShiftExpression;
-                            shiftExpression.Left = CreateExpression(token.Tokens[0] as NonterminalToken, ref lastToken);
-                            shiftExpression.Right = CreateExpression(token.Tokens[2] as NonterminalToken, ref lastToken);
+                            shiftExpression.Left = CreateExpression(token.Children[0] as Reduction, ref lastToken);
+                            shiftExpression.Right = CreateExpression(token.Children[2] as Reduction, ref lastToken);
                             shiftExpression.Type = GrapeShiftExpression.GrapeShiftExpressionType.ShiftLeft;
                             break;
                         // Unary expressions: !(expression), -(expression), ~(expression).
@@ -1164,25 +1180,25 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                             expression.FileName = currentFileName;
                             unaryExpression = expression as GrapeUnaryExpression;
                             unaryExpression.Type = GrapeUnaryExpression.GrapeUnaryExpressionType.Not;
-                            unaryExpression.Value = CreateExpression(token.Tokens[1] as NonterminalToken, ref lastToken);
+                            unaryExpression.Value = CreateExpression(token.Children[1] as Reduction, ref lastToken);
                             break;
                         case (int)RuleConstants.RULE_UNARYEXP_MINUS:
                             expression = new GrapeUnaryExpression();
                             expression.FileName = currentFileName;
                             unaryExpression = expression as GrapeUnaryExpression;
                             unaryExpression.Type = GrapeUnaryExpression.GrapeUnaryExpressionType.Negate;
-                            unaryExpression.Value = CreateExpression(token.Tokens[1] as NonterminalToken, ref lastToken);
+                            unaryExpression.Value = CreateExpression(token.Children[1] as Reduction, ref lastToken);
                             break;
                         case (int)RuleConstants.RULE_UNARYEXP_TILDE:
                             expression = new GrapeUnaryExpression();
                             expression.FileName = currentFileName;
                             unaryExpression = expression as GrapeUnaryExpression;
                             unaryExpression.Type = GrapeUnaryExpression.GrapeUnaryExpressionType.CurlyEqual;
-                            unaryExpression.Value = CreateExpression(token.Tokens[1] as NonterminalToken, ref lastToken);
+                            unaryExpression.Value = CreateExpression(token.Children[1] as Reduction, ref lastToken);
                             break;
                     }
                 } else {
-                    expression = CreateExpression(token.Tokens[0] as NonterminalToken, ref lastToken);
+                    expression = CreateExpression(token.Children[0] as Reduction, ref lastToken);
                 }
             }
 
@@ -1204,15 +1220,15 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
 
             if (expression != null) {
                 expression.FileName = currentFileName;
-                TerminalToken firstTerminalToken = GetFirstTerminalToken(token.Tokens);
-                TerminalToken lastTerminalToken = GetLastTerminalToken(token.Tokens);
+                TextToken firstTerminalToken = GetFirstTerminalToken(token.Children);
+                TextToken lastTerminalToken = GetLastTerminalToken(token.Children);
                 if (firstTerminalToken != null && lastTerminalToken != null) {
-                    expression.StartLine = firstTerminalToken.Location.LineNr;
-                    expression.StartColumn = firstTerminalToken.Location.ColumnNr;
-                    expression.EndLine = lastTerminalToken.Location.LineNr;
-                    expression.EndColumn = lastTerminalToken.Location.ColumnNr;
-                    expression.Offset = firstTerminalToken.Location.Position;
-                    expression.Length = lastTerminalToken.Location.Position - firstTerminalToken.Location.Position;
+                    expression.StartLine = firstTerminalToken.Position.Line;
+                    expression.StartColumn = firstTerminalToken.Position.Column;
+                    expression.EndLine = lastTerminalToken.Position.Line;
+                    expression.EndColumn = lastTerminalToken.Position.Column;
+                    expression.Offset = firstTerminalToken.Position.Index;
+                    expression.Length = lastTerminalToken.Position.Index - firstTerminalToken.Position.Index;
                 }
             }
 
@@ -1239,15 +1255,17 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             GrapeDeleteStatement
         }
 
-        private GrapeStatement CreateStatement(NonterminalToken token, GrapeStatementType statementType) {
-            TerminalToken dummyToken = null;
+        private GrapeStatement CreateStatement(Reduction token, GrapeStatementType statementType) {
+            TextToken dummyToken = null;
             return CreateStatement(token, statementType, ref dummyToken);
         }
 
         private GrapeIfStatement currentIfStatement;
         private GrapeSwitchStatement currentSwitchStatement;
         private GrapeTryStatement currentTryStatement;
-        private GrapeStatement CreateStatement(NonterminalToken token, GrapeStatementType statementType, ref TerminalToken lastToken) {
+    	private CompiledGrammar grammar;
+
+    	private GrapeStatement CreateStatement(Reduction token, GrapeStatementType statementType, ref TextToken lastToken) {
             GrapeStatement statement = null;
             GrapeForEachStatement forEachStatement = null;
             GrapeIfStatement ifStatement = null;
@@ -1264,10 +1282,10 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             GrapeThrowStatement throwStatement = null;
             GrapeInitStatement initStatement = null;
             GrapeDeleteStatement deleteStatement = null;
-            TerminalToken blockFirstToken = null;
-            TerminalToken blockLastToken = null;
-            NonterminalToken conditionToken = null;
-            NonterminalToken expressionToken = null;
+            TextToken blockFirstToken = null;
+            TextToken blockLastToken = null;
+            Reduction conditionToken = null;
+            Reduction expressionToken = null;
             int currentIndex = 0;
             int startIndex = 0;
             int index = 1;
@@ -1275,36 +1293,36 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                 case GrapeStatementType.GrapeForEachStatement:
                     statement = new GrapeForEachStatement();
                     forEachStatement = statement as GrapeForEachStatement;
-                    blockFirstToken = token.Tokens[0] as TerminalToken;
-                    blockLastToken = GetEndToken(token.Tokens);
+                    blockFirstToken = token.Children[0] as TextToken;
+                    blockLastToken = GetEndToken(token.Children);
                     index = 1;
-                    while (token.Tokens[index] is TerminalToken) {
+                    while (token.Children[index] is TextToken) {
                         index++;
                     }
 
                     startIndex = index - 1;
                     GrapeVariable v = new GrapeVariable();
-                    GrapeExpression type = GetTypeFromTypeToken(token.Tokens, v);
+                    GrapeExpression type = GetTypeFromTypeToken(token.Children, v);
                     v.Type = type;
-                    TerminalToken nameToken = token.Tokens[startIndex + 1] as TerminalToken;
+                    TextToken nameToken = token.Children[startIndex + 1] as TextToken;
                     if (nameToken != null) {
                         v.Name = nameToken.Text;
                     }
 
                     forEachStatement.Variable = v;
-                    NonterminalToken containerExpressionToken = token.Tokens[startIndex + 3] as NonterminalToken;
+                    Reduction containerExpressionToken = token.Children[startIndex + 3] as Reduction;
                     if (containerExpressionToken != null) {
                         forEachStatement.ContainerExpression = CreateExpression(containerExpressionToken);
                         forEachStatement.ContainerExpression.Parent = forEachStatement;
                     }
 
                     if (blockFirstToken != null && blockLastToken != null) {
-                        statement.Offset = blockFirstToken.Location.Position;
-                        statement.Length = blockLastToken.Location.Position - blockFirstToken.Location.Position;
-                        statement.StartLine = blockFirstToken.Location.LineNr;
-                        statement.StartColumn = blockFirstToken.Location.ColumnNr;
-                        statement.EndLine = blockLastToken.Location.LineNr;
-                        statement.EndColumn = blockLastToken.Location.ColumnNr;
+                        statement.Offset = blockFirstToken.Position.Index;
+                        statement.Length = blockLastToken.Position.Index - blockFirstToken.Position.Index;
+                        statement.StartLine = blockFirstToken.Position.Line;
+                        statement.StartColumn = blockFirstToken.Position.Column;
+                        statement.EndLine = blockLastToken.Position.Line;
+                        statement.EndColumn = blockLastToken.Position.Column;
                     }
 
                     lastToken = blockLastToken;
@@ -1316,11 +1334,11 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                     statement = new GrapeIfStatement();
                     ifStatement = statement as GrapeIfStatement;
                     currentIfStatement = ifStatement;
-                    blockFirstToken = token.Tokens[0] as TerminalToken;
-                    blockLastToken = GetEndToken(token.Tokens);
-                    conditionToken = token.Tokens[1] as NonterminalToken;
-                    if (conditionToken == null && token.Tokens[1] is TerminalToken && ((TerminalToken)token.Tokens[1]).Text == "(") {
-                        conditionToken = token.Tokens[2] as NonterminalToken;
+                    blockFirstToken = token.Children[0] as TextToken;
+                    blockLastToken = GetEndToken(token.Children);
+                    conditionToken = token.Children[1] as Reduction;
+                    if (conditionToken == null && token.Children[1] is TextToken && ((TextToken)token.Children[1]).Text == "(") {
+                        conditionToken = token.Children[2] as Reduction;
                     }
 
                     if (conditionToken != null) {
@@ -1329,12 +1347,12 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                     }
 
                     if (blockFirstToken != null && blockLastToken != null) {
-                        statement.Offset = blockFirstToken.Location.Position;
-                        statement.Length = blockLastToken.Location.Position - blockFirstToken.Location.Position;
-                        statement.StartLine = blockFirstToken.Location.LineNr;
-                        statement.StartColumn = blockFirstToken.Location.ColumnNr;
-                        statement.EndLine = blockLastToken.Location.LineNr;
-                        statement.EndColumn = blockLastToken.Location.ColumnNr;
+                        statement.Offset = blockFirstToken.Position.Index;
+                        statement.Length = blockLastToken.Position.Index - blockFirstToken.Position.Index;
+                        statement.StartLine = blockFirstToken.Position.Line;
+                        statement.StartColumn = blockFirstToken.Position.Column;
+                        statement.EndLine = blockLastToken.Position.Line;
+                        statement.EndColumn = blockLastToken.Position.Column;
                     }
 
                     lastToken = blockLastToken;
@@ -1348,11 +1366,11 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                         elseIfStatement = statement as GrapeElseIfStatement;
                         elseIfStatement.IfStatement = currentIfStatement;
                         currentIfStatement.ElseIfStatements.Add(elseIfStatement);
-                        blockFirstToken = token.Tokens[0] as TerminalToken;
-                        blockLastToken = GetEndToken(token.Tokens);
-                        conditionToken = token.Tokens[1] as NonterminalToken;
-                        if (conditionToken == null && token.Tokens[1] is TerminalToken && ((TerminalToken)token.Tokens[1]).Text == "(") {
-                            conditionToken = token.Tokens[2] as NonterminalToken;
+                        blockFirstToken = token.Children[0] as TextToken;
+                        blockLastToken = GetEndToken(token.Children);
+                        conditionToken = token.Children[1] as Reduction;
+                        if (conditionToken == null && token.Children[1] is TextToken && ((TextToken)token.Children[1]).Text == "(") {
+                            conditionToken = token.Children[2] as Reduction;
                         }
 
                         if (conditionToken != null) {
@@ -1361,12 +1379,12 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                         }
 
                         if (blockFirstToken != null && blockLastToken != null) {
-                            statement.Offset = blockFirstToken.Location.Position;
-                            statement.Length = blockLastToken.Location.Position - blockFirstToken.Location.Position;
-                            statement.StartLine = blockFirstToken.Location.LineNr;
-                            statement.StartColumn = blockFirstToken.Location.ColumnNr;
-                            statement.EndLine = blockLastToken.Location.LineNr;
-                            statement.EndColumn = blockLastToken.Location.ColumnNr;
+                            statement.Offset = blockFirstToken.Position.Index;
+                            statement.Length = blockLastToken.Position.Index - blockFirstToken.Position.Index;
+                            statement.StartLine = blockFirstToken.Position.Line;
+                            statement.StartColumn = blockFirstToken.Position.Column;
+                            statement.EndLine = blockLastToken.Position.Line;
+                            statement.EndColumn = blockLastToken.Position.Column;
                         }
 
                         lastToken = blockLastToken;
@@ -1384,15 +1402,15 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                         elseStatement = statement as GrapeElseStatement;
                         elseStatement.IfStatement = currentIfStatement;
                         currentIfStatement.ElseStatements.Add(elseStatement);
-                        blockFirstToken = token.Tokens[0] as TerminalToken;
-                        blockLastToken = GetEndToken(token.Tokens);
+                        blockFirstToken = token.Children[0] as TextToken;
+                        blockLastToken = GetEndToken(token.Children);
                         if (blockFirstToken != null && blockLastToken != null) {
-                            statement.Offset = blockFirstToken.Location.Position;
-                            statement.Length = blockLastToken.Location.Position - blockFirstToken.Location.Position;
-                            statement.StartLine = blockFirstToken.Location.LineNr;
-                            statement.StartColumn = blockFirstToken.Location.ColumnNr;
-                            statement.EndLine = blockLastToken.Location.LineNr;
-                            statement.EndColumn = blockLastToken.Location.ColumnNr;
+                            statement.Offset = blockFirstToken.Position.Index;
+                            statement.Length = blockLastToken.Position.Index - blockFirstToken.Position.Index;
+                            statement.StartLine = blockFirstToken.Position.Line;
+                            statement.StartColumn = blockFirstToken.Position.Column;
+                            statement.EndLine = blockLastToken.Position.Line;
+                            statement.EndColumn = blockLastToken.Position.Column;
                         }
 
                         lastToken = blockLastToken;
@@ -1410,15 +1428,15 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                 case GrapeStatementType.GrapeSwitchStatement:
                     statement = new GrapeSwitchStatement();
                     switchStatement = statement as GrapeSwitchStatement;
-                    blockFirstToken = token.Tokens[0] as TerminalToken;
-                    blockLastToken = GetEndToken(token.Tokens);
+                    blockFirstToken = token.Children[0] as TextToken;
+                    blockLastToken = GetEndToken(token.Children);
                     currentSwitchStatement = switchStatement;
-                    if (token.Tokens.Length >= 1) {
+                    if (token.Children.Count >= 1) {
                         currentIndex = 0;
                         expressionToken = null;
-                        while (currentIndex < token.Tokens.Length) {
-                            if (token.Tokens[currentIndex] is NonterminalToken && (((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSION || ((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSIONOPT || ((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSIONOPT2 || ((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSION_EQ)) {
-                                expressionToken = token.Tokens[currentIndex] as NonterminalToken;
+                        while (currentIndex < token.Children.Count) {
+                            if (token.Children[currentIndex] is Reduction && (((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSION || ((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSIONOPT || ((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSIONOPT2 || ((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSION_EQ)) {
+                                expressionToken = token.Children[currentIndex] as Reduction;
                                 break;
                             }
 
@@ -1432,12 +1450,12 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                     }
 
                     if (blockFirstToken != null && blockLastToken != null) {
-                        statement.Offset = blockFirstToken.Location.Position;
-                        statement.Length = blockLastToken.Location.Position - blockFirstToken.Location.Position;
-                        statement.StartLine = blockFirstToken.Location.LineNr;
-                        statement.StartColumn = blockFirstToken.Location.ColumnNr;
-                        statement.EndLine = blockLastToken.Location.LineNr;
-                        statement.EndColumn = blockLastToken.Location.ColumnNr;
+                        statement.Offset = blockFirstToken.Position.Index;
+                        statement.Length = blockLastToken.Position.Index - blockFirstToken.Position.Index;
+                        statement.StartLine = blockFirstToken.Position.Line;
+                        statement.StartColumn = blockFirstToken.Position.Column;
+                        statement.EndLine = blockLastToken.Position.Line;
+                        statement.EndColumn = blockLastToken.Position.Column;
                     }
 
                     lastToken = blockLastToken;
@@ -1450,14 +1468,14 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                         statement = new GrapeCaseStatement();
                         caseStatement = statement as GrapeCaseStatement;
                         caseStatement.SwitchStatement = currentSwitchStatement;
-                        blockFirstToken = token.Tokens[0] as TerminalToken;
-                        blockLastToken = GetEndToken(token.Tokens);
-                        if (token.Tokens.Length >= 1) {
+                        blockFirstToken = token.Children[0] as TextToken;
+                        blockLastToken = GetEndToken(token.Children);
+                        if (token.Children.Count >= 1) {
                             currentIndex = 0;
                             expressionToken = null;
-                            while (currentIndex < token.Tokens.Length) {
-                                if (token.Tokens[currentIndex] is NonterminalToken && (((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSION || ((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSIONOPT || ((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSIONOPT2 || ((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSION_EQ)) {
-                                    expressionToken = token.Tokens[currentIndex] as NonterminalToken;
+                            while (currentIndex < token.Children.Count) {
+                                if (token.Children[currentIndex] is Reduction && (((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSION || ((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSIONOPT || ((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSIONOPT2 || ((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSION_EQ)) {
+                                    expressionToken = token.Children[currentIndex] as Reduction;
                                     break;
                                 }
 
@@ -1471,12 +1489,12 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                         }
 
                         if (blockFirstToken != null && blockLastToken != null) {
-                            statement.Offset = blockFirstToken.Location.Position;
-                            statement.Length = blockLastToken.Location.Position - blockFirstToken.Location.Position;
-                            statement.StartLine = blockFirstToken.Location.LineNr;
-                            statement.StartColumn = blockFirstToken.Location.ColumnNr;
-                            statement.EndLine = blockLastToken.Location.LineNr;
-                            statement.EndColumn = blockLastToken.Location.ColumnNr;
+                            statement.Offset = blockFirstToken.Position.Index;
+                            statement.Length = blockLastToken.Position.Index - blockFirstToken.Position.Index;
+                            statement.StartLine = blockFirstToken.Position.Line;
+                            statement.StartColumn = blockFirstToken.Position.Column;
+                            statement.EndLine = blockLastToken.Position.Line;
+                            statement.EndColumn = blockLastToken.Position.Column;
                         }
 
                         lastToken = blockLastToken;
@@ -1494,15 +1512,15 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                         defaultStatement = statement as GrapeDefaultStatement;
                         defaultStatement.SwitchStatement = currentSwitchStatement;
                         currentSwitchStatement.DefaultStatement = defaultStatement;
-                        blockFirstToken = token.Tokens[0] as TerminalToken;
-                        blockLastToken = GetEndToken(token.Tokens);
+                        blockFirstToken = token.Children[0] as TextToken;
+                        blockLastToken = GetEndToken(token.Children);
                         if (blockFirstToken != null && blockLastToken != null) {
-                            statement.Offset = blockFirstToken.Location.Position;
-                            statement.Length = blockLastToken.Location.Position - blockFirstToken.Location.Position;
-                            statement.StartLine = blockFirstToken.Location.LineNr;
-                            statement.StartColumn = blockFirstToken.Location.ColumnNr;
-                            statement.EndLine = blockLastToken.Location.LineNr;
-                            statement.EndColumn = blockLastToken.Location.ColumnNr;
+                            statement.Offset = blockFirstToken.Position.Index;
+                            statement.Length = blockLastToken.Position.Index - blockFirstToken.Position.Index;
+                            statement.StartLine = blockFirstToken.Position.Line;
+                            statement.StartColumn = blockFirstToken.Position.Column;
+                            statement.EndLine = blockLastToken.Position.Line;
+                            statement.EndColumn = blockLastToken.Position.Column;
                         }
 
                         lastToken = blockLastToken;
@@ -1518,15 +1536,15 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                     statement = new GrapeTryStatement();
                     tryStatement = statement as GrapeTryStatement;
                     currentTryStatement = tryStatement;
-                    blockFirstToken = token.Tokens[0] as TerminalToken;
-                    blockLastToken = GetEndToken(token.Tokens);
+                    blockFirstToken = token.Children[0] as TextToken;
+                    blockLastToken = GetEndToken(token.Children);
                     if (blockFirstToken != null && blockLastToken != null) {
-                        statement.Offset = blockFirstToken.Location.Position;
-                        statement.Length = blockLastToken.Location.Position - blockFirstToken.Location.Position;
-                        statement.StartLine = blockFirstToken.Location.LineNr;
-                        statement.StartColumn = blockFirstToken.Location.ColumnNr;
-                        statement.EndLine = blockLastToken.Location.LineNr;
-                        statement.EndColumn = blockLastToken.Location.ColumnNr;
+                        statement.Offset = blockFirstToken.Position.Index;
+                        statement.Length = blockLastToken.Position.Index - blockFirstToken.Position.Index;
+                        statement.StartLine = blockFirstToken.Position.Line;
+                        statement.StartColumn = blockFirstToken.Position.Column;
+                        statement.EndLine = blockLastToken.Position.Line;
+                        statement.EndColumn = blockLastToken.Position.Column;
                     }
 
                     lastToken = blockLastToken;
@@ -1540,20 +1558,20 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                         catchStatement = statement as GrapeCatchStatement;
                         catchStatement.TryStatement = currentTryStatement;
                         currentTryStatement.CatchStatements.Add(catchStatement);
-                        blockFirstToken = token.Tokens[0] as TerminalToken;
-                        blockLastToken = GetEndToken(token.Tokens);
+                        blockFirstToken = token.Children[0] as TextToken;
+                        blockLastToken = GetEndToken(token.Children);
                         index = 1;
-                        while (token.Tokens[index] is TerminalToken) {
+                        while (token.Children[index] is TextToken) {
                             index++;
                         }
 
                         startIndex = index - 1;
-                        if (token.Tokens.Length > 1) {
+                        if (token.Children.Count > 1) {
                             GrapeVariable catchVariable = new GrapeVariable();
-                            GrapeExpression catchVariableType = GetTypeFromTypeToken(token.Tokens, catchVariable);
+                            GrapeExpression catchVariableType = GetTypeFromTypeToken(token.Children, catchVariable);
                             catchVariable.Type = catchVariableType;
-                            if (token.Tokens.Length > startIndex + 1) {
-                                TerminalToken catchVariableName = token.Tokens[startIndex + 1] as TerminalToken;
+                            if (token.Children.Count > startIndex + 1) {
+                                TextToken catchVariableName = token.Children[startIndex + 1] as TextToken;
                                 if (catchVariableName != null) {
                                     catchVariable.Name = catchVariableName.Text;
                                 }
@@ -1563,12 +1581,12 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                         }
 
                         if (blockFirstToken != null && blockLastToken != null) {
-                            statement.Offset = blockFirstToken.Location.Position;
-                            statement.Length = blockLastToken.Location.Position - blockFirstToken.Location.Position;
-                            statement.StartLine = blockFirstToken.Location.LineNr;
-                            statement.StartColumn = blockFirstToken.Location.ColumnNr;
-                            statement.EndLine = blockLastToken.Location.LineNr;
-                            statement.EndColumn = blockLastToken.Location.ColumnNr;
+                            statement.Offset = blockFirstToken.Position.Index;
+                            statement.Length = blockLastToken.Position.Index - blockFirstToken.Position.Index;
+                            statement.StartLine = blockFirstToken.Position.Line;
+                            statement.StartColumn = blockFirstToken.Position.Column;
+                            statement.EndLine = blockLastToken.Position.Line;
+                            statement.EndColumn = blockLastToken.Position.Column;
                         }
 
                         lastToken = blockLastToken;
@@ -1589,15 +1607,15 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                             currentTryStatement.FinallyStatement = finallyStatement;
                         }
 
-                        blockFirstToken = token.Tokens[0] as TerminalToken;
-                        blockLastToken = GetEndToken(token.Tokens);
+                        blockFirstToken = token.Children[0] as TextToken;
+                        blockLastToken = GetEndToken(token.Children);
                         if (blockFirstToken != null && blockLastToken != null) {
-                            statement.Offset = blockFirstToken.Location.Position;
-                            statement.Length = blockLastToken.Location.Position - blockFirstToken.Location.Position;
-                            statement.StartLine = blockFirstToken.Location.LineNr;
-                            statement.StartColumn = blockFirstToken.Location.ColumnNr;
-                            statement.EndLine = blockLastToken.Location.LineNr;
-                            statement.EndColumn = blockLastToken.Location.ColumnNr;
+                            statement.Offset = blockFirstToken.Position.Index;
+                            statement.Length = blockLastToken.Position.Index - blockFirstToken.Position.Index;
+                            statement.StartLine = blockFirstToken.Position.Line;
+                            statement.StartColumn = blockFirstToken.Position.Column;
+                            statement.EndLine = blockLastToken.Position.Line;
+                            statement.EndColumn = blockLastToken.Position.Column;
                         }
 
                         lastToken = blockLastToken;
@@ -1612,13 +1630,13 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                 case GrapeStatementType.GrapeWhileStatement:
                     statement = new GrapeWhileStatement();
                     whileStatement = statement as GrapeWhileStatement;
-                    blockFirstToken = token.Tokens[0] as TerminalToken;
-                    blockLastToken = GetEndToken(token.Tokens);
+                    blockFirstToken = token.Children[0] as TextToken;
+                    blockLastToken = GetEndToken(token.Children);
                     currentIndex = 0;
                     expressionToken = null;
-                    while (currentIndex < token.Tokens.Length) {
-                        if (token.Tokens[currentIndex] is NonterminalToken && (((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSION || ((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSIONOPT || ((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSIONOPT2 || ((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSION_EQ)) {
-                            expressionToken = token.Tokens[currentIndex] as NonterminalToken;
+                    while (currentIndex < token.Children.Count) {
+                        if (token.Children[currentIndex] is Reduction && (((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSION || ((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSIONOPT || ((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSIONOPT2 || ((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSION_EQ)) {
+                            expressionToken = token.Children[currentIndex] as Reduction;
                             break;
                         }
 
@@ -1631,12 +1649,12 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                     }
 
                     if (blockFirstToken != null && blockLastToken != null) {
-                        statement.Offset = blockFirstToken.Location.Position;
-                        statement.Length = blockLastToken.Location.Position - blockFirstToken.Location.Position;
-                        statement.StartLine = blockFirstToken.Location.LineNr;
-                        statement.StartColumn = blockFirstToken.Location.ColumnNr;
-                        statement.EndLine = blockLastToken.Location.LineNr;
-                        statement.EndColumn = blockLastToken.Location.ColumnNr;
+                        statement.Offset = blockFirstToken.Position.Index;
+                        statement.Length = blockLastToken.Position.Index - blockFirstToken.Position.Index;
+                        statement.StartLine = blockFirstToken.Position.Line;
+                        statement.StartColumn = blockFirstToken.Position.Column;
+                        statement.EndLine = blockLastToken.Position.Line;
+                        statement.EndColumn = blockLastToken.Position.Column;
                     }
 
                     lastToken = blockLastToken;
@@ -1646,15 +1664,15 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                     break;
                 case GrapeStatementType.GrapeBreakStatement:
                     statement = new GrapeBreakStatement();
-                    blockFirstToken = token.Tokens[0] as TerminalToken;
+                    blockFirstToken = token.Children[0] as TextToken;
                     blockLastToken = blockFirstToken;
                     if (blockFirstToken != null && blockLastToken != null) {
-                        statement.Offset = blockFirstToken.Location.Position;
-                        statement.Length = blockLastToken.Location.Position - blockFirstToken.Location.Position;
-                        statement.StartLine = blockFirstToken.Location.LineNr;
-                        statement.StartColumn = blockFirstToken.Location.ColumnNr;
-                        statement.EndLine = blockLastToken.Location.LineNr;
-                        statement.EndColumn = blockLastToken.Location.ColumnNr;
+                        statement.Offset = blockFirstToken.Position.Index;
+                        statement.Length = blockLastToken.Position.Index - blockFirstToken.Position.Index;
+                        statement.StartLine = blockFirstToken.Position.Line;
+                        statement.StartColumn = blockFirstToken.Position.Column;
+                        statement.EndLine = blockLastToken.Position.Line;
+                        statement.EndColumn = blockLastToken.Position.Column;
                     }
 
                     lastToken = blockLastToken;
@@ -1662,15 +1680,15 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                     break;
                 case GrapeStatementType.GrapeContinueStatement:
                     statement = new GrapeContinueStatement();
-                    blockFirstToken = token.Tokens[0] as TerminalToken;
+                    blockFirstToken = token.Children[0] as TextToken;
                     blockLastToken = blockFirstToken;
                     if (blockFirstToken != null && blockLastToken != null) {
-                        statement.Offset = blockFirstToken.Location.Position;
-                        statement.Length = blockLastToken.Location.Position - blockFirstToken.Location.Position;
-                        statement.StartLine = blockFirstToken.Location.LineNr;
-                        statement.StartColumn = blockFirstToken.Location.ColumnNr;
-                        statement.EndLine = blockLastToken.Location.LineNr;
-                        statement.EndColumn = blockLastToken.Location.ColumnNr;
+                        statement.Offset = blockFirstToken.Position.Index;
+                        statement.Length = blockLastToken.Position.Index - blockFirstToken.Position.Index;
+                        statement.StartLine = blockFirstToken.Position.Line;
+                        statement.StartColumn = blockFirstToken.Position.Column;
+                        statement.EndLine = blockLastToken.Position.Line;
+                        statement.EndColumn = blockLastToken.Position.Column;
                     }
 
                     lastToken = blockLastToken;
@@ -1679,12 +1697,12 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                 case GrapeStatementType.GrapeReturnStatement:
                     statement = new GrapeReturnStatement();
                     returnStatement = statement as GrapeReturnStatement;
-                    if (token.Tokens.Length > 1) {
+                    if (token.Children.Count > 1) {
                         currentIndex = 0;
                         expressionToken = null;
-                        while (currentIndex < token.Tokens.Length) {
-                            if (token.Tokens[currentIndex] is NonterminalToken && (((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSION || ((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSIONOPT || ((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSIONOPT2 || ((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSION_EQ)) {
-                                expressionToken = token.Tokens[currentIndex] as NonterminalToken;
+                        while (currentIndex < token.Children.Count) {
+                            if (token.Children[currentIndex] is Reduction && (((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSION || ((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSIONOPT || ((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSIONOPT2 || ((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSION_EQ)) {
+                                expressionToken = token.Children[currentIndex] as Reduction;
                                 break;
                             }
 
@@ -1697,15 +1715,15 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                         }
                     }
 
-                    blockFirstToken = token.Tokens[0] as TerminalToken;
+                    blockFirstToken = token.Children[0] as TextToken;
                     blockLastToken = blockFirstToken;
                     if (blockFirstToken != null && blockLastToken != null) {
-                        statement.Offset = blockFirstToken.Location.Position;
-                        statement.Length = blockLastToken.Location.Position - blockFirstToken.Location.Position;
-                        statement.StartLine = blockFirstToken.Location.LineNr;
-                        statement.StartColumn = blockFirstToken.Location.ColumnNr;
-                        statement.EndLine = blockLastToken.Location.LineNr;
-                        statement.EndColumn = blockLastToken.Location.ColumnNr;
+                        statement.Offset = blockFirstToken.Position.Index;
+                        statement.Length = blockLastToken.Position.Index - blockFirstToken.Position.Index;
+                        statement.StartLine = blockFirstToken.Position.Line;
+                        statement.StartColumn = blockFirstToken.Position.Column;
+                        statement.EndLine = blockLastToken.Position.Line;
+                        statement.EndColumn = blockLastToken.Position.Column;
                     }
 
                     lastToken = blockLastToken;
@@ -1714,12 +1732,12 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                 case GrapeStatementType.GrapeThrowStatement:
                     statement = new GrapeThrowStatement();
                     throwStatement = statement as GrapeThrowStatement;
-                    if (token.Tokens.Length > 1) {
+                    if (token.Children.Count > 1) {
                         currentIndex = 0;
                         expressionToken = null;
-                        while (currentIndex < token.Tokens.Length) {
-                            if (token.Tokens[currentIndex] is NonterminalToken && (((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSION || ((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSIONOPT || ((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSIONOPT2 || ((NonterminalToken)token.Tokens[currentIndex]).Rule.Id == (int)RuleConstants.RULE_EXPRESSION_EQ)) {
-                                expressionToken = token.Tokens[currentIndex] as NonterminalToken;
+                        while (currentIndex < token.Children.Count) {
+                            if (token.Children[currentIndex] is Reduction && (((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSION || ((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSIONOPT || ((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSIONOPT2 || ((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSION_EQ)) {
+                                expressionToken = token.Children[currentIndex] as Reduction;
                                 break;
                             }
 
@@ -1732,15 +1750,15 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                         }
                     }
 
-                    blockFirstToken = token.Tokens[0] as TerminalToken;
+                    blockFirstToken = token.Children[0] as TextToken;
                     blockLastToken = blockFirstToken;
                     if (blockFirstToken != null && blockLastToken != null) {
-                        statement.Offset = blockFirstToken.Location.Position;
-                        statement.Length = blockLastToken.Location.Position - blockFirstToken.Location.Position;
-                        statement.StartLine = blockFirstToken.Location.LineNr;
-                        statement.StartColumn = blockFirstToken.Location.ColumnNr;
-                        statement.EndLine = blockLastToken.Location.LineNr;
-                        statement.EndColumn = blockLastToken.Location.ColumnNr;
+                        statement.Offset = blockFirstToken.Position.Index;
+                        statement.Length = blockLastToken.Position.Index - blockFirstToken.Position.Index;
+                        statement.StartLine = blockFirstToken.Position.Line;
+                        statement.StartColumn = blockFirstToken.Position.Column;
+                        statement.EndLine = blockLastToken.Position.Line;
+                        statement.EndColumn = blockLastToken.Position.Column;
                     }
 
                     lastToken = blockLastToken;
@@ -1749,9 +1767,9 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                 case GrapeStatementType.GrapeInitStatement:
                     statement = new GrapeInitStatement();
                     initStatement = statement as GrapeInitStatement;
-                    blockFirstToken = token.Tokens[0] as TerminalToken;
+                    blockFirstToken = token.Children[0] as TextToken;
                     blockLastToken = blockFirstToken;
-                    TerminalToken initToken = token.Tokens[1] as TerminalToken;
+                    TextToken initToken = token.Children[1] as TextToken;
                     if (initToken != null) {
                         initStatement.Type = GrapeInitStatement.GrapeInitStatementType.Unknown;
                         if (initToken.Text == "base") {
@@ -1762,18 +1780,18 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                     }
 
                     int lastTokenIndex;
-                    NonterminalToken parametersToken = token.Tokens[3] as NonterminalToken;
+                    Reduction parametersToken = token.Children[3] as Reduction;
                     if (parametersToken != null) {
                         AddParametersToFunction(initStatement, parametersToken, 0, out lastTokenIndex);
                     }
 
                     if (blockFirstToken != null && blockLastToken != null) {
-                        statement.Offset = blockFirstToken.Location.Position;
-                        statement.Length = blockLastToken.Location.Position - blockFirstToken.Location.Position;
-                        statement.StartLine = blockFirstToken.Location.LineNr;
-                        statement.StartColumn = blockFirstToken.Location.ColumnNr;
-                        statement.EndLine = blockLastToken.Location.LineNr;
-                        statement.EndColumn = blockLastToken.Location.ColumnNr;
+                        statement.Offset = blockFirstToken.Position.Index;
+                        statement.Length = blockLastToken.Position.Index - blockFirstToken.Position.Index;
+                        statement.StartLine = blockFirstToken.Position.Line;
+                        statement.StartColumn = blockFirstToken.Position.Column;
+                        statement.EndLine = blockLastToken.Position.Line;
+                        statement.EndColumn = blockLastToken.Position.Column;
                     }
 
                     lastToken = blockLastToken;
@@ -1782,21 +1800,21 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                 case GrapeStatementType.GrapeDeleteStatement:
                     statement = new GrapeDeleteStatement();
                     deleteStatement = statement as GrapeDeleteStatement;
-                    blockFirstToken = token.Tokens[0] as TerminalToken;
-                    blockLastToken = GetEndToken(token.Tokens);
-                    NonterminalToken valueToken = token.Tokens[1] as NonterminalToken;
+                    blockFirstToken = token.Children[0] as TextToken;
+                    blockLastToken = GetEndToken(token.Children);
+                    Reduction valueToken = token.Children[1] as Reduction;
                     if (valueToken != null) {
                         deleteStatement.Value = CreateExpression(valueToken, ref blockLastToken);
                         deleteStatement.Value.Parent = deleteStatement;
                     }
 
                     if (blockFirstToken != null && blockLastToken != null) {
-                        statement.Offset = blockFirstToken.Location.Position;
-                        statement.Length = blockLastToken.Location.Position - blockFirstToken.Location.Position;
-                        statement.StartLine = blockFirstToken.Location.LineNr;
-                        statement.StartColumn = blockFirstToken.Location.ColumnNr;
-                        statement.EndLine = blockLastToken.Location.LineNr;
-                        statement.EndColumn = blockLastToken.Location.ColumnNr;
+                        statement.Offset = blockFirstToken.Position.Index;
+                        statement.Length = blockLastToken.Position.Index - blockFirstToken.Position.Index;
+                        statement.StartLine = blockFirstToken.Position.Line;
+                        statement.StartColumn = blockFirstToken.Position.Column;
+                        statement.EndLine = blockLastToken.Position.Line;
+                        statement.EndColumn = blockLastToken.Position.Column;
                     }
 
                     lastToken = blockLastToken;
@@ -1807,14 +1825,14 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             return statement;
         }
 
-        private void CreateVariable(NonterminalToken token) {
-            if (token.Tokens.Length >= 4) {
+        private void CreateVariable(Reduction token) {
+            if (token.Children.Count >= 4) {
                 GrapeVariable v;
                 GrapeField f = null;
-                TerminalToken firstToken = null;
-                TerminalToken lastToken = null;
-                NonterminalToken modifiers = token.Tokens[0] as NonterminalToken;
-                if ((modifiers != null && modifiers.Rule.Id != (int)RuleConstants.RULE_QUALIFIEDID && modifiers.Tokens.Length > 0) || currentBlock.Parent is GrapeClass) {
+                TextToken firstToken = null;
+                TextToken lastToken = null;
+                Reduction modifiers = token.Children[0] as Reduction;
+                if ((modifiers != null && modifiers.Symbol.Index != (int)RuleConstants.RULE_QUALIFIEDID && modifiers.Children.Count > 0) || currentBlock.Parent is GrapeClass) {
                     string modifiersText = GetModifiers(modifiers, out firstToken);
                     if (!string.IsNullOrEmpty(modifiersText) || currentBlock.Parent is GrapeClass) {
                         v = new GrapeField();
@@ -1828,16 +1846,16 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                 }
 
                 int nameTokenIndex = 2;
-                GrapeExpression type = GetTypeFromTypeToken(token.Tokens, v);
+                GrapeExpression type = GetTypeFromTypeToken(token.Children, v);
                 v.Type = type;
-                if (nameTokenIndex >= token.Tokens.Length) {
+                if (nameTokenIndex >= token.Children.Count) {
                     nameTokenIndex = 1;
                 }
 
-                TerminalToken nameToken = token.Tokens[nameTokenIndex] as TerminalToken;
+                TextToken nameToken = token.Children[nameTokenIndex] as TextToken;
                 if (nameToken.Text == "=") {
                     nameTokenIndex--;
-                    nameToken = token.Tokens[nameTokenIndex] as TerminalToken;
+                    nameToken = token.Children[nameTokenIndex] as TextToken;
                 }
 
                 if (nameToken != null) {
@@ -1845,11 +1863,11 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                     firstToken = nameToken;
                 }
 
-                TerminalToken endToken = nameToken;
-                if (token.Tokens.Length > nameTokenIndex + 1) {
-                    TerminalToken initializerToken = token.Tokens[nameTokenIndex + 1] as TerminalToken;
+                TextToken endToken = nameToken;
+                if (token.Children.Count > nameTokenIndex + 1) {
+                    TextToken initializerToken = token.Children[nameTokenIndex + 1] as TextToken;
                     if (initializerToken != null && initializerToken.Text == "=") {
-                        NonterminalToken valueExpressionToken = token.Tokens[nameTokenIndex + 2] as NonterminalToken;
+                        Reduction valueExpressionToken = token.Children[nameTokenIndex + 2] as Reduction;
                         if (valueExpressionToken != null) {
                             v.Value = CreateExpression(valueExpressionToken, ref endToken);
                             v.Value.Parent = v;
@@ -1860,26 +1878,26 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
 
                 lastToken = endToken;
                 if (firstToken != null && lastToken != null) {
-                    v.Offset = firstToken.Location.Position;
-                    v.Length = lastToken.Location.Position - firstToken.Location.Position;
-                    v.StartLine = firstToken.Location.LineNr;
-                    v.StartColumn = firstToken.Location.ColumnNr;
-                    v.EndLine = lastToken.Location.LineNr;
-                    v.EndColumn = lastToken.Location.ColumnNr;
+                    v.Offset = firstToken.Position.Index;
+                    v.Length = lastToken.Position.Index - firstToken.Position.Index;
+                    v.StartLine = firstToken.Position.Line;
+                    v.StartColumn = firstToken.Position.Column;
+                    v.EndLine = lastToken.Position.Line;
+                    v.EndColumn = lastToken.Position.Column;
                 }
 
                 AddGrapeEntityToCurrentParent(v);
             }
         }
 
-        private void AddParametersToCallExpression(GrapeCallExpression callExpression, NonterminalToken token, int startIndex, out int lastTokenIndex) {
+        private void AddParametersToCallExpression(GrapeCallExpression callExpression, Reduction token, int startIndex, out int lastTokenIndex) {
             lastTokenIndex = startIndex;
-            if (token.Tokens.Length > 0) {
-                NonterminalToken formalParamListToken = token.Tokens[0] as NonterminalToken;
-                foreach (Token formalParamToken in formalParamListToken.Tokens) {
-                    NonterminalToken formalParamNonterminalToken = formalParamToken as NonterminalToken;
+            if (token.Children.Count > 0) {
+                Reduction formalParamListToken = token.Children[0] as Reduction;
+                foreach (Token formalParamToken in formalParamListToken.Children) {
+                    Reduction formalParamNonterminalToken = formalParamToken as Reduction;
                     if (formalParamNonterminalToken != null) {
-                        if (formalParamNonterminalToken.Rule.Id == (int)RuleConstants.RULE_ARGLIST || formalParamNonterminalToken.Rule.Id == (int)RuleConstants.RULE_ARGLIST_COMMA || formalParamNonterminalToken.Rule.Id == (int)RuleConstants.RULE_ARGLISTOPT || formalParamNonterminalToken.Rule.Id == (int)RuleConstants.RULE_ARGLISTOPT2) {
+                        if (formalParamNonterminalToken.Symbol.Index == (int)RuleConstants.RULE_ARGLIST || formalParamNonterminalToken.Symbol.Index == (int)RuleConstants.RULE_ARGLIST_COMMA || formalParamNonterminalToken.Symbol.Index == (int)RuleConstants.RULE_ARGLISTOPT || formalParamNonterminalToken.Symbol.Index == (int)RuleConstants.RULE_ARGLISTOPT2) {
                             AddParametersToCallExpression(callExpression, formalParamListToken, startIndex, out lastTokenIndex);
                         } else {
                             GrapeExpression param = CreateExpression(formalParamNonterminalToken);
@@ -1893,14 +1911,14 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             }
         }
 
-        private void AddParametersToFunction(GrapeInitStatement i, NonterminalToken token, int startIndex, out int lastTokenIndex) {
+        private void AddParametersToFunction(GrapeInitStatement i, Reduction token, int startIndex, out int lastTokenIndex) {
             lastTokenIndex = startIndex;
-            if (token.Tokens.Length > 0) {
-                NonterminalToken formalParamListToken = token.Tokens[0] as NonterminalToken;
-                foreach (Token formalParamToken in formalParamListToken.Tokens) {
-                    NonterminalToken formalParamNonterminalToken = formalParamToken as NonterminalToken;
+            if (token.Children.Count > 0) {
+                Reduction formalParamListToken = token.Children[0] as Reduction;
+                foreach (Token formalParamToken in formalParamListToken.Children) {
+                    Reduction formalParamNonterminalToken = formalParamToken as Reduction;
                     if (formalParamNonterminalToken != null) {
-                        if (formalParamNonterminalToken.Rule.Id == (int)RuleConstants.RULE_ARGLIST || formalParamNonterminalToken.Rule.Id == (int)RuleConstants.RULE_ARGLIST_COMMA || formalParamNonterminalToken.Rule.Id == (int)RuleConstants.RULE_ARGLISTOPT || formalParamNonterminalToken.Rule.Id == (int)RuleConstants.RULE_ARGLISTOPT2) {
+                        if (formalParamNonterminalToken.Symbol.Index == (int)RuleConstants.RULE_ARGLIST || formalParamNonterminalToken.Symbol.Index == (int)RuleConstants.RULE_ARGLIST_COMMA || formalParamNonterminalToken.Symbol.Index == (int)RuleConstants.RULE_ARGLISTOPT || formalParamNonterminalToken.Symbol.Index == (int)RuleConstants.RULE_ARGLISTOPT2) {
                             AddParametersToFunction(i, formalParamListToken, startIndex, out lastTokenIndex);
                         } else {
                             GrapeExpression param = CreateExpression(formalParamNonterminalToken);
@@ -1915,35 +1933,35 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             }
         }
 
-        private void AddParametersToFunction(GrapeFunction f, NonterminalToken token, int startIndex, out int lastTokenIndex) {
+        private void AddParametersToFunction(GrapeFunction f, Reduction token, int startIndex, out int lastTokenIndex) {
             lastTokenIndex = startIndex;
-            if (token.Tokens.Length > 0) {
-                NonterminalToken formalParamListToken = token.Tokens[0] as NonterminalToken;
-                foreach (Token formalParamToken in formalParamListToken.Tokens) {
-                    NonterminalToken formalParamNonterminalToken = formalParamToken as NonterminalToken;
+            if (token.Children.Count > 0) {
+                Reduction formalParamListToken = token.Children[0] as Reduction;
+                foreach (Token formalParamToken in formalParamListToken.Children) {
+                    Reduction formalParamNonterminalToken = formalParamToken as Reduction;
                     if (formalParamNonterminalToken != null) {
-                        if (formalParamNonterminalToken.Rule.Id == (int)RuleConstants.RULE_FORMALPARAMLIST || formalParamNonterminalToken.Rule.Id == (int)RuleConstants.RULE_FORMALPARAMLIST_COMMA) {
+                        if (formalParamNonterminalToken.Symbol.Index == (int)RuleConstants.RULE_FORMALPARAMLIST || formalParamNonterminalToken.Symbol.Index == (int)RuleConstants.RULE_FORMALPARAMLIST_COMMA) {
                             AddParametersToFunction(f, formalParamListToken, startIndex, out lastTokenIndex);
                         } else {
                             GrapeVariable param = new GrapeVariable();
                             param.IsParameter = true;
                             param.FileName = currentFileName;
                             param.Parent = f;
-                            foreach (Token childToken in formalParamNonterminalToken.Tokens) {
-                                NonterminalToken childNonterminalToken = childToken as NonterminalToken;
-                                TerminalToken childTerminalToken = childToken as TerminalToken;
+                            foreach (Token childToken in formalParamNonterminalToken.Children) {
+                                Reduction childNonterminalToken = childToken as Reduction;
+                                TextToken childTerminalToken = childToken as TextToken;
                                 if (childNonterminalToken != null) {
-                                    GrapeExpression paramType = GetTypeFromTypeToken(formalParamNonterminalToken.Tokens, param);
+                                    GrapeExpression paramType = GetTypeFromTypeToken(formalParamNonterminalToken.Children, param);
                                     param.Type = paramType;
                                 } else if (childTerminalToken != null && childTerminalToken.Text != ",") {
                                     string paramName = childTerminalToken.Text;
                                     param.Name = paramName;
-                                    param.Offset = childTerminalToken.Location.Position;
+                                    param.Offset = childTerminalToken.Position.Index;
                                     param.Length = childTerminalToken.Text.Length;
-                                    param.StartLine = childTerminalToken.Location.LineNr;
-                                    param.StartColumn = childTerminalToken.Location.ColumnNr;
-                                    param.EndLine = childTerminalToken.Location.LineNr;
-                                    param.EndColumn = childTerminalToken.Location.ColumnNr + childTerminalToken.Text.Length;
+                                    param.StartLine = childTerminalToken.Position.Line;
+                                    param.StartColumn = childTerminalToken.Position.Column;
+                                    param.EndLine = childTerminalToken.Position.Line;
+                                    param.EndColumn = childTerminalToken.Position.Column + childTerminalToken.Text.Length;
                                 }
                             }
 
@@ -1981,19 +1999,19 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             }
         }
 
-        private void CreateFunction(NonterminalToken token) {
-            if (token.Tokens.Length >= 4) {
+        private void CreateFunction(Reduction token) {
+            if (token.Children.Count >= 4) {
                 GrapeFunction f = new GrapeFunction();
-                TerminalToken firstToken = null;
-                TerminalToken lastToken = null;
-                NonterminalToken modifiers = token.Tokens[0] as NonterminalToken;
-                if (modifiers != null && modifiers.Tokens.Length > 0) {
+                TextToken firstToken = null;
+                TextToken lastToken = null;
+                Reduction modifiers = token.Children[0] as Reduction;
+                if (modifiers != null && modifiers.Children.Count > 0) {
                     f.Modifiers = GetModifiers(modifiers, out firstToken);
                 }
 
                 int nameTokenIndex = 2;
-                GrapeExpression type = GetTypeFromTypeToken(token.Tokens, f);
-                TerminalToken ctorToken = token.Tokens[1] as TerminalToken;
+                GrapeExpression type = GetTypeFromTypeToken(token.Children, f);
+                TextToken ctorToken = token.Children[1] as TextToken;
                 bool isCtor = false;
                 if (ctorToken != null && (ctorToken.Text == "ctor" || ctorToken.Text == "dctor")) {
                     type = new GrapeIdentifierExpression { Identifier = ctorToken.Text };
@@ -2010,7 +2028,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                     }
                 }
 
-                TerminalToken nameToken = token.Tokens[nameTokenIndex] as TerminalToken;
+                TextToken nameToken = token.Children[nameTokenIndex] as TextToken;
                 if (nameToken != null) {
                     firstToken = nameToken;
                     f.Name = nameToken.Text;
@@ -2033,22 +2051,22 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
 
                 int lastTokenIndex;
                 if (f.Type != GrapeFunction.GrapeFunctionType.Destructor) {
-                    NonterminalToken parametersToken = token.Tokens[nameTokenIndex + 2] as NonterminalToken;
+                    Reduction parametersToken = token.Children[nameTokenIndex + 2] as Reduction;
                     AddParametersToFunction(f, parametersToken, nameTokenIndex + 2, out lastTokenIndex);
                 }
 
-                TerminalToken endToken = GetEndToken(token.Tokens);
+                TextToken endToken = GetEndToken(token.Children);
                 if (endToken != null) {
                     lastToken = endToken;
                 }
 
                 if (firstToken != null && lastToken != null) {
-                    f.Offset = firstToken.Location.Position;
-                    f.Length = lastToken.Location.Position - firstToken.Location.Position;
-                    f.StartLine = firstToken.Location.LineNr;
-                    f.StartColumn = firstToken.Location.ColumnNr;
-                    f.EndLine = lastToken.Location.LineNr;
-                    f.EndColumn = lastToken.Location.ColumnNr;
+                    f.Offset = firstToken.Position.Index;
+                    f.Length = lastToken.Position.Index - firstToken.Position.Index;
+                    f.StartLine = firstToken.Position.Line;
+                    f.StartColumn = firstToken.Position.Column;
+                    f.EndLine = lastToken.Position.Line;
+                    f.EndColumn = lastToken.Position.Column;
                 }
 
                 currentEntityWithBlock = f;
@@ -2057,7 +2075,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             }
         }
 
-        private void CreateBlock(NonterminalToken token) {
+        private void CreateBlock(Reduction token) {
             if (currentEntityWithBlock != null && currentEntityWithBlock is GrapeEntity && currentEntityWithBlock != lastEntityWithBlock) {
                 GrapeBlock block = new GrapeBlock();
                 GrapeEntity currentEntity = currentEntityWithBlock as GrapeEntity;
@@ -2075,39 +2093,39 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             }
         }
 
-        private void CreateClass(NonterminalToken token) {
-            if (token.Tokens.Length >= 3) {
+        private void CreateClass(Reduction token) {
+            if (token.Children.Count >= 3) {
                 GrapeClass c = new GrapeClass();
-                TerminalToken firstToken = null;
-                TerminalToken lastToken = null;
-                NonterminalToken modifiers = token.Tokens[0] as NonterminalToken;
-                if (modifiers != null && modifiers.Tokens.Length > 0) {
+                TextToken firstToken = null;
+                TextToken lastToken = null;
+                Reduction modifiers = token.Children[0] as Reduction;
+                if (modifiers != null && modifiers.Children.Count > 0) {
                     c.Modifiers = GetModifiers(modifiers, out firstToken);
                 }
 
-                TerminalToken nameToken = token.Tokens[2] as TerminalToken;
+                TextToken nameToken = token.Children[2] as TextToken;
                 if (nameToken != null) {
                     c.Name = nameToken.Text;
                     firstToken = nameToken;
                     lastToken = nameToken;
                 }
 
-                if (token.Tokens.Length >= 4) {
-                    NonterminalToken sizeToken = token.Tokens[3] as NonterminalToken;
-                    if (sizeToken != null && sizeToken.Tokens.Length > 0) {
-                        TerminalToken terminalToken = sizeToken.Tokens[1] as TerminalToken;
+                if (token.Children.Count >= 4) {
+                    Reduction sizeToken = token.Children[3] as Reduction;
+                    if (sizeToken != null && sizeToken.Children.Count > 0) {
+                        TextToken terminalToken = sizeToken.Children[1] as TextToken;
                         if (terminalToken != null) {
                             c.Size = Convert.ToInt32(terminalToken.Text);
                         }
                     }
                 }
 
-                if (token.Tokens.Length >= 5) {
-                    NonterminalToken inheritanceToken = token.Tokens[4] as NonterminalToken;
-                    if (inheritanceToken != null && inheritanceToken.Tokens.Length >= 2) {
-                        NonterminalToken qualifiedSuperIdToken = inheritanceToken.Tokens[1] as NonterminalToken;
-                        if (qualifiedSuperIdToken != null && qualifiedSuperIdToken.Tokens.Length >= 1) {
-                            NonterminalToken qualifiedIdToken = qualifiedSuperIdToken.Tokens[0] as NonterminalToken;
+                if (token.Children.Count >= 5) {
+                    Reduction inheritanceToken = token.Children[4] as Reduction;
+                    if (inheritanceToken != null && inheritanceToken.Children.Count >= 2) {
+                        Reduction qualifiedSuperIdToken = inheritanceToken.Children[1] as Reduction;
+                        if (qualifiedSuperIdToken != null && qualifiedSuperIdToken.Children.Count >= 1) {
+                            Reduction qualifiedIdToken = qualifiedSuperIdToken.Children[0] as Reduction;
                             c.Inherits = CreateExpression(qualifiedIdToken);
                             c.Inherits.Parent = c;
                         }
@@ -2117,18 +2135,18 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                     }
                 }
 
-                TerminalToken endToken = GetEndToken(token.Tokens);
+                TextToken endToken = GetEndToken(token.Children);
                 if (endToken != null) {
                     lastToken = endToken;
                 }
 
                 if (firstToken != null && lastToken != null) {
-                    c.Offset = firstToken.Location.Position;
-                    c.Length = lastToken.Location.Position - firstToken.Location.Position;
-                    c.StartLine = firstToken.Location.LineNr;
-                    c.StartColumn = firstToken.Location.ColumnNr;
-                    c.EndLine = lastToken.Location.LineNr;
-                    c.EndColumn = lastToken.Location.ColumnNr;
+                    c.Offset = firstToken.Position.Index;
+                    c.Length = lastToken.Position.Index - firstToken.Position.Index;
+                    c.StartLine = firstToken.Position.Line;
+                    c.StartColumn = firstToken.Position.Column;
+                    c.EndLine = lastToken.Position.Line;
+                    c.EndColumn = lastToken.Position.Column;
                 }
 
                 currentEntityWithBlock = c;
@@ -2137,23 +2155,23 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             }
         }
 
-        private void CreatePackageDeclaration(NonterminalToken token) {
-            if (token.Tokens.Length >= 2) {
+        private void CreatePackageDeclaration(Reduction token) {
+            if (token.Children.Count >= 2) {
                 GrapePackageDeclaration packageDeclaration = new GrapePackageDeclaration();
-                TerminalToken firstToken = token.Tokens[0] as TerminalToken;
-                NonterminalToken qualifiedIdToken = token.Tokens[1] as NonterminalToken;
+                TextToken firstToken = token.Children[0] as TextToken;
+                Reduction qualifiedIdToken = token.Children[1] as Reduction;
                 if (qualifiedIdToken != null) {
-                    TerminalToken lastToken;
+                    TextToken lastToken;
                     string packageName = GetQualifiedIdText(qualifiedIdToken, out lastToken);
                     packageDeclaration.PackageName = packageName;
                     packageDeclaration.FileName = currentFileName;
                     if (firstToken != null && lastToken != null) {
-                        packageDeclaration.Offset = firstToken.Location.Position;
-                        packageDeclaration.Length = lastToken.Location.Position - firstToken.Location.Position;
-                        packageDeclaration.StartLine = firstToken.Location.LineNr;
-                        packageDeclaration.StartColumn = firstToken.Location.ColumnNr;
-                        packageDeclaration.EndLine = lastToken.Location.LineNr;
-                        packageDeclaration.EndColumn = lastToken.Location.ColumnNr;
+                        packageDeclaration.Offset = firstToken.Position.Index;
+                        packageDeclaration.Length = lastToken.Position.Index - firstToken.Position.Index;
+                        packageDeclaration.StartLine = firstToken.Position.Line;
+                        packageDeclaration.StartColumn = firstToken.Position.Column;
+                        packageDeclaration.EndLine = lastToken.Position.Line;
+                        packageDeclaration.EndColumn = lastToken.Position.Column;
                     }
 
                     config.Ast.Children.Add(packageDeclaration);
@@ -2186,23 +2204,23 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             }
         }
 
-        private void CreateImportDeclaration(NonterminalToken token) {
-            if (token.Tokens.Length >= 2) {
+        private void CreateImportDeclaration(Reduction token) {
+            if (token.Children.Count >= 2) {
                 GrapeImportDeclaration importDeclaration = new GrapeImportDeclaration();
-                TerminalToken firstToken = token.Tokens[0] as TerminalToken;
-                NonterminalToken qualifiedIdToken = token.Tokens[1] as NonterminalToken;
+                TextToken firstToken = token.Children[0] as TextToken;
+                Reduction qualifiedIdToken = token.Children[1] as Reduction;
                 if (qualifiedIdToken != null) {
-                    TerminalToken lastToken;
+                    TextToken lastToken;
                     string importedPackageName = GetQualifiedIdText(qualifiedIdToken, out lastToken);
                     importDeclaration.ImportedPackage = importedPackageName;
                     importDeclaration.FileName = currentFileName;
                     if (firstToken != null && lastToken != null) {
-                        importDeclaration.Offset = firstToken.Location.Position;
-                        importDeclaration.Length = lastToken.Location.Position - firstToken.Location.Position;
-                        importDeclaration.StartLine = firstToken.Location.LineNr;
-                        importDeclaration.StartColumn = firstToken.Location.ColumnNr;
-                        importDeclaration.EndLine = lastToken.Location.LineNr;
-                        importDeclaration.EndColumn = lastToken.Location.ColumnNr;
+                        importDeclaration.Offset = firstToken.Position.Index;
+                        importDeclaration.Length = lastToken.Position.Index - firstToken.Position.Index;
+                        importDeclaration.StartLine = firstToken.Position.Line;
+                        importDeclaration.StartColumn = firstToken.Position.Column;
+                        importDeclaration.EndLine = lastToken.Position.Line;
+                        importDeclaration.EndColumn = lastToken.Position.Column;
                     }
 
                     config.Ast.Children.Add(importDeclaration);
@@ -2233,11 +2251,11 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             }
         }
 
-        private void ProcessNonterminalTokensOfToken(NonterminalToken token) {
-            foreach (Token childNormalToken in token.Tokens) {
-                NonterminalToken childToken = childNormalToken as NonterminalToken;
+        private void ProcessNonterminalTokensOfToken(Reduction token) {
+            foreach (Token childNormalToken in token.Children) {
+                Reduction childToken = childNormalToken as Reduction;
                 if (childToken != null) {
-                    switch (childToken.Rule.Id) {
+                    switch (childToken.Symbol.Index) {
                         // Generic top-level clauses (packages, imports, etc.)
                         case (int)RuleConstants.RULE_PACKAGE_PACKAGE:
                             CreatePackageDeclaration(childToken);
@@ -2334,32 +2352,28 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             }
         }
 
-        private void AcceptEvent(LALRParser parser, AcceptEventArgs args) {
+        private void AcceptEvent(Reduction acceptToken) {
             processedExpressionTokens.Clear();
-            ProcessNonterminalTokensOfToken(args.Token);
+            ProcessNonterminalTokensOfToken(acceptToken);
         }
 
-        private void TokenErrorEvent(LALRParser parser, TokenErrorEventArgs args) {
-            string message = "Token error with input: '" + args.Token.ToString() + "'";
-            if (config.ContinueOnError) {
-                args.Continue = true;
-            }
-
+        private void TokenErrorEvent(LalrProcessor parser, out bool continueParsing) {
+            string message = "Token error with input: '" + parser.CurrentToken + "'";
+            	continueParsing = config.ContinueOnError;
             if (config.OutputErrors) {
-                errorSink.AddError(new GrapeErrorSink.Error { Description = message, FileName = currentFileName, Offset = args.Token.Location.Position, Length = 1, StartLine = args.Token.Location.LineNr, EndLine = args.Token.Location.LineNr, StartColumn = args.Token.Location.ColumnNr, EndColumn = args.Token.Location.ColumnNr + 1 });
+                errorSink.AddError(new GrapeErrorSink.Error { Description = message, FileName = currentFileName, Offset = parser.CurrentToken.Position.Index, Length = 1, StartLine = parser.CurrentToken.Position.Line, EndLine = parser.CurrentToken.Position.Line, StartColumn = parser.CurrentToken.Position.Column, EndColumn = parser.CurrentToken.Position.Column + 1 });
             }
         }
 
-        private void ParseErrorEvent(LALRParser parser, ParseErrorEventArgs args) {
-            if (args.UnexpectedToken.ToString() != "(EOF)") {
-                string message = "Unexpected token: '" + args.UnexpectedToken.ToString() + "'";
-                if (config.ContinueOnError) {
-                    args.Continue = ContinueMode.Skip;
-                }
-
+        private void ParseErrorEvent(LalrProcessor parser, out bool continueParsing) {
+            if (parser.CurrentToken.Symbol.Kind != SymbolKind.End) {
+                string message = "Unexpected token: '" + parser.CurrentToken + "'";
+            	continueParsing = config.ContinueOnError;
                 if (config.OutputErrors) {
-                    errorSink.AddError(new GrapeErrorSink.Error { Description = message, FileName = currentFileName, Offset = args.UnexpectedToken.Location.Position, Length = 1, StartLine = args.UnexpectedToken.Location.LineNr, EndLine = args.UnexpectedToken.Location.LineNr, StartColumn = args.UnexpectedToken.Location.ColumnNr, EndColumn = args.UnexpectedToken.Location.ColumnNr + 1 });
+                    errorSink.AddError(new GrapeErrorSink.Error { Description = message, FileName = currentFileName, Offset = parser.CurrentToken.Position.Index, Length = 1, StartLine = parser.CurrentToken.Position.Line, EndLine = parser.CurrentToken.Position.Line, StartColumn = parser.CurrentToken.Position.Column, EndColumn = parser.CurrentToken.Position.Column + 1 });
                 }
+            } else {
+            	continueParsing = false;
             }
         }
     }
