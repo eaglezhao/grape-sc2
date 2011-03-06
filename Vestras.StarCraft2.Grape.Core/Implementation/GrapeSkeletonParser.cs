@@ -1227,8 +1227,8 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                     expression.StartColumn = firstTerminalToken.Position.Column;
                     expression.EndLine = lastTerminalToken.Position.Line;
                     expression.EndColumn = lastTerminalToken.Position.Column;
-                    expression.Offset = firstTerminalToken.Position.Index;
-                    expression.Length = lastTerminalToken.Position.Index - firstTerminalToken.Position.Index;
+                    expression.Offset = (int)(firstTerminalToken.Position.Index);
+                    expression.Length = (int)(lastTerminalToken.Position.Index - firstTerminalToken.Position.Index);
                 }
             }
 
@@ -1317,8 +1317,8 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                     }
 
                     if (blockFirstToken != null && blockLastToken != null) {
-                        statement.Offset = blockFirstToken.Position.Index;
-                        statement.Length = blockLastToken.Position.Index - blockFirstToken.Position.Index;
+                        statement.Offset = (int)blockFirstToken.Position.Index;
+                        statement.Length = (int)(blockLastToken.Position.Index - blockFirstToken.Position.Index);
                         statement.StartLine = blockFirstToken.Position.Line;
                         statement.StartColumn = blockFirstToken.Position.Column;
                         statement.EndLine = blockLastToken.Position.Line;
@@ -1347,8 +1347,8 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                     }
 
                     if (blockFirstToken != null && blockLastToken != null) {
-                        statement.Offset = blockFirstToken.Position.Index;
-                        statement.Length = blockLastToken.Position.Index - blockFirstToken.Position.Index;
+                        statement.Offset = (int)blockFirstToken.Position.Index;
+                        statement.Length = (int)(blockLastToken.Position.Index - blockFirstToken.Position.Index);
                         statement.StartLine = blockFirstToken.Position.Line;
                         statement.StartColumn = blockFirstToken.Position.Column;
                         statement.EndLine = blockLastToken.Position.Line;
@@ -1379,8 +1379,8 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                         }
 
                         if (blockFirstToken != null && blockLastToken != null) {
-                            statement.Offset = blockFirstToken.Position.Index;
-                            statement.Length = blockLastToken.Position.Index - blockFirstToken.Position.Index;
+                            statement.Offset = (int)blockFirstToken.Position.Index;
+                            statement.Length = (int)(blockLastToken.Position.Index - blockFirstToken.Position.Index);
                             statement.StartLine = blockFirstToken.Position.Line;
                             statement.StartColumn = blockFirstToken.Position.Column;
                             statement.EndLine = blockLastToken.Position.Line;
@@ -1405,8 +1405,8 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                         blockFirstToken = token.Children[0] as TextToken;
                         blockLastToken = GetEndToken(token.Children);
                         if (blockFirstToken != null && blockLastToken != null) {
-                            statement.Offset = blockFirstToken.Position.Index;
-                            statement.Length = blockLastToken.Position.Index - blockFirstToken.Position.Index;
+                            statement.Offset = (int)blockFirstToken.Position.Index;
+                            statement.Length = (int)(blockLastToken.Position.Index - blockFirstToken.Position.Index);
                             statement.StartLine = blockFirstToken.Position.Line;
                             statement.StartColumn = blockFirstToken.Position.Column;
                             statement.EndLine = blockLastToken.Position.Line;
@@ -1450,8 +1450,8 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                     }
 
                     if (blockFirstToken != null && blockLastToken != null) {
-                        statement.Offset = blockFirstToken.Position.Index;
-                        statement.Length = blockLastToken.Position.Index - blockFirstToken.Position.Index;
+                        statement.Offset = (int)blockFirstToken.Position.Index;
+                        statement.Length = (int)(blockLastToken.Position.Index - blockFirstToken.Position.Index);
                         statement.StartLine = blockFirstToken.Position.Line;
                         statement.StartColumn = blockFirstToken.Position.Column;
                         statement.EndLine = blockLastToken.Position.Line;
@@ -1489,8 +1489,8 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                         }
 
                         if (blockFirstToken != null && blockLastToken != null) {
-                            statement.Offset = blockFirstToken.Position.Index;
-                            statement.Length = blockLastToken.Position.Index - blockFirstToken.Position.Index;
+                            statement.Offset = (int)blockFirstToken.Position.Index;
+                            statement.Length = (int)(blockLastToken.Position.Index - blockFirstToken.Position.Index);
                             statement.StartLine = blockFirstToken.Position.Line;
                             statement.StartColumn = blockFirstToken.Position.Column;
                             statement.EndLine = blockLastToken.Position.Line;
@@ -1515,8 +1515,8 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                         blockFirstToken = token.Children[0] as TextToken;
                         blockLastToken = GetEndToken(token.Children);
                         if (blockFirstToken != null && blockLastToken != null) {
-                            statement.Offset = blockFirstToken.Position.Index;
-                            statement.Length = blockLastToken.Position.Index - blockFirstToken.Position.Index;
+                            statement.Offset = (int)blockFirstToken.Position.Index;
+                            statement.Length = (int)(blockLastToken.Position.Index - blockFirstToken.Position.Index);
                             statement.StartLine = blockFirstToken.Position.Line;
                             statement.StartColumn = blockFirstToken.Position.Column;
                             statement.EndLine = blockLastToken.Position.Line;
@@ -1539,8 +1539,8 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                     blockFirstToken = token.Children[0] as TextToken;
                     blockLastToken = GetEndToken(token.Children);
                     if (blockFirstToken != null && blockLastToken != null) {
-                        statement.Offset = blockFirstToken.Position.Index;
-                        statement.Length = blockLastToken.Position.Index - blockFirstToken.Position.Index;
+                        statement.Offset = (int)blockFirstToken.Position.Index;
+                        statement.Length = (int)(blockLastToken.Position.Index - blockFirstToken.Position.Index);
                         statement.StartLine = blockFirstToken.Position.Line;
                         statement.StartColumn = blockFirstToken.Position.Column;
                         statement.EndLine = blockLastToken.Position.Line;
@@ -1581,8 +1581,8 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                         }
 
                         if (blockFirstToken != null && blockLastToken != null) {
-                            statement.Offset = blockFirstToken.Position.Index;
-                            statement.Length = blockLastToken.Position.Index - blockFirstToken.Position.Index;
+                            statement.Offset = (int)blockFirstToken.Position.Index;
+                            statement.Length = (int)(blockLastToken.Position.Index - blockFirstToken.Position.Index);
                             statement.StartLine = blockFirstToken.Position.Line;
                             statement.StartColumn = blockFirstToken.Position.Column;
                             statement.EndLine = blockLastToken.Position.Line;
@@ -1610,8 +1610,8 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                         blockFirstToken = token.Children[0] as TextToken;
                         blockLastToken = GetEndToken(token.Children);
                         if (blockFirstToken != null && blockLastToken != null) {
-                            statement.Offset = blockFirstToken.Position.Index;
-                            statement.Length = blockLastToken.Position.Index - blockFirstToken.Position.Index;
+                            statement.Offset = (int)blockFirstToken.Position.Index;
+                            statement.Length = (int)(blockLastToken.Position.Index - blockFirstToken.Position.Index);
                             statement.StartLine = blockFirstToken.Position.Line;
                             statement.StartColumn = blockFirstToken.Position.Column;
                             statement.EndLine = blockLastToken.Position.Line;
@@ -1649,8 +1649,8 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                     }
 
                     if (blockFirstToken != null && blockLastToken != null) {
-                        statement.Offset = blockFirstToken.Position.Index;
-                        statement.Length = blockLastToken.Position.Index - blockFirstToken.Position.Index;
+                        statement.Offset = (int)blockFirstToken.Position.Index;
+                        statement.Length = (int)(blockLastToken.Position.Index - blockFirstToken.Position.Index);
                         statement.StartLine = blockFirstToken.Position.Line;
                         statement.StartColumn = blockFirstToken.Position.Column;
                         statement.EndLine = blockLastToken.Position.Line;
@@ -1667,8 +1667,8 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                     blockFirstToken = token.Children[0] as TextToken;
                     blockLastToken = blockFirstToken;
                     if (blockFirstToken != null && blockLastToken != null) {
-                        statement.Offset = blockFirstToken.Position.Index;
-                        statement.Length = blockLastToken.Position.Index - blockFirstToken.Position.Index;
+                        statement.Offset = (int)blockFirstToken.Position.Index;
+                        statement.Length = (int)(blockLastToken.Position.Index - blockFirstToken.Position.Index);
                         statement.StartLine = blockFirstToken.Position.Line;
                         statement.StartColumn = blockFirstToken.Position.Column;
                         statement.EndLine = blockLastToken.Position.Line;
@@ -1683,8 +1683,8 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                     blockFirstToken = token.Children[0] as TextToken;
                     blockLastToken = blockFirstToken;
                     if (blockFirstToken != null && blockLastToken != null) {
-                        statement.Offset = blockFirstToken.Position.Index;
-                        statement.Length = blockLastToken.Position.Index - blockFirstToken.Position.Index;
+                        statement.Offset = (int)blockFirstToken.Position.Index;
+                        statement.Length = (int)(blockLastToken.Position.Index - blockFirstToken.Position.Index);
                         statement.StartLine = blockFirstToken.Position.Line;
                         statement.StartColumn = blockFirstToken.Position.Column;
                         statement.EndLine = blockLastToken.Position.Line;
@@ -1718,8 +1718,8 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                     blockFirstToken = token.Children[0] as TextToken;
                     blockLastToken = blockFirstToken;
                     if (blockFirstToken != null && blockLastToken != null) {
-                        statement.Offset = blockFirstToken.Position.Index;
-                        statement.Length = blockLastToken.Position.Index - blockFirstToken.Position.Index;
+                        statement.Offset = (int)blockFirstToken.Position.Index;
+                        statement.Length = (int)(blockLastToken.Position.Index - blockFirstToken.Position.Index);
                         statement.StartLine = blockFirstToken.Position.Line;
                         statement.StartColumn = blockFirstToken.Position.Column;
                         statement.EndLine = blockLastToken.Position.Line;
@@ -1753,8 +1753,8 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                     blockFirstToken = token.Children[0] as TextToken;
                     blockLastToken = blockFirstToken;
                     if (blockFirstToken != null && blockLastToken != null) {
-                        statement.Offset = blockFirstToken.Position.Index;
-                        statement.Length = blockLastToken.Position.Index - blockFirstToken.Position.Index;
+                        statement.Offset = (int)blockFirstToken.Position.Index;
+                        statement.Length = (int)(blockLastToken.Position.Index - blockFirstToken.Position.Index);
                         statement.StartLine = blockFirstToken.Position.Line;
                         statement.StartColumn = blockFirstToken.Position.Column;
                         statement.EndLine = blockLastToken.Position.Line;
@@ -1786,8 +1786,8 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                     }
 
                     if (blockFirstToken != null && blockLastToken != null) {
-                        statement.Offset = blockFirstToken.Position.Index;
-                        statement.Length = blockLastToken.Position.Index - blockFirstToken.Position.Index;
+                        statement.Offset = (int)blockFirstToken.Position.Index;
+                        statement.Length = (int)(blockLastToken.Position.Index - blockFirstToken.Position.Index);
                         statement.StartLine = blockFirstToken.Position.Line;
                         statement.StartColumn = blockFirstToken.Position.Column;
                         statement.EndLine = blockLastToken.Position.Line;
@@ -1809,8 +1809,8 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                     }
 
                     if (blockFirstToken != null && blockLastToken != null) {
-                        statement.Offset = blockFirstToken.Position.Index;
-                        statement.Length = blockLastToken.Position.Index - blockFirstToken.Position.Index;
+                        statement.Offset = (int)blockFirstToken.Position.Index;
+                        statement.Length = (int)(blockLastToken.Position.Index - blockFirstToken.Position.Index);
                         statement.StartLine = blockFirstToken.Position.Line;
                         statement.StartColumn = blockFirstToken.Position.Column;
                         statement.EndLine = blockLastToken.Position.Line;
@@ -1878,8 +1878,8 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
 
                 lastToken = endToken;
                 if (firstToken != null && lastToken != null) {
-                    v.Offset = firstToken.Position.Index;
-                    v.Length = lastToken.Position.Index - firstToken.Position.Index;
+                    v.Offset = (int)firstToken.Position.Index;
+                    v.Length = (int)(lastToken.Position.Index - firstToken.Position.Index);
                     v.StartLine = firstToken.Position.Line;
                     v.StartColumn = firstToken.Position.Column;
                     v.EndLine = lastToken.Position.Line;
@@ -1956,7 +1956,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                                 } else if (childTerminalToken != null && childTerminalToken.Text != ",") {
                                     string paramName = childTerminalToken.Text;
                                     param.Name = paramName;
-                                    param.Offset = childTerminalToken.Position.Index;
+                                    param.Offset = (int)childTerminalToken.Position.Index;
                                     param.Length = childTerminalToken.Text.Length;
                                     param.StartLine = childTerminalToken.Position.Line;
                                     param.StartColumn = childTerminalToken.Position.Column;
@@ -2061,8 +2061,8 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                 }
 
                 if (firstToken != null && lastToken != null) {
-                    f.Offset = firstToken.Position.Index;
-                    f.Length = lastToken.Position.Index - firstToken.Position.Index;
+                    f.Offset = (int)firstToken.Position.Index;
+                    f.Length = (int)(lastToken.Position.Index - firstToken.Position.Index);
                     f.StartLine = firstToken.Position.Line;
                     f.StartColumn = firstToken.Position.Column;
                     f.EndLine = lastToken.Position.Line;
@@ -2141,8 +2141,8 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                 }
 
                 if (firstToken != null && lastToken != null) {
-                    c.Offset = firstToken.Position.Index;
-                    c.Length = lastToken.Position.Index - firstToken.Position.Index;
+                    c.Offset = (int)firstToken.Position.Index;
+                    c.Length = (int)(lastToken.Position.Index - firstToken.Position.Index);
                     c.StartLine = firstToken.Position.Line;
                     c.StartColumn = firstToken.Position.Column;
                     c.EndLine = lastToken.Position.Line;
@@ -2166,8 +2166,8 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                     packageDeclaration.PackageName = packageName;
                     packageDeclaration.FileName = currentFileName;
                     if (firstToken != null && lastToken != null) {
-                        packageDeclaration.Offset = firstToken.Position.Index;
-                        packageDeclaration.Length = lastToken.Position.Index - firstToken.Position.Index;
+                        packageDeclaration.Offset = (int)firstToken.Position.Index;
+                        packageDeclaration.Length = (int)(lastToken.Position.Index - firstToken.Position.Index);
                         packageDeclaration.StartLine = firstToken.Position.Line;
                         packageDeclaration.StartColumn = firstToken.Position.Column;
                         packageDeclaration.EndLine = lastToken.Position.Line;
@@ -2215,8 +2215,8 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                     importDeclaration.ImportedPackage = importedPackageName;
                     importDeclaration.FileName = currentFileName;
                     if (firstToken != null && lastToken != null) {
-                        importDeclaration.Offset = firstToken.Position.Index;
-                        importDeclaration.Length = lastToken.Position.Index - firstToken.Position.Index;
+                        importDeclaration.Offset = (int)firstToken.Position.Index;
+                        importDeclaration.Length = (int)(lastToken.Position.Index - firstToken.Position.Index);
                         importDeclaration.StartLine = firstToken.Position.Line;
                         importDeclaration.StartColumn = firstToken.Position.Column;
                         importDeclaration.EndLine = lastToken.Position.Line;
@@ -2361,7 +2361,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             string message = "Token error with input: '" + parser.CurrentToken + "'";
             	continueParsing = config.ContinueOnError;
             if (config.OutputErrors) {
-                errorSink.AddError(new GrapeErrorSink.Error { Description = message, FileName = currentFileName, Offset = parser.CurrentToken.Position.Index, Length = 1, StartLine = parser.CurrentToken.Position.Line, EndLine = parser.CurrentToken.Position.Line, StartColumn = parser.CurrentToken.Position.Column, EndColumn = parser.CurrentToken.Position.Column + 1 });
+                errorSink.AddError(new GrapeErrorSink.Error { Description = message, FileName = currentFileName, Offset = (int)parser.CurrentToken.Position.Index, Length = 1, StartLine = parser.CurrentToken.Position.Line, EndLine = parser.CurrentToken.Position.Line, StartColumn = parser.CurrentToken.Position.Column, EndColumn = parser.CurrentToken.Position.Column + 1 });
             }
         }
 
@@ -2370,7 +2370,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                 string message = "Unexpected token: '" + parser.CurrentToken + "'";
             	continueParsing = config.ContinueOnError;
                 if (config.OutputErrors) {
-                    errorSink.AddError(new GrapeErrorSink.Error { Description = message, FileName = currentFileName, Offset = parser.CurrentToken.Position.Index, Length = 1, StartLine = parser.CurrentToken.Position.Line, EndLine = parser.CurrentToken.Position.Line, StartColumn = parser.CurrentToken.Position.Column, EndColumn = parser.CurrentToken.Position.Column + 1 });
+                    errorSink.AddError(new GrapeErrorSink.Error { Description = message, FileName = currentFileName, Offset = (int)parser.CurrentToken.Position.Index, Length = 1, StartLine = parser.CurrentToken.Position.Line, EndLine = parser.CurrentToken.Position.Line, StartColumn = parser.CurrentToken.Position.Column, EndColumn = parser.CurrentToken.Position.Column + 1 });
                 }
             } else {
             	continueParsing = false;
