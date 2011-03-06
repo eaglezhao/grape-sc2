@@ -518,7 +518,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
 
                             qualifiedIdText += terminalToken.Text;
                             lastToken = terminalToken;
-                        } else if (nonterminalToken != null && nonterminalToken.Symbol.Index != (int)RuleConstants.RULE_MEMBERLIST) {
+                        } else if (nonterminalToken != null && nonterminalToken.Rule.Index != (int)RuleConstants.RULE_MEMBERLIST) {
                             GetQualifiedIdText(nonterminalToken, ref firstToken, ref qualifiedIdText, out lastToken);
                         }
                     }
@@ -560,7 +560,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                 foreach (Token token in modifiers.Children) {
                     Reduction nonterminalToken = token as Reduction;
                     if (nonterminalToken != null) {
-                        int id = nonterminalToken.Symbol.Index;
+                        int id = nonterminalToken.Rule.Index;
                         if (id == (int)RuleConstants.RULE_MODIFIER || id == (int)RuleConstants.RULE_MODIFIER_ABSTRACT || id == (int)RuleConstants.RULE_MODIFIER_OVERRIDE || id == (int)RuleConstants.RULE_MODIFIER_SEALED || id == (int)RuleConstants.RULE_MODIFIER_STATIC) {
                             int childIndex = 0;
                             foreach (Token childToken in nonterminalToken.Children) {
@@ -652,8 +652,8 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             int currentIndex = 0;
             foreach (Token token in tokens) {
                 Reduction nonterminalToken = token as Reduction;
-                if (nonterminalToken != null && ((nonterminalToken.Symbol.Index == (int)RuleConstants.RULE_TYPE || nonterminalToken.Symbol.Index == (int)RuleConstants.RULE_TYPE2) || nonterminalToken.Symbol.Index == (int)RuleConstants.RULE_QUALIFIEDID)) {
-                    if (currentIndex + 1 < tokens.Count && tokens[currentIndex + 1] is Reduction && ((Reduction)tokens[currentIndex + 1]).Symbol.Index == (int)RuleConstants.RULE_RANKSPECIFIERS) {
+                if (nonterminalToken != null && ((nonterminalToken.Rule.Index == (int)RuleConstants.RULE_TYPE || nonterminalToken.Rule.Index == (int)RuleConstants.RULE_TYPE2) || nonterminalToken.Rule.Index == (int)RuleConstants.RULE_QUALIFIEDID)) {
+                    if (currentIndex + 1 < tokens.Count && tokens[currentIndex + 1] is Reduction && ((Reduction)tokens[currentIndex + 1]).Rule.Index == (int)RuleConstants.RULE_RANKSPECIFIERS) {
                         expression = new GrapeArrayAccessExpression();
                         expression.FileName = currentFileName;
                         GrapeArrayAccessExpression arrayExpression = expression as GrapeArrayAccessExpression;
@@ -665,10 +665,10 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                         Reduction rankSpecifierToken = (tokens[currentIndex + 1] as Reduction).Children[0] as Reduction;
                         Reduction arrayExpressionToken = rankSpecifierToken.Children[1] as Reduction;
                         arrayExpression.Array = CreateExpression(arrayExpressionToken);
-                    } else if (nonterminalToken.Symbol.Index == (int)RuleConstants.RULE_TYPE || nonterminalToken.Symbol.Index == (int)RuleConstants.RULE_TYPE2) {
+                    } else if (nonterminalToken.Rule.Index == (int)RuleConstants.RULE_TYPE || nonterminalToken.Rule.Index == (int)RuleConstants.RULE_TYPE2) {
                         Reduction nonArrayToken = nonterminalToken.Children[0] as Reduction;
                         Reduction qualifiedIdToken = nonArrayToken.Children[0] as Reduction;
-                        if (nonterminalToken.Children.Count > 1 && nonterminalToken.Children[1] is Reduction && ((Reduction)nonterminalToken.Children[1]).Symbol.Index == (int)RuleConstants.RULE_RANKSPECIFIERS) {
+                        if (nonterminalToken.Children.Count > 1 && nonterminalToken.Children[1] is Reduction && ((Reduction)nonterminalToken.Children[1]).Rule.Index == (int)RuleConstants.RULE_RANKSPECIFIERS) {
                             expression = new GrapeArrayAccessExpression();
                             expression.FileName = currentFileName;
                             GrapeArrayAccessExpression arrayExpression = expression as GrapeArrayAccessExpression;
@@ -711,7 +711,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
 
         private void AddMethodCallsToExpression(GrapeMemberExpression expression, Reduction token) {
             foreach (Token childToken in token.Children) {
-                if (childToken is Reduction && (((Reduction)childToken).Symbol.Index == (int)RuleConstants.RULE_METHODCALLS || ((Reduction)childToken).Symbol.Index == (int)RuleConstants.RULE_METHODCALLS2)) {
+                if (childToken is Reduction && (((Reduction)childToken).Rule.Index == (int)RuleConstants.RULE_METHODCALLS || ((Reduction)childToken).Rule.Index == (int)RuleConstants.RULE_METHODCALLS2)) {
                     Reduction nonterminalToken = childToken as Reduction;
                     GrapeMemberExpression nextExpression = new GrapeMemberExpression();
                     GrapeIdentifierExpression identifierExpression = new GrapeIdentifierExpression();
@@ -814,7 +814,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             if (token != null) {
                 processedExpressionTokens.Add(token);
                 if (token.Children.Count > 1 || (token.Children.Count == 1 && token.Children[0] is TextToken)) {
-                    switch (token.Symbol.Index) {
+                    switch (token.Rule.Index) {
                         // Expression in brackets: ((expression))
                         case (int)RuleConstants.RULE_VALUE_LPARAN_RPARAN:
                             expression = new GrapeStackExpression();
@@ -827,7 +827,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                         case (int)RuleConstants.RULE_STATEMENTEXP_LPARAN_RPARAN2:
                         case (int)RuleConstants.RULE_VALUE_NEW_LPARAN_RPARAN:
                             int startIndex = 0;
-                            if (token.Symbol.Index == (int)RuleConstants.RULE_VALUE_NEW_LPARAN_RPARAN) {
+                            if (token.Rule.Index == (int)RuleConstants.RULE_VALUE_NEW_LPARAN_RPARAN) {
                                 startIndex = 1;
                                 callExpression = new GrapeObjectCreationExpression();
                             } else {
@@ -869,7 +869,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
 
                                 if (token.Children.Count > startIndex + 5) {
                                     Reduction assignTailToken = token.Children[startIndex + 5] as Reduction;
-                                    if (assignTailToken != null && assignTailToken.Symbol.Index == (int)RuleConstants.RULE_ASSIGNTAIL_EQ) {
+                                    if (assignTailToken != null && assignTailToken.Rule.Index == (int)RuleConstants.RULE_ASSIGNTAIL_EQ) {
                                         processedExpressionTokens.Add(assignTailToken);
                                         GrapeSetExpression setExpression = new GrapeSetExpression();
                                         setExpression.FileName = currentFileName;
@@ -895,7 +895,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                                 expression = arrayExpression;
                                 if (token.Children.Count > 5) {
                                     Reduction assignTailToken = token.Children[startIndex + 5] as Reduction;
-                                    if (assignTailToken != null && assignTailToken.Symbol.Index == (int)RuleConstants.RULE_ASSIGNTAIL_EQ) {
+                                    if (assignTailToken != null && assignTailToken.Rule.Index == (int)RuleConstants.RULE_ASSIGNTAIL_EQ) {
                                         processedExpressionTokens.Add(assignTailToken);
                                         GrapeSetExpression setExpression = new GrapeSetExpression();
                                         setExpression.FileName = currentFileName;
@@ -918,7 +918,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                                 AddMethodCallsToExpression(expression as GrapeMemberExpression, token);
                                 if (token.Children.Count > 2) {
                                     Reduction assignTailToken = token.Children[2] as Reduction;
-                                    if (assignTailToken != null && assignTailToken.Symbol.Index == (int)RuleConstants.RULE_ASSIGNTAIL_EQ) {
+                                    if (assignTailToken != null && assignTailToken.Rule.Index == (int)RuleConstants.RULE_ASSIGNTAIL_EQ) {
                                         processedExpressionTokens.Add(assignTailToken);
                                         GrapeSetExpression setExpression = new GrapeSetExpression();
                                         setExpression.Member = member;
@@ -1081,7 +1081,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                             conditionalExpression = expression as GrapeConditionalExpression;
                             conditionalExpression.Left = CreateExpression(token.Children[0] as Reduction, ref lastToken);
                             conditionalExpression.Right = CreateExpression(token.Children[2] as Reduction, ref lastToken);
-                            if (token.Symbol.Index == (int)RuleConstants.RULE_EQUALITYEXP_EQEQ) {
+                            if (token.Rule.Index == (int)RuleConstants.RULE_EQUALITYEXP_EQEQ) {
                                 conditionalExpression.Type = GrapeConditionalExpression.GrapeConditionalExpressionType.Equal;
                             } else {
                                 conditionalExpression.Type = GrapeConditionalExpression.GrapeConditionalExpressionType.NotEqual;
@@ -1130,7 +1130,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                             addExpression = expression as GrapeAddExpression;
                             addExpression.Left = CreateExpression(token.Children[0] as Reduction, ref lastToken);
                             addExpression.Right = CreateExpression(token.Children[2] as Reduction, ref lastToken);
-                            addExpression.Type = token.Symbol.Index == (int)RuleConstants.RULE_ADDEXP_MINUS ? GrapeAddExpression.GrapeAddExpressionType.Subtraction : GrapeAddExpression.GrapeAddExpressionType.Addition;
+                            addExpression.Type = token.Rule.Index == (int)RuleConstants.RULE_ADDEXP_MINUS ? GrapeAddExpression.GrapeAddExpressionType.Subtraction : GrapeAddExpression.GrapeAddExpressionType.Addition;
                             break;
                         // Multiplication expressions: (expression) * (expression), (expression) / (expression), (expression) % (expression).
                         case (int)RuleConstants.RULE_MULTEXP_DIV:
@@ -1435,7 +1435,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                         currentIndex = 0;
                         expressionToken = null;
                         while (currentIndex < token.Children.Count) {
-                            if (token.Children[currentIndex] is Reduction && (((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSION || ((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSIONOPT || ((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSIONOPT2 || ((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSION_EQ)) {
+                            if (token.Children[currentIndex] is Reduction && (((Reduction)token.Children[currentIndex]).Rule.Index == (int)RuleConstants.RULE_EXPRESSION || ((Reduction)token.Children[currentIndex]).Rule.Index == (int)RuleConstants.RULE_EXPRESSIONOPT || ((Reduction)token.Children[currentIndex]).Rule.Index == (int)RuleConstants.RULE_EXPRESSIONOPT2 || ((Reduction)token.Children[currentIndex]).Rule.Index == (int)RuleConstants.RULE_EXPRESSION_EQ)) {
                                 expressionToken = token.Children[currentIndex] as Reduction;
                                 break;
                             }
@@ -1474,7 +1474,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                             currentIndex = 0;
                             expressionToken = null;
                             while (currentIndex < token.Children.Count) {
-                                if (token.Children[currentIndex] is Reduction && (((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSION || ((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSIONOPT || ((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSIONOPT2 || ((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSION_EQ)) {
+                                if (token.Children[currentIndex] is Reduction && (((Reduction)token.Children[currentIndex]).Rule.Index == (int)RuleConstants.RULE_EXPRESSION || ((Reduction)token.Children[currentIndex]).Rule.Index == (int)RuleConstants.RULE_EXPRESSIONOPT || ((Reduction)token.Children[currentIndex]).Rule.Index == (int)RuleConstants.RULE_EXPRESSIONOPT2 || ((Reduction)token.Children[currentIndex]).Rule.Index == (int)RuleConstants.RULE_EXPRESSION_EQ)) {
                                     expressionToken = token.Children[currentIndex] as Reduction;
                                     break;
                                 }
@@ -1635,7 +1635,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                     currentIndex = 0;
                     expressionToken = null;
                     while (currentIndex < token.Children.Count) {
-                        if (token.Children[currentIndex] is Reduction && (((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSION || ((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSIONOPT || ((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSIONOPT2 || ((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSION_EQ)) {
+                        if (token.Children[currentIndex] is Reduction && (((Reduction)token.Children[currentIndex]).Rule.Index == (int)RuleConstants.RULE_EXPRESSION || ((Reduction)token.Children[currentIndex]).Rule.Index == (int)RuleConstants.RULE_EXPRESSIONOPT || ((Reduction)token.Children[currentIndex]).Rule.Index == (int)RuleConstants.RULE_EXPRESSIONOPT2 || ((Reduction)token.Children[currentIndex]).Rule.Index == (int)RuleConstants.RULE_EXPRESSION_EQ)) {
                             expressionToken = token.Children[currentIndex] as Reduction;
                             break;
                         }
@@ -1701,7 +1701,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                         currentIndex = 0;
                         expressionToken = null;
                         while (currentIndex < token.Children.Count) {
-                            if (token.Children[currentIndex] is Reduction && (((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSION || ((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSIONOPT || ((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSIONOPT2 || ((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSION_EQ)) {
+                            if (token.Children[currentIndex] is Reduction && (((Reduction)token.Children[currentIndex]).Rule.Index == (int)RuleConstants.RULE_EXPRESSION || ((Reduction)token.Children[currentIndex]).Rule.Index == (int)RuleConstants.RULE_EXPRESSIONOPT || ((Reduction)token.Children[currentIndex]).Rule.Index == (int)RuleConstants.RULE_EXPRESSIONOPT2 || ((Reduction)token.Children[currentIndex]).Rule.Index == (int)RuleConstants.RULE_EXPRESSION_EQ)) {
                                 expressionToken = token.Children[currentIndex] as Reduction;
                                 break;
                             }
@@ -1736,7 +1736,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                         currentIndex = 0;
                         expressionToken = null;
                         while (currentIndex < token.Children.Count) {
-                            if (token.Children[currentIndex] is Reduction && (((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSION || ((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSIONOPT || ((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSIONOPT2 || ((Reduction)token.Children[currentIndex]).Symbol.Index == (int)RuleConstants.RULE_EXPRESSION_EQ)) {
+                            if (token.Children[currentIndex] is Reduction && (((Reduction)token.Children[currentIndex]).Rule.Index == (int)RuleConstants.RULE_EXPRESSION || ((Reduction)token.Children[currentIndex]).Rule.Index == (int)RuleConstants.RULE_EXPRESSIONOPT || ((Reduction)token.Children[currentIndex]).Rule.Index == (int)RuleConstants.RULE_EXPRESSIONOPT2 || ((Reduction)token.Children[currentIndex]).Rule.Index == (int)RuleConstants.RULE_EXPRESSION_EQ)) {
                                 expressionToken = token.Children[currentIndex] as Reduction;
                                 break;
                             }
@@ -1832,7 +1832,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                 TextToken firstToken = null;
                 TextToken lastToken = null;
                 Reduction modifiers = token.Children[0] as Reduction;
-                if ((modifiers != null && modifiers.Symbol.Index != (int)RuleConstants.RULE_QUALIFIEDID && modifiers.Children.Count > 0) || currentBlock.Parent is GrapeClass) {
+                if ((modifiers != null && modifiers.Rule.Index != (int)RuleConstants.RULE_QUALIFIEDID && modifiers.Children.Count > 0) || currentBlock.Parent is GrapeClass) {
                     string modifiersText = GetModifiers(modifiers, out firstToken);
                     if (!string.IsNullOrEmpty(modifiersText) || currentBlock.Parent is GrapeClass) {
                         v = new GrapeField();
@@ -1897,7 +1897,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                 foreach (Token formalParamToken in formalParamListToken.Children) {
                     Reduction formalParamNonterminalToken = formalParamToken as Reduction;
                     if (formalParamNonterminalToken != null) {
-                        if (formalParamNonterminalToken.Symbol.Index == (int)RuleConstants.RULE_ARGLIST || formalParamNonterminalToken.Symbol.Index == (int)RuleConstants.RULE_ARGLIST_COMMA || formalParamNonterminalToken.Symbol.Index == (int)RuleConstants.RULE_ARGLISTOPT || formalParamNonterminalToken.Symbol.Index == (int)RuleConstants.RULE_ARGLISTOPT2) {
+                        if (formalParamNonterminalToken.Rule.Index == (int)RuleConstants.RULE_ARGLIST || formalParamNonterminalToken.Rule.Index == (int)RuleConstants.RULE_ARGLIST_COMMA || formalParamNonterminalToken.Rule.Index == (int)RuleConstants.RULE_ARGLISTOPT || formalParamNonterminalToken.Rule.Index == (int)RuleConstants.RULE_ARGLISTOPT2) {
                             AddParametersToCallExpression(callExpression, formalParamListToken, startIndex, out lastTokenIndex);
                         } else {
                             GrapeExpression param = CreateExpression(formalParamNonterminalToken);
@@ -1918,7 +1918,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                 foreach (Token formalParamToken in formalParamListToken.Children) {
                     Reduction formalParamNonterminalToken = formalParamToken as Reduction;
                     if (formalParamNonterminalToken != null) {
-                        if (formalParamNonterminalToken.Symbol.Index == (int)RuleConstants.RULE_ARGLIST || formalParamNonterminalToken.Symbol.Index == (int)RuleConstants.RULE_ARGLIST_COMMA || formalParamNonterminalToken.Symbol.Index == (int)RuleConstants.RULE_ARGLISTOPT || formalParamNonterminalToken.Symbol.Index == (int)RuleConstants.RULE_ARGLISTOPT2) {
+                        if (formalParamNonterminalToken.Rule.Index == (int)RuleConstants.RULE_ARGLIST || formalParamNonterminalToken.Rule.Index == (int)RuleConstants.RULE_ARGLIST_COMMA || formalParamNonterminalToken.Rule.Index == (int)RuleConstants.RULE_ARGLISTOPT || formalParamNonterminalToken.Rule.Index == (int)RuleConstants.RULE_ARGLISTOPT2) {
                             AddParametersToFunction(i, formalParamListToken, startIndex, out lastTokenIndex);
                         } else {
                             GrapeExpression param = CreateExpression(formalParamNonterminalToken);
@@ -1940,7 +1940,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
                 foreach (Token formalParamToken in formalParamListToken.Children) {
                     Reduction formalParamNonterminalToken = formalParamToken as Reduction;
                     if (formalParamNonterminalToken != null) {
-                        if (formalParamNonterminalToken.Symbol.Index == (int)RuleConstants.RULE_FORMALPARAMLIST || formalParamNonterminalToken.Symbol.Index == (int)RuleConstants.RULE_FORMALPARAMLIST_COMMA) {
+                        if (formalParamNonterminalToken.Rule.Index == (int)RuleConstants.RULE_FORMALPARAMLIST || formalParamNonterminalToken.Rule.Index == (int)RuleConstants.RULE_FORMALPARAMLIST_COMMA) {
                             AddParametersToFunction(f, formalParamListToken, startIndex, out lastTokenIndex);
                         } else {
                             GrapeVariable param = new GrapeVariable();
@@ -2255,7 +2255,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
             foreach (Token childNormalToken in token.Children) {
                 Reduction childToken = childNormalToken as Reduction;
                 if (childToken != null) {
-                    switch (childToken.Symbol.Index) {
+                    switch (childToken.Rule.Index) {
                         // Generic top-level clauses (packages, imports, etc.)
                         case (int)RuleConstants.RULE_PACKAGE_PACKAGE:
                             CreatePackageDeclaration(childToken);
