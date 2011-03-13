@@ -30,6 +30,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="bsn.GoldParser">
       <HintPath>..\Lib\bsn.GoldParser.dll</HintPath>
@@ -38,55 +41,114 @@
     <Reference Include="System.ComponentModel.Composition" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Ast\GrapeArrayAccessExpression.cs" />
+    <Compile Include="Ast\GrapeArrayAccess.cs" />
+    <Compile Include="Ast\GrapeArrayExpression.cs" />
+    <Compile Include="Ast\GrapeArrayType.cs" />
+    <Compile Include="Ast\GrapeBinaryAndExpression.cs" />
+    <Compile Include="Ast\GrapeBinaryExpression.cs" />
+    <Compile Include="Ast\GrapeBinaryOrExpression.cs" />
     <Compile Include="Ast\GrapeBreakStatement.cs" />
     <Compile Include="Ast\GrapeAddExpression.cs" />
-    <Compile Include="Ast\GrapeCallExpression.cs" />
-    <Compile Include="Ast\GrapeCaseStatement.cs" />
-    <Compile Include="Ast\GrapeCatchStatement.cs" />
+    <Compile Include="Ast\GrapeCallExpression.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Ast\GrapeDivisionExpression.cs" />
+    <Compile Include="Ast\GrapeEqualExpression.cs" />
+    <Compile Include="Ast\GrapeBoolLiteralExpression.cs" />
+    <Compile Include="Ast\GrapeParameter.cs" />
+    <Compile Include="Ast\GrapeGreaterThanExpression.cs" />
+    <Compile Include="Ast\GrapeGreaterThanOrEqualExpression.cs" />
+    <Compile Include="Ast\GrapeHexadecimalLiteralExpression.cs" />
+    <Compile Include="Ast\GrapeIdentifier.cs" />
+    <Compile Include="Ast\GrapeIntLiteralExpression.cs" />
+    <Compile Include="Ast\GrapeLessThanExpression.cs" />
+    <Compile Include="Ast\GrapeLessThanOrEqualExpression.cs" />
+    <Compile Include="Ast\GrapeLogicalAndExpression.cs" />
+    <Compile Include="Ast\GrapeLogicalOrExpression.cs" />
+    <Compile Include="Ast\GrapeLogicalXorExpression.cs" />
+    <Compile Include="Ast\GrapeAccessExpression.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Ast\GrapeMember.cs" />
+    <Compile Include="Ast\GrapeMemberExpression.cs" />
+    <Compile Include="Ast\GrapeMethodCall.cs" />
+    <Compile Include="Ast\GrapeModuloExpression.cs" />
+    <Compile Include="Ast\GrapeNegateUnaryExpression.cs" />
+    <Compile Include="Ast\GrapeNotEqualExpression.cs" />
+    <Compile Include="Ast\GrapeNotUnaryExpression.cs" />
+    <Compile Include="Ast\GrapeNullLiteralExpression.cs" />
+    <Compile Include="Ast\GrapeObject.cs" />
+    <Compile Include="Ast\GrapeRealLiteralExpression.cs" />
+    <Compile Include="Ast\GrapeExpressionStatement.cs" />
+    <Compile Include="Ast\GrapeShiftLeftExpression.cs" />
+    <Compile Include="Ast\GrapeShiftRightExpression.cs" />
+    <Compile Include="Ast\GrapeStringLiteralExpression.cs" />
+    <Compile Include="Ast\GrapeSwitchCase.cs" />
+    <Compile Include="Ast\GrapeCatchClause.cs" />
+    <Compile Include="Ast\GrapeClassItem.cs" />
     <Compile Include="Ast\GrapeConditionalExpression.cs" />
     <Compile Include="Ast\GrapeContinueStatement.cs" />
-    <Compile Include="Ast\GrapeDefaultStatement.cs" />
+    <Compile Include="Ast\GrapeDeclaration.cs" />
     <Compile Include="Ast\GrapeDeleteStatement.cs" />
-    <Compile Include="Ast\GrapeElseIfStatement.cs" />
-    <Compile Include="Ast\GrapeElseStatement.cs" />
-    <Compile Include="Ast\GrapeFinallyStatement.cs" />
+    <Compile Include="Ast\GrapeFinallyClause.cs" />
     <Compile Include="Ast\GrapeForEachStatement.cs" />
-    <Compile Include="Ast\GrapeIdentifierExpression.cs" />
     <Compile Include="Ast\GrapeExpression.cs" />
-    <Compile Include="Ast\GrapeIfStatement.cs" />
+    <Compile Include="Ast\GrapeConditionalStatement.cs" />
     <Compile Include="Ast\GrapeInitStatement.cs" />
     <Compile Include="Ast\GrapeLiteralExpression.cs" />
-    <Compile Include="Ast\GrapeMemberExpression.cs" />
     <Compile Include="Ast\GrapeMultiplicationExpression.cs" />
     <Compile Include="Ast\GrapeNameofExpression.cs" />
     <Compile Include="Ast\GrapeObjectCreationExpression.cs" />
     <Compile Include="Ast\GrapeReturnStatement.cs" />
     <Compile Include="Ast\GrapeSetExpression.cs" />
     <Compile Include="Ast\GrapeShiftExpression.cs" />
-    <Compile Include="Ast\GrapeStackExpression.cs" />
     <Compile Include="Ast\GrapeStatement.cs" />
+    <Compile Include="Ast\GrapeStatementWithBlock.cs" />
+    <Compile Include="Ast\GrapeSubExpression.cs" />
     <Compile Include="Ast\GrapeSwitchStatement.cs" />
     <Compile Include="Ast\GrapeThrowStatement.cs" />
+    <Compile Include="Ast\GrapeCurlyEqualUnaryExpression.cs" />
     <Compile Include="Ast\GrapeTryStatement.cs" />
+    <Compile Include="Ast\GrapeType.cs" />
     <Compile Include="Ast\GrapeTypecastExpression.cs" />
     <Compile Include="Ast\GrapeUnaryExpression.cs" />
+    <Compile Include="Ast\GrapeVariableStatement.cs" />
     <Compile Include="Ast\GrapeWhileStatement.cs" />
+    <Compile Include="GrapeArrayInitializer.cs" />
+    <Compile Include="GrapeConstructor.cs" />
+    <Compile Include="GrapeDestructor.cs" />
     <Compile Include="GrapeErrorSink.cs" />
     <Compile Include="GrapeAst.cs" />
-    <Compile Include="Ast\GrapeBlock.cs" />
     <Compile Include="GrapeClass.cs" />
     <Compile Include="GrapeEntity.cs" />
     <Compile Include="GrapeField.cs" />
-    <Compile Include="GrapeFunction.cs" />
+    <Compile Include="GrapeMethod.cs" />
     <Compile Include="GrapeImportDeclaration.cs" />
+    <Compile Include="GrapeInitializer.cs" />
+    <Compile Include="GrapeValueInitializer.cs" />
+    <Compile Include="Implementation\GrapeAbstractModifier.cs" />
+    <Compile Include="Implementation\GrapeCommentEntity.cs" />
+    <Compile Include="Implementation\GrapeInternalModifier.cs" />
+    <Compile Include="Implementation\GrapeList.cs" />
+    <Compile Include="Implementation\GrapeModifier.cs" />
+    <Compile Include="Implementation\GrapeOptional.cs" />
+    <Compile Include="Implementation\GrapeOverrideModifier.cs" />
+    <Compile Include="Implementation\GrapeParserExtensions.cs" />
+    <Compile Include="Implementation\GrapeParsingEntity.cs" />
     <Compile Include="GrapePackageDeclaration.cs" />
     <Compile Include="GrapeVariable.cs" />
-    <Compile Include="GrapeEntityWithBlock.cs" />
-    <Compile Include="Implementation\GrapeSkeletonParser.cs" />
+    <Compile Include="Implementation\GrapeErrorEntity.cs" />
+    <Compile Include="Implementation\GrapePrivateModifier.cs" />
+    <Compile Include="Implementation\GrapeProcessor.cs" />
     <Compile Include="IGrapeParser.cs" />
     <Compile Include="Implementation\GrapeParser.cs" />
     <Compile Include="Implementation\GrapeParserConfiguration.cs" />
+    <Compile Include="Implementation\GrapeProtectedModifier.cs" />
+    <Compile Include="Implementation\GrapePublicModifier.cs" />
+    <Compile Include="Implementation\GrapeSealedModifier.cs" />
+    <Compile Include="Implementation\GrapeSemanticActions.cs" />
+    <Compile Include="Implementation\GrapeStaticModifier.cs" />
+    <Compile Include="Implementation\GrapeTokenizer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

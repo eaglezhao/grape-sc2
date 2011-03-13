@@ -1,9 +1,10 @@
 ﻿using System;
 
+using bsn.GoldParser.Semantic;
+
 namespace Vestras.StarCraft2.Grape.Core.Ast {
-    public class GrapeBreakStatement : GrapeStatement {
-        public override bool CanHaveBlock {
-            get { return false; }
-        }
-    }
+	public class GrapeBreakStatement: GrapeStatement {
+		[Rule("<Statement> ::= ~break ~<NL>")]
+		public GrapeBreakStatement() {}
+	}
 }

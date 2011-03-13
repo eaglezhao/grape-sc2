@@ -1,41 +1,22 @@
 ﻿using System;
 
+using bsn.GoldParser.Semantic;
+
 namespace Vestras.StarCraft2.Grape.Core.Ast {
-    public class GrapeMultiplicationExpression : GrapeExpression {
-        private GrapeExpression left;
-        private GrapeExpression right;
+	public class GrapeMultiplicationExpression: GrapeBinaryExpression {
+		public enum GrapeMultiplicationExpressionType {
+			Multiplication,
+			Division,
+			Mod
+		}
 
-        public GrapeMultiplicationExpressionType Type { get; internal set; }
-        public GrapeExpression Left {
-            get {
-                return left;
-            }
-            internal set {
-                left = value;
-                if (left != null) {
-                    left.Parent = this;
-                    left.FileName = FileName;
-                }
-            }
-        }
+		[Rule("<Mult Exp> ::= <Mult Exp> ~'*' <Typecast Exp>")]
+		public GrapeMultiplicationExpression(GrapeExpression left, GrapeExpression right): base(left, right) {}
 
-        public GrapeExpression Right {
-            get {
-                return right;
-            }
-            internal set {
-                right = value;
-                if (right != null) {
-                    right.Parent = this;
-                    right.FileName = FileName;
-                }
-            }
-        }
-
-        public enum GrapeMultiplicationExpressionType {
-            Multiplication,
-            Division,
-            Mod
-        }
-    }
+		public virtual GrapeMultiplicationExpressionType Type {
+			get {
+				return GrapeMultiplicationExpressionType.Multiplication;
+			}
+		}
+	}
 }

@@ -1,22 +1,37 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
+
+using bsn.GoldParser.Semantic;
+
+using Vestras.StarCraft2.Grape.Core.Implementation;
 
 namespace Vestras.StarCraft2.Grape.Core.Ast {
-    public class GrapeInitStatement : GrapeStatement {
-        public GrapeInitStatementType Type { get; internal set; }
-        public List<GrapeExpression> Parameters { get; internal set; }
-        public override bool CanHaveBlock {
-            get { return false; }
-        }
+	public class GrapeInitStatement: GrapeStatement {
+		public enum GrapeInitStatementType {
+			This,
+			Base,
+			Unknown
+		}
 
-        public GrapeInitStatement() {
-            Parameters = new List<GrapeExpression>();
-        }
+		private readonly ReadOnlyCollection<GrapeExpression> parameters;
+		private readonly GrapeInitStatementType type;
 
-        public enum GrapeInitStatementType {
-            This,
-            Base,
-            Unknown
-        }
-    }
+		[Rule("<Statement> ::= ~init <Object> ~'(' <Arg List Opt> ~')' ~<NL>")]
+		public GrapeInitStatement(GrapeObject objectIdentifier, GrapeList<GrapeExpression> parameters) {
+			type = (GrapeInitStatementType)Enum.Parse(typeof(GrapeInitStatementType), objectIdentifier.Name, true);
+			this.parameters = parameters.ToList(this).AsReadOnly();
+		}
+
+		public ReadOnlyCollection<GrapeExpression> Parameters {
+			get {
+				return parameters;
+			}
+		}
+
+		public GrapeInitStatementType Type {
+			get {
+				return type;
+			}
+		}
+	}
 }

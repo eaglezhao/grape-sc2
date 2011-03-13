@@ -1,20 +1,20 @@
 ﻿using System;
 
-namespace Vestras.StarCraft2.Grape.Core.Ast {
-    public class GrapeNameofExpression : GrapeExpression {
-        private GrapeExpression value;
+using bsn.GoldParser.Semantic;
 
-        public GrapeExpression Value {
-            get {
-                return value;
-            }
-            internal set {
-                this.value = value;
-                if (this.value != null) {
-                    this.value.Parent = this;
-                    this.value.FileName = FileName;
-                }
-            }
-        }
-    }
+namespace Vestras.StarCraft2.Grape.Core.Ast {
+	public class GrapeNameofExpression: GrapeExpression {
+		private readonly GrapeType value;
+
+		[Rule("<Value> ::= ~nameof ~'(' <Simple Type> ~')'")]
+		public GrapeNameofExpression(GrapeType value) {
+			this.value = value;
+		}
+
+		public GrapeType Value {
+			get {
+				return value;
+			}
+		}
+	}
 }

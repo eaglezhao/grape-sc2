@@ -1,34 +1,42 @@
 ﻿using System;
+using System.Diagnostics;
+
+using bsn.GoldParser.Semantic;
 
 namespace Vestras.StarCraft2.Grape.Core.Ast {
-    public class GrapeMemberExpression : GrapeExpression {
-        private GrapeExpression member;
-        private GrapeMemberExpression next;
+	public class GrapeMemberExpression: GrapeAccessExpression {
+		internal static GrapeMemberExpression Create(GrapeAccessExpressionType type, GrapeIdentifier identifier, GrapeAccessExpression next) {
+			if (identifier == null) {
+				throw new ArgumentNullException("identifier");
+			}
+			Debug.Assert((type == GrapeAccessExpressionType.Root) || (type == GrapeAccessExpressionType.Field));
+			GrapeMemberExpression result = new GrapeMemberExpression(type, identifier, next);
+			result.InitializeFromTemplate(identifier);
+			return result;
+		}
 
-        public GrapeExpression Member {
-            get {
-                return member;
-            }
-            internal set {
-                member = value;
-                if (member != null) {
-                    member.Parent = this;
-                    member.FileName = FileName;
-                }
-            }
-        }
+		private readonly GrapeIdentifier identifier;
+		private readonly GrapeAccessExpressionType type;
 
-        public GrapeMemberExpression Next {
-            get {
-                return next;
-            }
-            internal set {
-                next = value;
-                if (next != null) {
-                    next.Parent = this;
-                    next.FileName = FileName;
-                }
-            }
-        }
-    }
+		[Rule("<Value> ::= <Object>")]
+		public GrapeMemberExpression(GrapeObject identifier): this(GrapeAccessExpressionType.Root, identifier, null) {}
+
+		protected GrapeMemberExpression(GrapeAccessExpressionType type, GrapeIdentifier identifier, GrapeAccessExpression next): base(next) {
+			Debug.Assert(type != GrapeAccessExpressionType.Array);
+			this.type = type;
+			this.identifier = identifier;
+		}
+
+		public GrapeIdentifier Identifier {
+			get {
+				return identifier;
+			}
+		}
+
+		public override sealed GrapeAccessExpressionType Type {
+			get {
+				return type;
+			}
+		}
+	}
 }

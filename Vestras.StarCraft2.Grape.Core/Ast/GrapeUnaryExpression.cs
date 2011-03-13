@@ -1,28 +1,27 @@
 ﻿using System;
 
 namespace Vestras.StarCraft2.Grape.Core.Ast {
-    public class GrapeUnaryExpression : GrapeExpression {
-        private GrapeExpression value;
+	public abstract class GrapeUnaryExpression: GrapeExpression {
+		public enum GrapeUnaryExpressionType {
+			Negate,
+			Not,
+			CurlyEqual,
+		}
 
-        public GrapeExpression Value {
-            get {
-                return value;
-            }
-            internal set {
-                this.value = value;
-                if (this.value != null) {
-                    this.value.Parent = this;
-                    this.value.FileName = FileName;
-                }
-            }
-        }
+		private readonly GrapeExpression value;
 
-        public GrapeUnaryExpressionType Type { get; internal set; }
+		protected GrapeUnaryExpression(GrapeExpression value) {
+			this.value = value;
+		}
 
-        public enum GrapeUnaryExpressionType {
-            Negate,
-            Not,
-            CurlyEqual,
-        }
-    }
+		public abstract GrapeUnaryExpressionType Type {
+			get;
+		}
+
+		public GrapeExpression Value {
+			get {
+				return value;
+			}
+		}
+	}
 }

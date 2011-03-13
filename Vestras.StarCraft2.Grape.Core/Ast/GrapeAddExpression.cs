@@ -1,40 +1,39 @@
 ﻿using System;
 
+using bsn.GoldParser.Semantic;
+
 namespace Vestras.StarCraft2.Grape.Core.Ast {
-    public class GrapeAddExpression : GrapeExpression {
-        private GrapeExpression left;
-        private GrapeExpression right;
+	public class GrapeAddExpression: GrapeExpression {
+		public enum GrapeAddExpressionType {
+			Addition,
+			Subtraction
+		}
 
-        public GrapeAddExpressionType Type { get; internal set; }
-        public GrapeExpression Left {
-            get {
-                return left;
-            }
-            internal set {
-                left = value;
-                if (left != null) {
-                    left.Parent = this;
-                    left.FileName = FileName;
-                }
-            }
-        }
+		private readonly GrapeExpression left;
+		private readonly GrapeExpression right;
 
-        public GrapeExpression Right {
-            get {
-                return right;
-            }
-            internal set {
-                right = value;
-                if (right != null) {
-                    right.Parent = this;
-                    right.FileName = FileName;
-                }
-            }
-        }
+		[Rule("<Add Exp> ::= <Add Exp> ~'+' <Mult Exp>")]
+		public GrapeAddExpression(GrapeExpression left, GrapeExpression right) {
+			this.left = left;
+			this.right = right;
+		}
 
-        public enum GrapeAddExpressionType {
-            Addition,
-            Subtraction
-        }
-    }
+		public GrapeExpression Left {
+			get {
+				return left;
+			}
+		}
+
+		public GrapeExpression Right {
+			get {
+				return right;
+			}
+		}
+
+		public virtual GrapeAddExpressionType Type {
+			get {
+				return GrapeAddExpressionType.Addition;
+			}
+		}
+	}
 }

@@ -1,31 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
+
+using Vestras.StarCraft2.Grape.Core.Implementation;
 
 namespace Vestras.StarCraft2.Grape.Core.Ast {
-    public class GrapeCallExpression : GrapeMemberExpression {
-        private ObservableCollection<GrapeExpression> parameters = new ObservableCollection<GrapeExpression>();
+	public class GrapeCallExpression: GrapeMemberExpression {
+		internal static GrapeCallExpression Create(GrapeIdentifier identifier, GrapeList<GrapeExpression> parameters, GrapeAccessExpression next) {
+			List<GrapeEntity> children = new List<GrapeEntity>();
+			children.Add(identifier);
+			children.AddRange(parameters.Enumerate());
+			GrapeCallExpression result = new GrapeCallExpression(identifier, parameters, next);
+			result.InitializeFromTemplate(identifier);
+			result.InitializeFromChildren(identifier.FileName, children);
+			return result;
+		}
 
-        public ObservableCollection<GrapeExpression> Parameters {
-            get {
-                return parameters;
-            }
-            internal set {
-                parameters = value;
-            }
-        }
+		private readonly ReadOnlyCollection<GrapeExpression> parameters;
 
-        public GrapeCallExpression() {
-            parameters.CollectionChanged += (sender, e) => {
-                if (e.Action == NotifyCollectionChangedAction.Add) {
-                    foreach (object item in e.NewItems) {
-                        if (item is GrapeExpression) {
-                            (item as GrapeExpression).Parent = this;
-                        }
-                    }
-                }
-            };
-        }
-    }
+		private GrapeCallExpression(GrapeIdentifier identifier, GrapeList<GrapeExpression> parameters, GrapeAccessExpression next): base(GrapeAccessExpressionType.Method, identifier, next) {
+			this.parameters = parameters.ToList(this).AsReadOnly();
+		}
+
+		public ReadOnlyCollection<GrapeExpression> Parameters {
+			get {
+				return parameters;
+			}
+		}
+	}
 }

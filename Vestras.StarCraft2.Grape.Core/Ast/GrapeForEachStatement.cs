@@ -1,11 +1,30 @@
 ﻿using System;
 
+using bsn.GoldParser.Semantic;
+
+using Vestras.StarCraft2.Grape.Core.Implementation;
+
 namespace Vestras.StarCraft2.Grape.Core.Ast {
-    public class GrapeForEachStatement : GrapeStatement {
-        public GrapeVariable Variable { get; internal set; }
-        public GrapeExpression ContainerExpression { get; internal set; }
-        public override bool CanHaveBlock {
-            get { return true; }
-        }
-    }
+	public class GrapeForEachStatement: GrapeStatementWithBlock {
+		private readonly GrapeVariable iteratorVariable;
+		private readonly GrapeExpression valueExpression;
+
+		[Rule("<Statement> ::= ~foreach <Variable Declarator Uninitialized> ~in <Expression> ~':' <Stm Block>")]
+		public GrapeForEachStatement(GrapeVariable iteratorVariable, GrapeExpression valueExpression, GrapeList<GrapeStatement> statements): base(statements) {
+			this.iteratorVariable = iteratorVariable;
+			this.valueExpression = valueExpression;
+		}
+
+		public GrapeVariable IteratorVariable {
+			get {
+				return iteratorVariable;
+			}
+		}
+
+		public GrapeExpression ValueExpression {
+			get {
+				return valueExpression;
+			}
+		}
+	}
 }

@@ -1,32 +1,44 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.IO;
-using System.Reflection;
+
+using bsn.GoldParser.Grammar;
+
+using Vestras.StarCraft2.Grape.Core.Ast;
 
 namespace Vestras.StarCraft2.Grape.Core.Implementation {
-    [Export(typeof(IGrapeParser))]
-    internal sealed class GrapeParser : IGrapeParser {
-        [Import]
-        private GrapeErrorSink errorSink = null;
-        public GrapeAst Parse(string file, bool outputErrors, bool continueOnError) {
-            return Parse(new string[] { file }, outputErrors, continueOnError);
-        }
+	[Export(typeof(IGrapeParser))]
+	internal sealed class GrapeParser: IGrapeParser {
+		private static readonly GrapeSemanticActions semanticActions = new GrapeSemanticActions();
 
-        public GrapeAst Parse(string[] files, bool outputErrors, bool continueOnError) {
-            GrapeAst ast = new GrapeAst();
-            GrapeParserConfiguration config = new GrapeParserConfiguration(ast, outputErrors, continueOnError);
-            Stream stream = GetType().Assembly.GetManifestResourceStream("Vestras.StarCraft2.Grape.Core.Implementation.grape.cgt");
-            GrapeSkeletonParser skeletonParser = new GrapeSkeletonParser(stream, config);
-            skeletonParser.errorSink = errorSink;
-            foreach (string file in files) {
-                using (StreamReader reader = new StreamReader(file)) {
-                    skeletonParser.currentFileName = file;
-                    skeletonParser.Parse(reader.ReadToEnd());
-                }
-            }
+		[Import]
+		private GrapeErrorSink errorSink;
 
-            return ast;
-        }
-    }
+		public GrapeParser() {
+			semanticActions.Initialize(Debugger.IsAttached); // emit semantic action diagnostics to debug log when debugging
+		}
+
+		public GrapeAst Parse(string file, bool outputErrors, bool continueOnError) {
+			return Parse(new[] {file}, outputErrors, continueOnError);
+		}
+
+		public GrapeAst Parse(string[] files, bool outputErrors, bool continueOnError) {
+			GrapeParserConfiguration configuration = new GrapeParserConfiguration(errorSink, outputErrors, continueOnError);
+			GrapeAst ast = new GrapeAst();
+			foreach (string file in files) {
+				configuration.FileName = file;
+				using (StreamReader reader = new StreamReader(file)) {
+					GrapeProcessor processor = new GrapeProcessor(reader, configuration, semanticActions);
+					if (processor.ParseAll() == ParseMessage.Accept) {
+						foreach (GrapeDeclaration declaration in ((GrapeList<GrapeDeclaration>)processor.CurrentToken).Enumerate()) {
+							declaration.Parent = null;
+							ast.Children.Add(declaration);
+						}
+					}
+				}
+			}
+			return ast;
+		}
+	}
 }

@@ -1,34 +1,28 @@
 ﻿using System;
 
+using bsn.GoldParser.Semantic;
+
 namespace Vestras.StarCraft2.Grape.Core.Ast {
-    public class GrapeTypecastExpression : GrapeExpression {
-        private GrapeExpression type;
-        private GrapeExpression value;
+	public class GrapeTypecastExpression: GrapeExpression {
+		private readonly GrapeType typeName;
+		private readonly GrapeExpression value;
 
-        public GrapeExpression Type {
-            get {
-                return type;
-            }
-            internal set {
-                type = value;
-                if (type != null) {
-                    type.Parent = this;
-                    type.FileName = FileName;
-                }
-            }
-        }
+		[Rule("<Typecast Exp> ::= <Typecast Exp> ~as <Type>")]
+		public GrapeTypecastExpression(GrapeExpression value, GrapeType typeName) {
+			this.value = value;
+			this.typeName = typeName;
+		}
 
-        public GrapeExpression Value {
-            get {
-                return value;
-            }
-            internal set {
-                this.value = value;
-                if (this.value != null) {
-                    this.value.Parent = this;
-                    this.value.FileName = FileName;
-                }
-            }
-        }
-    }
+		public GrapeType TypeName {
+			get {
+				return typeName;
+			}
+		}
+
+		public GrapeExpression Value {
+			get {
+				return value;
+			}
+		}
+	}
 }

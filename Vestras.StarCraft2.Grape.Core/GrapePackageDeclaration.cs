@@ -1,17 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
+
+using bsn.GoldParser.Semantic;
+
+using Vestras.StarCraft2.Grape.Core.Ast;
+using Vestras.StarCraft2.Grape.Core.Implementation;
 
 namespace Vestras.StarCraft2.Grape.Core {
-    public sealed class GrapePackageDeclaration : GrapeEntity {
-        public List<GrapeEntity> Children { get; internal set; }
-        public string PackageName { get; internal set; }
+	public sealed class GrapePackageDeclaration: GrapeDeclaration {
+		private readonly string packageName;
 
-        public override string ToString() {
-            return GetType().Name + " PackageName = " + PackageName;
-        }
+		[Rule("<Package> ::= ~package <Qualified ID> ~<NL>")]
+		public GrapePackageDeclaration(GrapeList<GrapeIdentifier> packageNameParts) {
+			packageName = packageNameParts.GetFullName();
+		}
 
-        public GrapePackageDeclaration() {
-            Children = new List<GrapeEntity>();
-        }
-    }
+		public string PackageName {
+			get {
+				return packageName;
+			}
+		}
+
+		public override string ToString() {
+			return GetType().Name+" PackageName = "+PackageName;
+		}
+	}
 }

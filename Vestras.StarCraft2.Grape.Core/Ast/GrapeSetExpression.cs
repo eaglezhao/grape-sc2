@@ -1,20 +1,28 @@
 ﻿using System;
 
-namespace Vestras.StarCraft2.Grape.Core.Ast {
-    public class GrapeSetExpression : GrapeMemberExpression {
-        private GrapeExpression value;
+using bsn.GoldParser.Semantic;
 
-        public GrapeExpression Value {
-            get {
-                return value;
-            }
-            internal set {
-                this.value = value;
-                if (this.value != null) {
-                    this.value.Parent = this;
-                    this.value.FileName = FileName;
-                }
-            }
-        }
-    }
+namespace Vestras.StarCraft2.Grape.Core.Ast {
+	public class GrapeSetExpression: GrapeExpression {
+		private readonly GrapeAccessExpression memberAccess;
+		private readonly GrapeExpression value;
+
+		[Rule("<Assignment Expression> ::= <Member Access> ~'=' <Expression>")]
+		public GrapeSetExpression(GrapeAccessExpression memberAccess, GrapeExpression value) {
+			this.memberAccess = memberAccess;
+			this.value = value;
+		}
+
+		public GrapeAccessExpression MemberAccess {
+			get {
+				return memberAccess;
+			}
+		}
+
+		public GrapeExpression Value {
+			get {
+				return value;
+			}
+		}
+	}
 }
