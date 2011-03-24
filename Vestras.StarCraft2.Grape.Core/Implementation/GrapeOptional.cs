@@ -16,11 +16,11 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
 		private readonly T item;
 
 		[Rule("<Class Size Opt> ::=", typeof(GrapeLiteralExpression<int>))]
-		[Rule("<Class Base Opt> ::=", typeof(GrapeType))]
+		[Rule("<Class Base Opt> ::=", typeof(GrapeSimpleType))]
 		public GrapeOptional(): this(null) {}
 
 		[Rule("<Class Size Opt> ::= ~'[' DecimalLiteral ~']'", typeof(GrapeLiteralExpression<int>))]
-		[Rule("<Class Base Opt> ::= ~inherits <Simple Type>", typeof(GrapeType))]
+		[Rule("<Class Base Opt> ::= ~inherits <Simple Type>", typeof(GrapeSimpleType))]
 		public GrapeOptional(T item) {
 			this.item = item;
 		}

@@ -4,14 +4,14 @@ using bsn.GoldParser.Semantic;
 
 namespace Vestras.StarCraft2.Grape.Core.Ast {
 	public class GrapeNameofExpression: GrapeExpression {
-		private readonly GrapeType value;
+		private readonly GrapeSimpleType value;
 
 		[Rule("<Value> ::= ~nameof ~'(' <Simple Type> ~')'")]
-		public GrapeNameofExpression(GrapeType value) {
+		public GrapeNameofExpression(GrapeSimpleType value) {
 			this.value = value;
 		}
 
-		public GrapeType Value {
+		public GrapeSimpleType Value {
 			get {
 				return value;
 			}

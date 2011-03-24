@@ -109,6 +109,7 @@
     <Compile Include="Ast\GrapeThrowStatement.cs" />
     <Compile Include="Ast\GrapeCurlyEqualUnaryExpression.cs" />
     <Compile Include="Ast\GrapeTryStatement.cs" />
+    <Compile Include="Ast\GrapeSimpleType.cs" />
     <Compile Include="Ast\GrapeType.cs" />
     <Compile Include="Ast\GrapeTypecastExpression.cs" />
     <Compile Include="Ast\GrapeUnaryExpression.cs" />

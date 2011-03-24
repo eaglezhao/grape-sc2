@@ -8,13 +8,13 @@ using Vestras.StarCraft2.Grape.Core.Implementation;
 
 namespace Vestras.StarCraft2.Grape.Core {
 	public sealed class GrapeClass: GrapeClassItem {
-		private readonly GrapeType inherits;
+		private readonly GrapeSimpleType inherits;
 		private readonly ReadOnlyCollection<GrapeClassItem> classItems;
 		private readonly string name;
 		private readonly int? size;
 
 		[Rule("<Class Decl> ::= <Modifier List Opt> ~class Identifier <Class Size Opt> <Class Base Opt> ~':' <Class Item Block>")]
-		public GrapeClass(GrapeList<GrapeModifier> modifiers, GrapeIdentifier identifier, GrapeOptional<GrapeLiteralExpression<int>> size, GrapeOptional<GrapeType> inherits, GrapeList<GrapeClassItem> classItems): base(modifiers) {
+		public GrapeClass(GrapeList<GrapeModifier> modifiers, GrapeIdentifier identifier, GrapeOptional<GrapeLiteralExpression<int>> size, GrapeOptional<GrapeSimpleType> inherits, GrapeList<GrapeClassItem> classItems): base(modifiers) {
 			GrapeLiteralExpression<int> sizeLiteral = size;
 			this.size = (sizeLiteral == null) ? default(int?) : sizeLiteral.Value;
 			this.inherits = inherits;
@@ -22,7 +22,7 @@ namespace Vestras.StarCraft2.Grape.Core {
 			name = identifier.Name;
 		}
 
-		public GrapeType Inherits {
+		public GrapeSimpleType Inherits {
 			get {
 				return inherits;
 			}

@@ -9,7 +9,7 @@ using Vestras.StarCraft2.Grape.Core.Ast;
 
 namespace Vestras.StarCraft2.Grape.Core.Implementation {
 	[Export(typeof(IGrapeParser))]
-	internal sealed class GrapeParser: IGrapeParser {
+	public sealed class GrapeParser: IGrapeParser {
 		private static readonly GrapeSemanticActions semanticActions = new GrapeSemanticActions();
 
 		[Import]

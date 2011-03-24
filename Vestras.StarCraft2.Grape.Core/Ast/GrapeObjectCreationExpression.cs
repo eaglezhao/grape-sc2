@@ -7,16 +7,16 @@ using Vestras.StarCraft2.Grape.Core.Implementation;
 
 namespace Vestras.StarCraft2.Grape.Core.Ast {
 	public class GrapeObjectCreationExpression: GrapeExpression {
-		private readonly GrapeType className;
+		private readonly GrapeSimpleType className;
 		private readonly ReadOnlyCollection<GrapeExpression> parameters;
 
 		[Rule("<Value> ::= ~new <Simple Type> ~'(' <Arg List Opt> ~')'")]
-		public GrapeObjectCreationExpression(GrapeType className, GrapeList<GrapeExpression> parameters) {
+		public GrapeObjectCreationExpression(GrapeSimpleType className, GrapeList<GrapeExpression> parameters) {
 			this.className = className;
 			this.parameters = parameters.ToList(this).AsReadOnly();
 		}
 
-		public GrapeType ClassName {
+		public GrapeSimpleType ClassName {
 			get {
 				return className;
 			}

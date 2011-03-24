@@ -116,6 +116,7 @@ Comment End = '*/'
 
 <Array Type>
     ::= <Qualified ID> '[' ']'
+     |  <Array Type> '[' ']'
 
 ! The following rules are type of expressions or statements
 

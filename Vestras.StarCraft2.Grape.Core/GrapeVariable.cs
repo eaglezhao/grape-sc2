@@ -6,7 +6,7 @@ using Vestras.StarCraft2.Grape.Core.Ast;
 
 namespace Vestras.StarCraft2.Grape.Core {
 	public class GrapeVariable: GrapeEntity {
-		internal static GrapeVariable Create(GrapeType type, GrapeIdentifier name) {
+		internal static GrapeVariable Create(GrapeSimpleType type, GrapeIdentifier name) {
 			GrapeVariable variable = new GrapeVariable(type, name);
 			variable.InitializeFromTemplate(type);
 			variable.InitializeFromChildren(type.FileName, new GrapeEntity[] {type, name});
