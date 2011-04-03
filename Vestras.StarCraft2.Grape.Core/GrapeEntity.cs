@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Reflection;
 
 using bsn.GoldParser.Parser;
 using bsn.GoldParser.Semantic;
@@ -9,6 +11,43 @@ namespace Vestras.StarCraft2.Grape.Core {
 	public abstract class GrapeEntity: SemanticToken {
 		protected GrapeEntity() {
 			FileName = string.Empty;
+		}
+
+		public IEnumerable<T> GetChildren<T>() where T: GrapeEntity {
+			foreach (PropertyInfo property in GetType().GetProperties(BindingFlags.Instance|BindingFlags.Public)) {
+				if (!property.Name.Equals("Parent", StringComparison.Ordinal)) {
+					foreach (GrapeEntity child in EnumerateEntitiesOfProperty(property)) {
+						T childAsT = child as T;
+						if (childAsT != null) {
+							yield return childAsT;
+						}
+						foreach (T childOfChild in child.GetChildren<T>()) {
+							yield return childOfChild;
+						}
+					}
+				}
+			}
+		}
+
+		private IEnumerable<GrapeEntity> EnumerateEntitiesOfProperty(PropertyInfo property) {
+			if (typeof(GrapeEntity).IsAssignableFrom(property.PropertyType)) {
+				GrapeEntity result = (GrapeEntity)property.GetValue(this, null);
+				if ((result != null) && (result != Parent)) {
+					yield return result;
+				}
+			} else {
+				if (typeof(IEnumerable).IsAssignableFrom(property.PropertyType)) {
+					IEnumerator enumerator = ((IEnumerable)property.GetValue(this, null)).GetEnumerator();
+					using (enumerator as IDisposable) {
+						while (enumerator.MoveNext()) {
+							GrapeEntity result = enumerator.Current as GrapeEntity;
+							if (result != null) {
+								yield return result;
+							}
+						}
+					}
+				}
+			}
 		}
 
 		public int EndColumn {
