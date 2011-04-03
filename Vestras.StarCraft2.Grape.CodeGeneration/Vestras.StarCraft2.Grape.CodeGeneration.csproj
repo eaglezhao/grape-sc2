@@ -31,17 +31,18 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="bsn.GoldParser">
+      <HintPath>..\Lib\bsn.GoldParser.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IGrapeCodeGenerator.cs" />
-    <Compile Include="Implementation\GrapeDeleteStatementValidator.cs" />
     <Compile Include="Implementation\DirectoryHelper.cs" />
     <Compile Include="Implementation\Generator\GrapeComponentsContainer.cs" />
     <Compile Include="Implementation\GrapeDeleteStatementVisitor.cs" />
     <Compile Include="Implementation\GrapeDeleteStatementValidator.cs" />
-    <Compile Include="Implementation\Generator\GrapeExpressionGenerator.cs" />
     <Compile Include="Implementation\Generator\GrapeExpressionGenerator.cs" />
     <Compile Include="Implementation\GrapeExpressionValidator.cs" />
     <Compile Include="Implementation\GrapeMemberExpressionValidator.cs" />
