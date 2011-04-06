@@ -4,17 +4,17 @@ using Vestras.StarCraft2.Grape.Core.Ast;
 
 namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
     [Export(typeof(IAstNodeVisitor))]
-    internal sealed class GrapeIfStatementVisitor : IAstNodeVisitor {
+    internal sealed class GrapeConditionalStatementVisitor : IAstNodeVisitor {
         public GrapeCodeGeneratorConfiguration Config { get; set; }
         public IAstNodeValidator Validator { get; set; }
         public Type[] NodeType {
             get {
-                return new Type[] { typeof(GrapeIfStatement) };
+                return new Type[] { typeof(GrapeConditionalStatement) };
             }
         }
 
         public void VisitNode(object obj) {
-            GrapeIfStatement s = obj as GrapeIfStatement;
+            GrapeConditionalStatement s = obj as GrapeConditionalStatement;
             if (s != null) {
                 bool isValid = true;
                 if (Validator != null) {
@@ -22,7 +22,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                 }
 
                 if (isValid) {
-                    // TODO: insert if statement code generation here.
+                    // TODO: insert conditional statement code generation here.
                 }
             }
         }

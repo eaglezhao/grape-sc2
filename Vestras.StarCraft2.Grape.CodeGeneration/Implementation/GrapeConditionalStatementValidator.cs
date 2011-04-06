@@ -5,7 +5,7 @@ using Vestras.StarCraft2.Grape.Core.Ast;
 
 namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
     [Export(typeof(IAstNodeValidator))]
-    internal class GrapeIfStatementValidator : IAstNodeValidator {
+    internal class GrapeConditionalStatementValidator : IAstNodeValidator {
         [Import]
         private GrapeErrorSink errorSink = null;
         [Import]
@@ -14,13 +14,13 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
         public GrapeCodeGeneratorConfiguration Config { get; set; }
         public Type[] NodeType {
             get {
-                return new Type[] { typeof(GrapeIfStatement) };
+                return new Type[] { typeof(GrapeConditionalStatement) };
             }
         }
 
         public bool ValidateNode(object obj) {
             if (Config.OutputErrors) {
-                GrapeIfStatement s = obj as GrapeIfStatement;
+                GrapeConditionalStatement s = obj as GrapeConditionalStatement;
                 if (s != null) {
                     string errorMessage = "";
                     if (!typeCheckingUtils.DoesExpressionResolveToType(Config, s, s.Condition, "bool_base", ref errorMessage)) {
