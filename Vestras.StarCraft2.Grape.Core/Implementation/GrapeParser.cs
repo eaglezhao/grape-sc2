@@ -13,7 +13,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
 		private static readonly GrapeSemanticActions semanticActions = new GrapeSemanticActions();
 
 		[Import]
-		private GrapeErrorSink errorSink;
+		private GrapeErrorSink errorSink = null;
 
 		public GrapeParser() {
 			semanticActions.Initialize(Debugger.IsAttached); // emit semantic action diagnostics to debug log when debugging

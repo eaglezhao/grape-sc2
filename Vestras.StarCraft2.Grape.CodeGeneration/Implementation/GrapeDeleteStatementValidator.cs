@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using Vestras.StarCraft2.Grape.Core;
 using Vestras.StarCraft2.Grape.Core.Ast;
+using Vestras.StarCraft2.Grape.Core.Implementation;
 
 namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
     [Export(typeof(IAstNodeValidator))]
@@ -23,7 +24,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
             if (Config.OutputErrors) {
                 GrapeDeleteStatement s = obj as GrapeDeleteStatement;
                 if (s != null) {
-                    string qualifiedId = s.Value is GrapeIdentifierExpression ? ((GrapeIdentifierExpression)s.Value).Identifier : s.Value is GrapeMemberExpression ? ((GrapeMemberExpression)s.Value).GetMemberExpressionQualifiedId() : typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, s.Value);
+                    string qualifiedId = s.Value is GrapeIdentifierExpression ? ((GrapeIdentifierExpression)s.Value).Identifier : s.Value is GrapeMemberExpression ? ((GrapeMemberExpression)s.Value).GetAccessExpressionQualifiedId() : typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, s.Value);
                     if (qualifiedId == "this" || qualifiedId == "base") {
                         errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot delete static type '" + qualifiedId + "'.", FileName = s.FileName, Entity = s });
                         if (!Config.ContinueOnError) {
@@ -46,7 +47,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         }
                     }
 
-                    GrapeEntity entity = (new List<GrapeEntity>(typeCheckingUtils.GetEntitiesForMemberExpression(Config, s.Value as GrapeMemberExpression, s, out errorMessage)))[0];
+                    GrapeEntity entity = (new List<GrapeEntity>(typeCheckingUtils.GetEntitiesForAccessExpression(Config, s.Value as GrapeMemberExpression, s, out errorMessage)))[0];
                     if (entity != null && entity is GrapeClass) {
                         errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot delete static type '" + qualifiedId + "'.", FileName = s.FileName, Entity = s });
                         if (!Config.ContinueOnError) {
@@ -55,30 +56,19 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                     }
 
                     GrapeClass c = s.GetLogicalParentOfEntityType<GrapeClass>();
-                    string[] modifiers = c.GetAppropriateModifiersForEntityAccess(Config, entity);
-                    string potentialModifiers = entity.GetPotentialModifiersOfEntity();
+                    GrapeModifier.GrapeModifierType modifiers = c.GetAppropriateModifiersForEntityAccess(Config, entity);
+                    GrapeModifier.GrapeModifierType potentialModifiers = entity.GetPotentialModifiersOfEntity();
                     bool invalidModifiers = false;
-                    if (modifiers != null) {
-                        if (potentialModifiers == null) {
-                            if (modifiers.Length == 1 && modifiers[0] == "public") {
+                    if (modifiers != 0) {
+                        if (potentialModifiers == 0) {
+                            if (modifiers == GrapeModifier.GrapeModifierType.Public) {
                                 invalidModifiers = false;
                             } else {
                                 invalidModifiers = true;
                             }
                         } else {
-                            foreach (string modifier in modifiers) {
-                                bool hasModifier = false;
-                                foreach (string entityModifier in potentialModifiers.Split(' ')) {
-                                    if (entityModifier == modifier) {
-                                        hasModifier = true;
-                                        break;
-                                    }
-                                }
-
-                                if (!hasModifier) {
-                                    invalidModifiers = true;
-                                    break;
-                                }
+                            if (modifiers != potentialModifiers) {
+                                invalidModifiers = true;
                             }
                         }
                     } else {

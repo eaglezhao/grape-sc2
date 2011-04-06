@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using Vestras.StarCraft2.Grape.Core;
 using Vestras.StarCraft2.Grape.Core.Ast;
+using Vestras.StarCraft2.Grape.Core.Implementation;
 
 namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
     [Export(typeof(IAstNodeValidator))]
@@ -38,27 +39,12 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
 
         private bool ValidateModifiers(GrapeField f, out string errorMessage) {
             errorMessage = "";
-            bool hasAccessModifier = false;
-            bool isAbstract = false;
-            bool isSealed = false;
-            bool isOverride = false;
-            foreach (string modifier in f.Modifiers.Split(' ')) {
-                if (IsModifierAccessModifier(modifier)) {
-                    if (hasAccessModifier) {
-                        errorMessage = "A field cannot have multiple access modifiers.";
-                        return false;
-                    }
-
-                    hasAccessModifier = true;
-                } else {
-                    if (modifier == "abstract") {
-                        isAbstract = true;
-                    } else if (modifier == "sealed") {
-                        isSealed = true;
-                    } else if (modifier == "override") {
-                        isOverride = true;
-                    }
-                }
+            bool isAbstract = f.Modifiers.Contains(GrapeModifier.GrapeModifierType.Abstract);
+            bool isSealed = f.Modifiers.Contains(GrapeModifier.GrapeModifierType.Sealed);
+            bool isOverride = f.Modifiers.Contains(GrapeModifier.GrapeModifierType.Override);
+            if (f.Modifiers.HasInvalidAccessModifiers()) {
+                errorMessage = "Invalid access modifiers found.";
+                return false;
             }
 
             if (isAbstract) {
@@ -97,8 +83,8 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         }
                     }
 
-                    if (f.Parent != null && f.Parent is GrapeClass && ((GrapeClass)f.Parent).Modifiers.Contains("static")) {
-                        if (!f.Modifiers.Contains("static")) {
+                    if (f.Parent != null && f.Parent is GrapeClass && ((GrapeClass)f.Parent).Modifiers.Contains(GrapeModifier.GrapeModifierType.Static)) {
+                        if (!f.Modifiers.Contains(GrapeModifier.GrapeModifierType.Static)) {
                             errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot declare instance members in a static class.", FileName = f.FileName, Entity = f });
                             if (!Config.ContinueOnError) {
                                 return false;
@@ -106,19 +92,19 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         }
                     }
 
-                    if (f.Type != null && !typeCheckingUtils.DoesTypeExist(Config, f.Type, f.FileName)) {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "The type '" + typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, f.Type) + "' could not be found.", FileName = f.FileName, Entity = f.Type });
+                    if (f.Field.Type != null && !typeCheckingUtils.DoesTypeExist(Config, f.Field.Type, f.FileName)) {
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "The type '" + typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, f.Field.Type) + "' could not be found.", FileName = f.FileName, Entity = f.Field.Type });
                         if (!Config.ContinueOnError) {
                             return false;
                         }
                     }
 
                     string errorMessage;
-                    GrapeEntity type = (new List<GrapeEntity>(typeCheckingUtils.GetEntitiesForMemberExpression(Config, f.Type as GrapeMemberExpression, f, out errorMessage)))[0];
+                    GrapeEntity type = (new List<GrapeEntity>(typeCheckingUtils.GetEntitiesForAccessExpression(Config, f.Field.Type, f, out errorMessage)))[0];
                     if (type is GrapeClass) {
                         GrapeClass typeClass = type as GrapeClass;
-                        if (typeClass.Modifiers.Contains("static")) {
-                            errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot declare a field of static type '" + typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, f.Type) + "'.", FileName = f.FileName, Entity = f.Type });
+                        if (typeClass.Modifiers.Contains(GrapeModifier.GrapeModifierType.Static)) {
+                            errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot declare a field of static type '" + typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, f.Field.Type) + "'.", FileName = f.FileName, Entity = f.Field.Type });
                             if (!Config.ContinueOnError) {
                                 return false;
                             }
@@ -133,8 +119,8 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         }
                     }
 
-                    if (f.Value != null && !typeCheckingUtils.DoesExpressionResolveToType(Config, f, f.Value, f.Type, ref errorMessage)) {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot resolve expression to the type '" + typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, f.Type) + "'. " + errorMessage, FileName = f.FileName, Entity = f });
+                    if (f.Field.Initializer != null && f.Field.Initializer is GrapeValueInitializer && !typeCheckingUtils.DoesExpressionResolveToType(Config, f, ((GrapeValueInitializer)f.Field.Initializer).Value, f.Field.Type, ref errorMessage)) {
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot resolve expression to the type '" + typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, f.Field.Type) + "'. " + errorMessage, FileName = f.FileName, Entity = f });
                         if (!Config.ContinueOnError) {
                             return false;
                         }

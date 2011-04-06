@@ -2,6 +2,7 @@
 using System.ComponentModel.Composition;
 using Vestras.StarCraft2.Grape.Core;
 using Vestras.StarCraft2.Grape.Core.Ast;
+using Vestras.StarCraft2.Grape.Core.Implementation;
 
 namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
     [Export(typeof(IAstNodeValidator))]
@@ -35,32 +36,15 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
             return false;
         }
 
-        private bool ValidateModifiers(GrapeClass f, out string errorMessage) {
+        private bool ValidateModifiers(GrapeClass c, out string errorMessage) {
             errorMessage = "";
-            bool hasAccessModifier = false;
-            bool isStatic = false;
-            bool isAbstract = false;
-            bool isSealed = false;
-            bool isOverride = false;
-            foreach (string modifier in f.Modifiers.Split(' ')) {
-                if (IsModifierAccessModifier(modifier)) {
-                    if (hasAccessModifier) {
-                        errorMessage = "A class cannot have multiple access modifiers.";
-                        return false;
-                    }
-
-                    hasAccessModifier = true;
-                } else {
-                    if (modifier == "static") {
-                        isStatic = true;
-                    } else if (modifier == "abstract") {
-                        isAbstract = true;
-                    } else if (modifier == "sealed") {
-                        isSealed = true;
-                    } else if (modifier == "override") {
-                        isOverride = true;
-                    }
-                }
+            bool isStatic = c.Modifiers.Contains(GrapeModifier.GrapeModifierType.Static);
+            bool isAbstract = c.Modifiers.Contains(GrapeModifier.GrapeModifierType.Abstract);
+            bool isSealed = c.Modifiers.Contains(GrapeModifier.GrapeModifierType.Sealed);
+            bool isOverride = c.Modifiers.Contains(GrapeModifier.GrapeModifierType.Override);
+            if (c.Modifiers.HasInvalidAccessModifiers()) {
+                errorMessage = "Invalid access modifiers found.";
+                return false;
             }
 
             if (isStatic && isAbstract) {
@@ -93,7 +77,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         }
                     }
 
-                    if (c.Modifiers.Contains("static") && c.Size != GrapeClass.UseDefaultSize) {
+                    if (c.Modifiers.Contains(GrapeModifier.GrapeModifierType.Static) && c.Size != GrapeClass.DefaultSize) {
                         errorSink.AddError(new GrapeErrorSink.Error { Description = "A static class cannot have a size specified.", FileName = c.FileName, Entity = c });
                         if (!Config.ContinueOnError) {
                             return false;
@@ -114,16 +98,9 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         }
                     }
 
-                    GrapeMemberExpression inheritsTypeMemberExpression = c.Inherits as GrapeMemberExpression;
-                    string inheritsTypeQualifiedId = "";
-                    if (inheritsTypeMemberExpression != null) {
-                        inheritsTypeQualifiedId = inheritsTypeMemberExpression.GetMemberExpressionQualifiedId();
-                    } else if (c.Inherits is GrapeIdentifierExpression) {
-                        inheritsTypeQualifiedId = ((GrapeIdentifierExpression)c.Inherits).Identifier;
-                    }
-
+                    string inheritsTypeQualifiedId = c.Inherits.ToString();
                     if (inheritsTypeQualifiedId == "void" || inheritsTypeQualifiedId == "void_base") {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "The void type cannot be inherited.", FileName = c.FileName, Entity = inheritsTypeMemberExpression });
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "The void type cannot be inherited.", FileName = c.FileName, Entity = c.Inherits });
                         if (!Config.ContinueOnError) {
                             return false;
                         }

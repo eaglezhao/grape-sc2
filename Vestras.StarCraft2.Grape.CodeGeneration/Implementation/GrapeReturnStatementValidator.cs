@@ -22,37 +22,30 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
             if (Config.OutputErrors) {
                 GrapeReturnStatement s = obj as GrapeReturnStatement;
                 if (s != null) {
-                    GrapeFunction logicalFunctionParent = s.GetLogicalParentOfEntityType<GrapeFunction>();
-                    if (logicalFunctionParent == null) {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "A return statement must be the logical child of a function.", FileName = s.FileName, Entity = s });
+                    GrapeMethod logicalMethodParent = s.GetLogicalParentOfEntityType<GrapeMethod>();
+                    if (logicalMethodParent == null) {
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "A return statement must be the logical child of a method.", FileName = s.FileName, Entity = s });
                         if (!Config.ContinueOnError) {
                             return false;
                         }
                     }
 
                     string errorMessage = "";
-                    GrapeMemberExpression returnTypeMemberExpression = logicalFunctionParent.ReturnType as GrapeMemberExpression;
-                    string returnTypeQualifiedId = "";
-                    if (returnTypeMemberExpression != null) {
-                        returnTypeQualifiedId = returnTypeMemberExpression.GetMemberExpressionQualifiedId();
-                    } else if (logicalFunctionParent.ReturnType is GrapeIdentifierExpression) {
-                        returnTypeQualifiedId = ((GrapeIdentifierExpression)logicalFunctionParent.ReturnType).Identifier;
-                    }
-
+                    string returnTypeQualifiedId = logicalMethodParent.ReturnType.ToString();
                     if (returnTypeQualifiedId == "void" || returnTypeQualifiedId == "void_base") {
                         if (s.ReturnValue != null) {
-                            errorSink.AddError(new GrapeErrorSink.Error { Description = "Since " + logicalFunctionParent.Name + " returns void, a return keyword must not be followed by an expression.", FileName = s.FileName, Entity = s });
+                            errorSink.AddError(new GrapeErrorSink.Error { Description = "Since " + logicalMethodParent.Name + " returns void, a return keyword must not be followed by an expression.", FileName = s.FileName, Entity = s });
                             if (!Config.ContinueOnError) {
                                 return false;
                             }
                         }
                     } else if (s.ReturnValue == null) {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Since " + logicalFunctionParent.Name + " does not return void, a return keyword must be followed by an expression.", FileName = s.FileName, Entity = s });
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Since " + logicalMethodParent.Name + " does not return void, a return keyword must be followed by an expression.", FileName = s.FileName, Entity = s });
                         if (!Config.ContinueOnError) {
                             return false;
                         }
-                    } else if (!typeCheckingUtils.DoesExpressionResolveToType(Config, s, s.ReturnValue, returnTypeMemberExpression, ref errorMessage)) {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot resolve expression to the type '" + typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, logicalFunctionParent.ReturnType) + "'. " + errorMessage, FileName = s.FileName, Entity = s.ReturnValue });
+                    } else if (!typeCheckingUtils.DoesExpressionResolveToType(Config, s, s.ReturnValue, logicalMethodParent.ReturnType, ref errorMessage)) {
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot resolve expression to the type '" + typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, logicalMethodParent.ReturnType) + "'. " + errorMessage, FileName = s.FileName, Entity = s.ReturnValue });
                         if (!Config.ContinueOnError) {
                             return false;
                         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using Vestras.StarCraft2.Grape.Core;
 using Vestras.StarCraft2.Grape.Core.Ast;
+using Vestras.StarCraft2.Grape.Core.Implementation;
 
 namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
     [Export]
@@ -45,9 +46,6 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                             }
                         }
                     }
-                } else if (expression.GetType() == typeof(GrapeMemberExpression)) {
-                    GrapeMemberExpression memberExpression = expression as GrapeMemberExpression;
-                    return ValidateExpression(config, memberExpression.Member);
                 } else if (expression.GetType() == typeof(GrapeMultiplicationExpression)) {
                     GrapeMultiplicationExpression multiplicationExpression = expression as GrapeMultiplicationExpression;
                     if (!(typeCheckingUtils.DoesExpressionResolveToType(config, expression, multiplicationExpression.Left, "int_base", ref errorMessage) && typeCheckingUtils.DoesExpressionResolveToType(config, expression, multiplicationExpression.Right, "int_base", ref errorMessage)) || !(typeCheckingUtils.DoesExpressionResolveToType(config, expression, multiplicationExpression.Left, "fixed_base", ref errorMessage) && typeCheckingUtils.DoesExpressionResolveToType(config, expression, multiplicationExpression.Right, "fixed_base", ref errorMessage))) {
@@ -65,8 +63,8 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         }
                     }
 
-                    string qualifiedId = (nameofExpression.Value as GrapeMemberExpression).GetMemberExpressionQualifiedId();
-                    GrapeEntity valueEntity = (new List<GrapeEntity>(typeCheckingUtils.GetEntitiesForMemberExpression(config, nameofExpression.Value as GrapeMemberExpression, expression, out errorMessage, false)))[0];
+                    string qualifiedId = nameofExpression.Value.ToString();
+                    GrapeEntity valueEntity = (new List<GrapeEntity>(typeCheckingUtils.GetEntitiesForAccessExpression(config, nameofExpression.Value, expression, out errorMessage, false)))[0];
                     if (valueEntity == null) {
                         errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot find entity for expression '" + qualifiedId + "'. " + errorMessage, FileName = expression.FileName, Entity = expression });
                         if (!config.ContinueOnError) {
@@ -75,30 +73,19 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                     }
 
                     GrapeClass c = expression.GetLogicalParentOfEntityType<GrapeClass>();
-                    string[] modifiers = c.GetAppropriateModifiersForEntityAccess(config, valueEntity);
-                    string potentialModifiers = valueEntity.GetPotentialModifiersOfEntity();
+                    GrapeModifier.GrapeModifierType modifiers = c.GetAppropriateModifiersForEntityAccess(config, valueEntity);
+                    GrapeModifier.GrapeModifierType potentialModifiers = valueEntity.GetPotentialModifiersOfEntity();
                     bool invalidModifiers = false;
-                    if (modifiers != null) {
-                        if (potentialModifiers == null) {
-                            if (modifiers.Length == 1 && modifiers[0] == "public") {
+                    if (modifiers != 0) {
+                        if (potentialModifiers == 0) {
+                            if (modifiers == GrapeModifier.GrapeModifierType.Public) {
                                 invalidModifiers = false;
                             } else {
                                 invalidModifiers = true;
                             }
                         } else {
-                            foreach (string modifier in modifiers) {
-                                bool hasModifier = false;
-                                foreach (string entityModifier in potentialModifiers.Split(' ')) {
-                                    if (entityModifier == modifier) {
-                                        hasModifier = true;
-                                        break;
-                                    }
-                                }
-
-                                if (!hasModifier) {
-                                    invalidModifiers = true;
-                                    break;
-                                }
+                            if (modifiers != potentialModifiers) {
+                                invalidModifiers = true;
                             }
                         }
                     } else {
@@ -119,8 +106,6 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                             return false;
                         }
                     }
-                } else if (expression.GetType() == typeof(GrapeStackExpression)) {
-                    return ValidateExpression(config, ((GrapeStackExpression)expression).Child);
                 } else if (expression.GetType() == typeof(GrapeTypecastExpression)) {
                     GrapeTypecastExpression typecastExpression = expression as GrapeTypecastExpression;
                     if (typeCheckingUtils.DoesExpressionResolveToType(config, typecastExpression, typecastExpression.Value, "text_base")) {
@@ -130,7 +115,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         }
                     }
 
-                    return typeCheckingUtils.DoesExpressionResolveToType(config, expression, typecastExpression.Value, typecastExpression.Type);
+                    return typeCheckingUtils.DoesExpressionResolveToType(config, expression, typecastExpression.Value, typecastExpression.TypeName);
                 } else if (expression.GetType() == typeof(GrapeUnaryExpression)) {
                     GrapeUnaryExpression unaryExpression = expression as GrapeUnaryExpression;
                     if (unaryExpression.Type == GrapeUnaryExpression.GrapeUnaryExpressionType.Not) {

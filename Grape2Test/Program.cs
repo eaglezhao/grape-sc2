@@ -12,7 +12,7 @@ namespace Grape2Test {
 	class Program {
 		static void Main(string[] args) {
 			GrapeParser parser = new GrapeParser();
-			GrapeAst ast = parser.Parse(@"c:\temp\Grape2.txt", false, false);
+			GrapeAst ast = parser.Parse(@"c:\Grape2.txt", false, false);
 			foreach (GrapeEntity entity in ast.Children) {
 				Debug.WriteLine("Entity: "+entity.GetType().Name);
 				foreach (GrapeEntity child in entity.GetChildren<GrapeExpression>()) {

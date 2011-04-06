@@ -35,7 +35,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
             return false;
         }
 
-        private void VisitNodesForEntityList(List<GrapeEntity> entities) {
+        private void VisitNodesForEntityList(IEnumerable<GrapeEntity> entities) {
             foreach (GrapeEntity entity in entities) {
                 foreach (IAstNodeVisitor nodeVisitor in nodeVisitors) {
                     if (IsTypeInTypeArray(entity.GetType(), nodeVisitor.NodeType)) {
@@ -47,14 +47,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
 
                         if (config.GenerateCode) {
                             nodeVisitor.VisitNode(entity);
-                            GrapeBlock logicalBlockParent = entity.GetLogicalParentOfEntityType<GrapeBlock>();
-                            if (logicalBlockParent != null) {
-                                if (logicalBlockParent.Children.FindLast(new Predicate<GrapeEntity>(delegate(GrapeEntity e) {
-                                    return e == entity;
-                                })) == entity) {
-                                    config.OutputCode += Environment.NewLine + "}" + Environment.NewLine;
-                                }
-                            }
+                            // TODO: implement end block } code generation here.
                         } else {
                             nodeVisitor.Validator.ValidateNode(entity);
                         }
@@ -63,17 +56,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                     }
                 }
 
-                if (entity is GrapeStatement) {
-                    if (((GrapeStatement)entity).CanHaveBlock) {
-                        VisitNodesForEntityList(((GrapeStatement)entity).Block.Children);
-                    }
-                } else if (entity is GrapeEntityWithBlock) {
-                    VisitNodesForEntityList(((GrapeEntityWithBlock)entity).Block.Children);
-                } else if (entity is GrapeBlock) {
-                    VisitNodesForEntityList(((GrapeBlock)entity).Children);
-                } else if (entity is GrapePackageDeclaration) {
-                    VisitNodesForEntityList(((GrapePackageDeclaration)entity).Children);
-                }
+                VisitNodesForEntityList(entity.GetChildren());
             }
         }
 

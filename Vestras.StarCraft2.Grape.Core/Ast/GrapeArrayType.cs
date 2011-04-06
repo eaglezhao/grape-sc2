@@ -6,6 +6,11 @@ namespace Vestras.StarCraft2.Grape.Core.Ast {
 	public class GrapeArrayType: GrapeType {
 		private readonly GrapeType elementType;
 
+        public override GrapeExpression ToExpression() {
+            // TODO: implement this. Return GrapeAccessExpression of some sort?
+            throw new System.NotImplementedException();
+        }
+
 		[Rule("<Array Type> ::= <Qualified ID> ~'[' ~']'")]
 		public GrapeArrayType(GrapeList<GrapeIdentifier> nameParts): this(new GrapeSimpleType(nameParts)) {}
 

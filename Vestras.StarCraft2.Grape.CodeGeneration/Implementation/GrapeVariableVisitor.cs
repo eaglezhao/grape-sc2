@@ -5,12 +5,8 @@ using Vestras.StarCraft2.Grape.Core;
 namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
     [Export(typeof(IAstNodeVisitor)), Export]
     internal sealed class GrapeVariableVisitor : IAstNodeVisitor {
-
-        [Import]
-        private GrapeExpressionGenerator expressionGenerator = null;
         [Import]
         private GrapeTypeCheckingUtilities typeCheckingUtils = null;
-
 
         public GrapeCodeGeneratorConfiguration Config { get; set; }
         public IAstNodeValidator Validator { get; set; }
@@ -29,16 +25,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                 }
 
                 if (isValid) {
-                    expressionGenerator.Config = Config;
-
-                    //string type = "[type]";
-                    string type = typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, v.Type);
-                    //type.Replace("_base", "");
-
-                    string output = type + " " + v.Name + "=" + expressionGenerator.VisitExpression(v.Value) + ";";
-
-                    Config.OutputCode += output + Environment.NewLine;
-                    // TODO: insert field code generation here.
+                    // TODO: insert variable code generation here.
                 }
             }
         }

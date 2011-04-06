@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using Vestras.StarCraft2.Grape.Core;
 using Vestras.StarCraft2.Grape.Core.Ast;
+using Vestras.StarCraft2.Grape.Core.Implementation;
 
 namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
     [Export(typeof(IAstNodeValidator)), Export]
@@ -40,8 +41,8 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
             if (Config.OutputErrors) {
                 GrapeVariable v = obj as GrapeVariable;
                 if (v != null) {
-                    if (!v.IsLogicalChildOfEntityType<GrapeFunction>()) {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "A variable must be the child of a function.", FileName = v.FileName, Entity = v });
+                    if (!v.IsLogicalChildOfEntityType<GrapeMethod>()) {
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "A variable must be the child of a method.", FileName = v.FileName, Entity = v });
                         if (!Config.ContinueOnError) {
                             return false;
                         }
@@ -55,10 +56,10 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         }
                     }
 
-                    GrapeEntity type = (new List<GrapeEntity>(typeCheckingUtils.GetEntitiesForMemberExpression(Config, v.Type as GrapeMemberExpression, v, out errorMessage)))[0];
+                    GrapeEntity type = (new List<GrapeEntity>(typeCheckingUtils.GetEntitiesForAccessExpression(Config, v.Type, v, out errorMessage)))[0];
                     if (type is GrapeClass) {
                         GrapeClass typeClass = type as GrapeClass;
-                        if (typeClass.Modifiers.Contains("static")) {
+                        if (typeClass.Modifiers.Contains(GrapeModifier.GrapeModifierType.Static)) {
                             errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot declare a variable of static type '" + typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, v.Type) + "'.", FileName = v.FileName, Entity = v.Type });
                             if (!Config.ContinueOnError) {
                                 return false;
@@ -66,8 +67,8 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         }
                     }
 
-                    if (v.Value != null && !typeCheckingUtils.DoesExpressionResolveToType(Config, v, v.Value, v.Type, ref errorMessage)) {
-                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot resolve expression to the type '" + typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, v.Type) + "'. " + errorMessage, FileName = v.FileName, Entity = v.Value });
+                    if (v.Initializer != null && v.Initializer is GrapeValueInitializer && !typeCheckingUtils.DoesExpressionResolveToType(Config, v, (v.Initializer as GrapeValueInitializer).Value, v.Type, ref errorMessage)) {
+                        errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot resolve expression to the type '" + typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, v.Type) + "'. " + errorMessage, FileName = v.FileName, Entity = v.Initializer });
                         if (!Config.ContinueOnError) {
                             return false;
                         }

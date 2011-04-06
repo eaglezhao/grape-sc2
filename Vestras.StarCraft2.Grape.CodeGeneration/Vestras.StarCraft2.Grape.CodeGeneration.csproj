@@ -40,16 +40,15 @@
   <ItemGroup>
     <Compile Include="IGrapeCodeGenerator.cs" />
     <Compile Include="Implementation\DirectoryHelper.cs" />
-    <Compile Include="Implementation\Generator\GrapeComponentsContainer.cs" />
     <Compile Include="Implementation\GrapeDeleteStatementVisitor.cs" />
     <Compile Include="Implementation\GrapeDeleteStatementValidator.cs" />
-    <Compile Include="Implementation\Generator\GrapeExpressionGenerator.cs" />
     <Compile Include="Implementation\GrapeExpressionValidator.cs" />
     <Compile Include="Implementation\GrapeMemberExpressionValidator.cs" />
     <Compile Include="Implementation\GrapeMemberExpressionVisitor.cs" />
     <Compile Include="Implementation\GrapeForEachStatementValidator.cs" />
     <Compile Include="Implementation\GrapeForEachStatementVisitor.cs" />
     <Compile Include="Implementation\GrapeAstUtilities.cs" />
+    <Compile Include="Implementation\GrapeModifierExtensionMethods.cs" />
     <Compile Include="Implementation\GrapeTypeCheckingUtilities.cs" />
     <Compile Include="Implementation\GrapeWhileStatementValidator.cs" />
     <Compile Include="Implementation\GrapeWhileStatementVisitor.cs" />
@@ -60,8 +59,8 @@
     <Compile Include="Implementation\GrapeExpressionExtensionMethods.cs" />
     <Compile Include="Implementation\GrapeReturnStatementValidator.cs" />
     <Compile Include="Implementation\GrapeReturnStatementVisitor.cs" />
-    <Compile Include="Implementation\GrapeIfStatementValidator.cs" />
-    <Compile Include="Implementation\GrapeIfStatementVisitor.cs" />
+    <Compile Include="Implementation\GrapeConditionalStatementValidator.cs" />
+    <Compile Include="Implementation\GrapeConditionalStatementVisitor.cs" />
     <Compile Include="Implementation\GrapeContinueStatementValidator.cs" />
     <Compile Include="Implementation\GrapeContinueStatementVisitor.cs" />
     <Compile Include="Implementation\GrapeBreakStatementValidator.cs" />
@@ -71,8 +70,8 @@
     <Compile Include="Implementation\GrapeEntityExtensionMethods.cs" />
     <Compile Include="Implementation\GrapeFieldValidator.cs" />
     <Compile Include="Implementation\GrapeFieldVisitor.cs" />
-    <Compile Include="Implementation\GrapeFunctionValidator.cs" />
-    <Compile Include="Implementation\GrapeFunctionVisitor.cs" />
+    <Compile Include="Implementation\GrapeMethodValidator.cs" />
+    <Compile Include="Implementation\GrapeMethodVisitor.cs" />
     <Compile Include="Implementation\GrapeAstVisitor.cs" />
     <Compile Include="Implementation\GrapeCodeGenerator.cs" />
     <Compile Include="Implementation\GrapeCodeGeneratorConfiguration.cs" />

@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using Vestras.StarCraft2.Grape.Core;
 using Vestras.StarCraft2.Grape.Core.Ast;
+using Vestras.StarCraft2.Grape.Core.Implementation;
 
 namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
     [Export(typeof(IAstNodeValidator))]
@@ -40,20 +41,23 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         if (inheritingEntity != null && inheritingEntity is GrapeClass) {
                             string errorMessage = "";
                             GrapeClass inheritingClass = inheritingEntity as GrapeClass;
-                            GrapeFunction function = null;
-                            foreach (GrapeEntity entity in inheritingClass.Block.Children) {
-                                if (entity != null && entity is GrapeFunction && ((GrapeFunction)entity).Name == inheritingClass.Name && ((GrapeFunction)entity).Type == GrapeFunction.GrapeFunctionType.Constructor) {
-                                    function = entity as GrapeFunction;
+                            GrapeMethod method = null;
+                            foreach (GrapeEntity entity in inheritingClass.GetChildren()) {
+                                if (entity != null && entity is GrapeMethod && ((GrapeMethod)entity).Name == inheritingClass.Name && ((GrapeMethod)entity).Type == GrapeMethod.GrapeMethodType.Constructor) {
+                                    method = entity as GrapeMethod;
                                     break;
                                 }
                             }
 
-                            if (function == null) {
-                                function = new GrapeFunction { Block = new GrapeBlock(), FileName = inheritingClass.FileName, Modifiers = "public", Name = inheritingClass.Name, ReturnType = new GrapeIdentifierExpression { Identifier = inheritingClass.Name }, Type = GrapeFunction.GrapeFunctionType.Constructor, Parent = inheritingClass };
+                            if (method == null) {
+                                GrapeList<GrapeModifier> methodModifiers = new GrapeList<GrapeModifier>(new GrapePublicModifier());
+                                GrapeList<GrapeIdentifier> nameParts = new GrapeList<GrapeIdentifier>(new GrapeIdentifier(inheritingClass.Name));
+                                method = new GrapeMethod(methodModifiers, new GrapeSimpleType(nameParts), new GrapeIdentifier(inheritingClass.Name), new GrapeList<GrapeParameter>(), new GrapeList<GrapeStatement>());
+                                method.Parent = inheritingClass;
                             }
 
-                            string[] modifiers = c.GetAppropriateModifiersForEntityAccess(Config, function);
-                            bool valid = memberExpressionValidator.ValidateFunctionSignatureAndOverloads(new GrapeCallExpression { FileName = s.FileName, Length = s.Length, Member = new GrapeIdentifierExpression { Identifier = inheritingClass.Name }, Offset = s.Offset, Parameters = new ObservableCollection<GrapeExpression>(s.Parameters), Parent = s }, function, modifiers, ref errorMessage);
+                            GrapeModifier.GrapeModifierType modifiers = c.GetAppropriateModifiersForEntityAccess(Config, method);
+                            bool valid = memberExpressionValidator.ValidateFunctionSignatureAndOverloads(new GrapeCallExpression { Length = s.Length, Member = new GrapeIdentifierExpression { Identifier = inheritingClass.Name }, Offset = s.Offset, Parameters = new ObservableCollection<GrapeExpression>(s.Parameters), Parent = s }, method, modifiers, ref errorMessage);
                             if (!valid) {
                                 errorSink.AddError(new GrapeErrorSink.Error { Description = errorMessage, FileName = s.FileName, Entity = s });
                                 if (!Config.ContinueOnError) {
@@ -68,21 +72,24 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         }
                     } else if (s.Type == GrapeInitStatement.GrapeInitStatementType.This) {
                         GrapeClass c = s.GetLogicalParentOfEntityType<GrapeClass>();
-                        GrapeFunction function = null;
-                        foreach (GrapeEntity entity in c.Block.Children) {
-                            if (entity != null && entity is GrapeFunction && ((GrapeFunction)entity).Name == c.Name && ((GrapeFunction)entity).Type == GrapeFunction.GrapeFunctionType.Constructor) {
-                                function = entity as GrapeFunction;
+                        GrapeMethod method = null;
+                        foreach (GrapeEntity entity in c.GetChildren()) {
+                            if (entity != null && entity is GrapeMethod && ((GrapeMethod)entity).Name == c.Name && ((GrapeMethod)entity).Type == GrapeMethod.GrapeMethodType.Constructor) {
+                                method = entity as GrapeMethod;
                                 break;
                             }
                         }
 
-                        if (function == null) {
-                            function = new GrapeFunction { Block = new GrapeBlock(), FileName = c.FileName, Modifiers = "public", Name = c.Name, ReturnType = new GrapeIdentifierExpression { Identifier = c.Name }, Type = GrapeFunction.GrapeFunctionType.Constructor, Parent = c };
+                        if (method == null) {
+                            GrapeList<GrapeModifier> methodModifiers = new GrapeList<GrapeModifier>(new GrapePublicModifier());
+                            GrapeList<GrapeIdentifier> nameParts = new GrapeList<GrapeIdentifier>(new GrapeIdentifier(c.Name));
+                            method = new GrapeMethod(methodModifiers, new GrapeSimpleType(nameParts), new GrapeIdentifier(c.Name), new GrapeList<GrapeParameter>(), new GrapeList<GrapeStatement>());
+                            method.Parent = c;
                         }
 
                         string errorMessage = "";
-                        string[] modifiers = c.GetAppropriateModifiersForEntityAccess(Config, function);
-                        bool valid = memberExpressionValidator.ValidateFunctionSignatureAndOverloads(new GrapeCallExpression { FileName = s.FileName, Length = s.Length, Member = new GrapeIdentifierExpression { Identifier = c.Name }, Offset = s.Offset, Parameters = new ObservableCollection<GrapeExpression>(s.Parameters), Parent = s }, function, modifiers, ref errorMessage);
+                        GrapeModifier.GrapeModifierType modifiers = c.GetAppropriateModifiersForEntityAccess(Config, method);
+                        bool valid = memberExpressionValidator.ValidateFunctionSignatureAndOverloads(new GrapeCallExpression { FileName = s.FileName, Length = s.Length, Member = new GrapeIdentifierExpression { Identifier = c.Name }, Offset = s.Offset, Parameters = new ObservableCollection<GrapeExpression>(s.Parameters), Parent = s }, method, modifiers, ref errorMessage);
                         if (!valid) {
                             errorSink.AddError(new GrapeErrorSink.Error { Description = errorMessage, FileName = s.FileName, Entity = s });
                             if (!Config.ContinueOnError) {
