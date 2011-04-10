@@ -24,7 +24,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
             if (Config.OutputErrors) {
                 GrapeDeleteStatement s = obj as GrapeDeleteStatement;
                 if (s != null) {
-                    string qualifiedId = s.Value is GrapeIdentifierExpression ? ((GrapeIdentifierExpression)s.Value).Identifier : s.Value is GrapeMemberExpression ? ((GrapeMemberExpression)s.Value).GetAccessExpressionQualifiedId() : typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, s.Value);
+                    string qualifiedId = s.Value is GrapeAccessExpression ? ((GrapeAccessExpression)s.Value).GetAccessExpressionQualifiedId() : typeCheckingUtils.GetTypeNameForTypeAccessExpression(Config, s.Value);
                     if (qualifiedId == "this" || qualifiedId == "base") {
                         errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot delete static type '" + qualifiedId + "'.", FileName = s.FileName, Entity = s });
                         if (!Config.ContinueOnError) {

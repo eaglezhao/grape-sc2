@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using Vestras.StarCraft2.Grape.Core;
-using Vestras.StarCraft2.Grape.Core.Ast;
 using Vestras.StarCraft2.Grape.Core.Implementation;
 
 namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
@@ -133,7 +132,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
 
                     string errorMessage;
                     if (m.Modifiers.Contains(GrapeModifier.GrapeModifierType.Override)) {
-                        GrapeMethod baseMethod = m.GetOverridingFunction(Config, out errorMessage);
+                        GrapeMethod baseMethod = m.GetOverridingMethod(Config, out errorMessage);
                         if (baseMethod == null) {
                             errorSink.AddError(new GrapeErrorSink.Error { Description = errorMessage, FileName = m.FileName, Entity = m });
                             if (!Config.ContinueOnError) {
