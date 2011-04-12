@@ -9,7 +9,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
     [Export]
     internal sealed class GrapeExpressionValidator {
         [Import]
-        private GrapeMemberExpressionValidator memberExpressionValidator = null;
+        private GrapeAccessExpressionValidator accessExpressionValidator = null;
         [Import]
         private GrapeErrorSink errorSink = null;
         [Import]
@@ -19,8 +19,8 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
             if (expression != null) {
                 GrapeAst ast = config.Ast;
                 string errorMessage = "";
-                if (GrapeAstVisitor.IsTypeInTypeArray(expression.GetType(), memberExpressionValidator.NodeType)) {
-                    return memberExpressionValidator.ValidateNode(expression);
+                if (GrapeAstVisitor.IsTypeInTypeArray(expression.GetType(), accessExpressionValidator.NodeType)) {
+                    return accessExpressionValidator.ValidateNode(expression);
                 } else if (expression.GetType() == typeof(GrapeAddExpression)) {
                     GrapeAddExpression addExpression = expression as GrapeAddExpression;
                     if (!(typeCheckingUtils.DoesExpressionResolveToType(config, expression, addExpression.Left, "int_base") && typeCheckingUtils.DoesExpressionResolveToType(config, expression, addExpression.Right, "int_base", ref errorMessage)) || !(typeCheckingUtils.DoesExpressionResolveToType(config, expression, addExpression.Left, "fixed_base", ref errorMessage) && typeCheckingUtils.DoesExpressionResolveToType(config, expression, addExpression.Right, "fixed_base", ref errorMessage)) || !(typeCheckingUtils.DoesExpressionResolveToType(config, expression, addExpression.Left, "string_base", ref errorMessage) && typeCheckingUtils.DoesExpressionResolveToType(config, expression, addExpression.Right, "string_base", ref errorMessage))) {

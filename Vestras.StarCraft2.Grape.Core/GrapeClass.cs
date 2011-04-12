@@ -8,6 +8,8 @@ using Vestras.StarCraft2.Grape.Core.Implementation;
 
 namespace Vestras.StarCraft2.Grape.Core {
 	public sealed class GrapeClass: GrapeClassItem {
+        public static readonly int DefaultSize = 100;
+
 		private readonly GrapeSimpleType inherits;
 		private readonly ReadOnlyCollection<GrapeClassItem> classItems;
 		private readonly string name;

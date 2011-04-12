@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using Vestras.StarCraft2.Grape.Core;
 using Vestras.StarCraft2.Grape.Core.Ast;
@@ -11,7 +10,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
         [Import]
         private GrapeErrorSink errorSink = null;
         [Import]
-        private GrapeMemberExpressionValidator memberExpressionValidator = null;
+        private GrapeAccessExpressionValidator accessExpressionValidator = null;
         [Import]
         private GrapeAstUtilities astUtils = null;
         [Import]
@@ -57,7 +56,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                             }
 
                             GrapeModifier.GrapeModifierType modifiers = c.GetAppropriateModifiersForEntityAccess(Config, method);
-                            bool valid = memberExpressionValidator.ValidateFunctionSignatureAndOverloads(new GrapeCallExpression { Length = s.Length, Member = new GrapeIdentifierExpression { Identifier = inheritingClass.Name }, Offset = s.Offset, Parameters = new ObservableCollection<GrapeExpression>(s.Parameters), Parent = s }, method, modifiers, ref errorMessage);
+                            bool valid = accessExpressionValidator.ValidateMethodSignatureAndOverloads(GrapeCallExpression.Create(new GrapeIdentifier(inheritingClass.Name), GrapeList<GrapeExpression>.FromEnumerable(s.Parameters), null), method, modifiers, ref errorMessage);
                             if (!valid) {
                                 errorSink.AddError(new GrapeErrorSink.Error { Description = errorMessage, FileName = s.FileName, Entity = s });
                                 if (!Config.ContinueOnError) {
@@ -89,7 +88,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
 
                         string errorMessage = "";
                         GrapeModifier.GrapeModifierType modifiers = c.GetAppropriateModifiersForEntityAccess(Config, method);
-                        bool valid = memberExpressionValidator.ValidateFunctionSignatureAndOverloads(new GrapeCallExpression { FileName = s.FileName, Length = s.Length, Member = new GrapeIdentifierExpression { Identifier = c.Name }, Offset = s.Offset, Parameters = new ObservableCollection<GrapeExpression>(s.Parameters), Parent = s }, method, modifiers, ref errorMessage);
+                        bool valid = accessExpressionValidator.ValidateMethodSignatureAndOverloads(GrapeCallExpression.Create(new GrapeIdentifier(c.Name), GrapeList<GrapeExpression>.FromEnumerable(s.Parameters), null), method, modifiers, ref errorMessage);
                         if (!valid) {
                             errorSink.AddError(new GrapeErrorSink.Error { Description = errorMessage, FileName = s.FileName, Entity = s });
                             if (!Config.ContinueOnError) {

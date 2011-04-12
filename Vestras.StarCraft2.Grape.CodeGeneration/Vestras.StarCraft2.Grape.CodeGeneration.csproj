@@ -43,12 +43,14 @@
     <Compile Include="Implementation\GrapeDeleteStatementVisitor.cs" />
     <Compile Include="Implementation\GrapeDeleteStatementValidator.cs" />
     <Compile Include="Implementation\GrapeExpressionValidator.cs" />
-    <Compile Include="Implementation\GrapeMemberExpressionValidator.cs" />
-    <Compile Include="Implementation\GrapeMemberExpressionVisitor.cs" />
+    <Compile Include="Implementation\GrapeAccessExpressionValidator.cs" />
+    <Compile Include="Implementation\GrapeAccessExpressionVisitor.cs" />
     <Compile Include="Implementation\GrapeForEachStatementValidator.cs" />
     <Compile Include="Implementation\GrapeForEachStatementVisitor.cs" />
     <Compile Include="Implementation\GrapeAstUtilities.cs" />
     <Compile Include="Implementation\GrapeModifierExtensionMethods.cs" />
+    <Compile Include="Implementation\GrapeObjectCreationExpressionValidator.cs" />
+    <Compile Include="Implementation\GrapeSetExpressionValidator.cs" />
     <Compile Include="Implementation\GrapeTypeCheckingUtilities.cs" />
     <Compile Include="Implementation\GrapeWhileStatementValidator.cs" />
     <Compile Include="Implementation\GrapeWhileStatementVisitor.cs" />

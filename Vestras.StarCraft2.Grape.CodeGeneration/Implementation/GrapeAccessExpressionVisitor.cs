@@ -4,7 +4,7 @@ using Vestras.StarCraft2.Grape.Core.Ast;
 
 namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
     [Export(typeof(IAstNodeVisitor)), Export]
-    internal sealed class GrapeMemberExpressionVisitor : IAstNodeVisitor {
+    internal sealed class GrapeAccessExpressionVisitor : IAstNodeVisitor {
         public GrapeCodeGeneratorConfiguration Config { get; set; }
         public IAstNodeValidator Validator { get; set; }
         public Type[] NodeType {

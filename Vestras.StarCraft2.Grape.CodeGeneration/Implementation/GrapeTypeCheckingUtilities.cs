@@ -15,7 +15,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
         [Import]
         private GrapeAstUtilities astUtils = null;
         [Import]
-        private GrapeMemberExpressionValidator memberExpressionValidator = null;
+        private GrapeAccessExpressionValidator accessExpressionValidator = null;
         internal static GrapeTypeCheckingUtilities Instance;
 
         public bool IsTypeInClassInheritanceTree(GrapeCodeGeneratorConfiguration config, string typeName, GrapeClass c) {
@@ -491,7 +491,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                 entity = lastParent;
                 if (entity != null) {
                     GrapeMethod method = entity as GrapeMethod;
-                    if (method != null && accessExpression is GrapeCallExpression && !memberExpressionValidator.ValidateFunctionSignatureAndOverloads(((GrapeCallExpression)accessExpression), method, GrapeModifier.GrapeModifierType.Public, ref errorMessage)) {
+                    if (method != null && accessExpression is GrapeCallExpression && !accessExpressionValidator.ValidateMethodSignatureAndOverloads(((GrapeCallExpression)accessExpression), method, GrapeModifier.GrapeModifierType.Public, ref errorMessage)) {
                         return new GrapeEntity[] { entity };
                     }
 
@@ -676,7 +676,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         currentMemberExpression = currentMemberExpression.Next;
                     }
 
-                    if (callExpression != null && !memberExpressionValidator.ValidateFunctionSignatureAndOverloads(callExpression, method, GrapeModifier.GrapeModifierType.Public, ref errorMessage)) {
+                    if (callExpression != null && !accessExpressionValidator.ValidateMethodSignatureAndOverloads(callExpression, method, GrapeModifier.GrapeModifierType.Public, ref errorMessage)) {
                         return entities;
                     }
                 }
@@ -688,12 +688,11 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
         }
 
         public bool DoesExpressionResolveToType(GrapeCodeGeneratorConfiguration config, GrapeEntity parent, GrapeType expression, GrapeType type) { // left for compat
-            string dummyMessage = "";
-            return DoesExpressionResolveToType(config, parent, expression.ToExpression(), type, ref dummyMessage);
+            return expression.ToString() == type.ToString();
         }
 
         public bool DoesExpressionResolveToType(GrapeCodeGeneratorConfiguration config, GrapeEntity parent, GrapeType expression, GrapeType type, ref string errorMessage) { // left for compat
-            return DoesExpressionResolveToType(config, parent, expression.ToExpression(), type.ToString(), ref errorMessage);
+            return expression.ToString() == type.ToString();
         }
 
         public bool DoesExpressionResolveToType(GrapeCodeGeneratorConfiguration config, GrapeEntity parent, GrapeExpression expression, GrapeType type) { // left for compat
@@ -706,12 +705,11 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
         }
 
         public bool DoesExpressionResolveToType(GrapeCodeGeneratorConfiguration config, GrapeEntity parent, GrapeType expression, string typeName) { // left for compat
-            string dummyMessage = "";
-            return DoesExpressionResolveToType(config, parent, expression.ToExpression(), typeName, ref dummyMessage);
+            return expression.ToString() == typeName;
         }
 
         public bool DoesExpressionResolveToType(GrapeCodeGeneratorConfiguration config, GrapeEntity parent, GrapeType expression, string typeName, ref string errorMessage) { // left for compat
-            return DoesExpressionResolveToType(config, parent, expression.ToExpression(), typeName, ref errorMessage);
+            return expression.ToString() == typeName;
         }
 
         public bool DoesExpressionResolveToType(GrapeCodeGeneratorConfiguration config, GrapeEntity parent, GrapeExpression expression, GrapeExpression type) {

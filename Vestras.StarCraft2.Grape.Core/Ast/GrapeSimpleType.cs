@@ -7,11 +7,6 @@ namespace Vestras.StarCraft2.Grape.Core.Ast {
         private readonly string packageName;
         private readonly string typeName;
 
-        public override GrapeExpression ToExpression() {
-            // TODO: implement this. Return GrapeAccessExpression of some sort?
-            throw new NotImplementedException();
-        }
-
         [Rule("<Simple Type> ::= <Qualified ID>")]
         public GrapeSimpleType(GrapeList<GrapeIdentifier> nameParts) {
             packageName = nameParts.GetPackageName();
