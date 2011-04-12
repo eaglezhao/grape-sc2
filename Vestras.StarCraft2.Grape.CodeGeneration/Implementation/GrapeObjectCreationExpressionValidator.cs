@@ -47,7 +47,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         }
                     }
 
-                    GrapeEntity entity = (new List<GrapeEntity>(typeCheckingUtils.GetEntitiesForAccessExpression(Config, s.ClassName, s, out errorMessage)))[0];
+                    GrapeEntity entity = (new List<GrapeEntity>(typeCheckingUtils.GetEntitiesForObjectCreationExpression(Config, s, s, out errorMessage)))[0];
                     if (entity != null) {
                         GrapeMethod methodWithSignature = entity as GrapeMethod;
                         GrapeModifier.GrapeModifierType modifiers = s.GetLogicalParentOfEntityType<GrapeClass>().GetAppropriateModifiersForEntityAccess(Config, methodWithSignature);

@@ -330,6 +330,40 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
             return GetEntitiesForAccessExpression(config, accessExpression, parent, out errorMessage, true);
         }
 
+        public IEnumerable<GrapeEntity> GetEntitiesForObjectCreationExpression(GrapeCodeGeneratorConfiguration config, GrapeObjectCreationExpression objectCreationExpression, GrapeEntity parent) {
+            string dummyMessage = "";
+            return GetEntitiesForObjectCreationExpression(config, objectCreationExpression, parent, out dummyMessage);
+        }
+
+        public IEnumerable<GrapeEntity> GetEntitiesForObjectCreationExpression(GrapeCodeGeneratorConfiguration config, GrapeObjectCreationExpression objectCreationExpression, GrapeEntity parent, out string errorMessage) {
+            errorMessage = "";
+            GrapeClass c = astUtils.GetClassWithNameFromImportedPackagesInFile(config.Ast, GetTypeNameForTypeAccessExpression(config, objectCreationExpression.ClassName), objectCreationExpression.FileName);
+            if (c != null) {
+                List<GrapeMethod> constructors = c.GetConstructors();
+                if (constructors.Count == 0) {
+                    GrapeMethod method = new GrapeConstructor(new GrapeList<GrapeModifier>(new GrapePublicModifier()), new GrapeIdentifier(c.Name), new GrapeList<GrapeParameter>(), new GrapeList<GrapeStatement>());
+                    method.Parent = c;
+                    return new GrapeEntity[] { method };
+                } else {
+                    errorMessage = "";
+                    GrapeModifier.GrapeModifierType modifiers = objectCreationExpression.GetLogicalParentOfEntityType<GrapeClass>().GetAppropriateModifiersForEntityAccess(config, constructors[0]);
+                    List<GrapeMethod> functionsWithSignature = GetMethodsWithSignature(config, constructors, modifiers, c.Name, new GrapeSimpleType(new GrapeList<GrapeIdentifier>(new GrapeIdentifier(c.Name))), new List<GrapeExpression>(objectCreationExpression.Parameters), ref errorMessage);
+                    if (functionsWithSignature.Count > 1) {
+                        errorMessage = "Multiple methods with signature '" + GetMethodSignatureString(config, c.Name, new GrapeSimpleType(new GrapeList<GrapeIdentifier>(new GrapeIdentifier(c.Name))), new List<GrapeExpression>(objectCreationExpression.Parameters)) + "' found.";
+                        return new GrapeEntity[] { null };
+                    }
+
+                    if (functionsWithSignature.Count == 0) {
+                        return new GrapeEntity[] { null };
+                    }
+
+                    return functionsWithSignature;
+                }
+            }
+
+            return new GrapeEntity[] { null };
+        }
+
         public IEnumerable<GrapeEntity> GetEntitiesForAccessExpression(GrapeCodeGeneratorConfiguration config, GrapeAccessExpression accessExpression, GrapeEntity parent, out string errorMessage, bool detectMethodsUsedAsTypesOrVars) {
             errorMessage = "";
             string memberExpressionQualifiedId = accessExpression.GetAccessExpressionQualifiedId();
@@ -355,33 +389,6 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                 if (thisClass != null && thisClass.Inherits != null) {
                     GrapeClass baseClass = astUtils.GetClassWithNameFromImportedPackagesInFile(config.Ast, GetTypeNameForTypeAccessExpression(config, thisClass.Inherits, ref errorMessage), parent.FileName);
                     return new GrapeEntity[] { baseClass };
-                }
-
-                return new GrapeEntity[] { null };
-            } else if (accessExpression is GrapeObjectCreationExpression) {
-                GrapeObjectCreationExpression objectCreationExpression = accessExpression as GrapeObjectCreationExpression;
-                GrapeClass c = astUtils.GetClassWithNameFromImportedPackagesInFile(config.Ast, GetTypeNameForTypeAccessExpression(config, objectCreationExpression.Member), accessExpression.FileName);
-                if (c != null) {
-                    List<GrapeMethod> constructors = c.GetConstructors();
-                    if (constructors.Count == 0) {
-                        GrapeMethod method = new GrapeConstructor(new GrapeList<GrapeModifier>(new GrapePublicModifier()), new GrapeIdentifier(c.Name), new GrapeList<GrapeParameter>(), new GrapeList<GrapeStatement>());
-                        method.Parent = c;
-                        return new GrapeEntity[] { method };
-                    } else {
-                        errorMessage = "";
-                        GrapeModifier.GrapeModifierType modifiers = objectCreationExpression.GetLogicalParentOfEntityType<GrapeClass>().GetAppropriateModifiersForEntityAccess(config, constructors[0]);
-                        List<GrapeMethod> functionsWithSignature = GetMethodsWithSignature(config, constructors, modifiers, c.Name, new GrapeSimpleType(new GrapeList<GrapeIdentifier>(new GrapeIdentifier(c.Name))), new List<GrapeExpression>(objectCreationExpression.Parameters), ref errorMessage);
-                        if (functionsWithSignature.Count > 1) {
-                            errorMessage = "Multiple methods with signature '" + GetMethodSignatureString(config, c.Name, new GrapeSimpleType(new GrapeList<GrapeIdentifier>(new GrapeIdentifier(c.Name))), new List<GrapeExpression>(objectCreationExpression.Parameters)) + "' found.";
-                            return new GrapeEntity[] { null };
-                        }
-
-                        if (functionsWithSignature.Count == 0) {
-                            return new GrapeEntity[] { null };
-                        }
-
-                        return functionsWithSignature;
-                    }
                 }
 
                 return new GrapeEntity[] { null };
