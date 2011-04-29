@@ -7,7 +7,7 @@ namespace Vestras.StarCraft2.Grape.Core.Ast {
 		private readonly GrapeList<GrapeExpression> parameters;
 
 		[Rule("<Method Call> ::= <Field Access> ~'(' <Arg List Opt> ~')'")]
-		public GrapeMethodCall(GrapeMember ofMember, GrapeList<GrapeExpression> parameters): base(ofMember, null) {
+        public GrapeMethodCall(GrapeMember ofMember, GrapeList<GrapeExpression> parameters) : base(ofMember, new GrapeList<GrapeIdentifier>(ofMember.PopIdentifier())) {
 			this.parameters = parameters;
 		}
 
