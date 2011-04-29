@@ -123,13 +123,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                                 lastExpressionWithNext = lastExpression;
                             }
 
-                            lastExpression = lastExpression.Member as GrapeAccessExpression;
-                            if (lastExpression == null && lastExpressionWithNext != null) {
-                                lastExpression = lastExpressionWithNext.Next;
-                                if (lastExpression.Member != null && !(lastExpression.Member is GrapeAccessExpression)) {
-                                    break;
-                                }
-                            }
+                            lastExpression = lastExpression.Next;
                         }
 
                         if (!(lastExpression is GrapeCallExpression)) {

@@ -8,7 +8,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Lib", "Lib", "{F1DBA63A-2CA
 		Lib\bsn.GoldParser.dll = Lib\bsn.GoldParser.dll
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Stdlib", "Stdlib", "{3F9FC55D-08B1-4C0A-ACA2-D10D478B5B0F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vestras.StarCraft2.Grape.Galaxy.Interop", "Vestras.StarCraft2.Grape.Galaxy.Interop\Vestras.StarCraft2.Grape.Galaxy.Interop.csproj", "{8E57B4EE-630C-438D-8DFC-A1137DC41EAC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vestras.StarCraft2.Grape.CodeGeneration", "Vestras.StarCraft2.Grape.CodeGeneration\Vestras.StarCraft2.Grape.CodeGeneration.csproj", "{B7D42AC7-A1E7-45AC-AAAA-151BE8A3148E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vestras.StarCraft2.Grape.Compiler", "Vestras.StarCraft2.Grape.Compiler\Vestras.StarCraft2.Grape.Compiler.csproj", "{5025A97F-8810-4F9F-8F63-7CB0B4D4393A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{7F2C1234-79C2-4ED1-AAE0-38F1F733768E}"
+	ProjectSection(SolutionItems) = preProject
+		grape\doc\grape-documentation.htm = grape\doc\grape-documentation.htm
+		grape\doc\grape-logo.png = grape\doc\grape-logo.png
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Stdlib", "Stdlib", "{B4E1A4AC-2902-487E-8298-713294E245B9}"
 	ProjectSection(SolutionItems) = preProject
 		grape\system\abilcmd_base.gp = grape\system\abilcmd_base.gp
 		grape\system\actor_base.gp = grape\system\actor_base.gp
@@ -23,6 +35,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Stdlib", "Stdlib", "{3F9FC5
 		grape\system\camerainfo_base.gp = grape\system\camerainfo_base.gp
 		grape\system\color_base.gp = grape\system\color_base.gp
 		grape\system\convert.gp = grape\system\convert.gp
+		grape\system\difficulty.gp = grape\system\difficulty.gp
 		grape\system\doodad_base.gp = grape\system\doodad_base.gp
 		grape\system\exception.gp = grape\system\exception.gp
 		grape\system\fixed_base.gp = grape\system\fixed_base.gp
@@ -34,6 +47,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Stdlib", "Stdlib", "{3F9FC5
 		grape\system\mod_base.gp = grape\system\mod_base.gp
 		grape\system\object.gp = grape\system\object.gp
 		grape\system\order_base.gp = grape\system\order_base.gp
+		grape\system\player.gp = grape\system\player.gp
 		grape\system\playergroup_base.gp = grape\system\playergroup_base.gp
 		grape\system\point_base.gp = grape\system\point_base.gp
 		grape\system\region_base.gp = grape\system\region_base.gp
@@ -42,6 +56,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Stdlib", "Stdlib", "{3F9FC5
 		grape\system\sound_channel.gp = grape\system\sound_channel.gp
 		grape\system\soundlink_base.gp = grape\system\soundlink_base.gp
 		grape\system\string_base.gp = grape\system\string_base.gp
+		grape\system\text_base.gp = grape\system\text_base.gp
 		grape\system\timer_base.gp = grape\system\timer_base.gp
 		grape\system\transmissionsource_base.gp = grape\system\transmissionsource_base.gp
 		grape\system\trigger_base.gp = grape\system\trigger_base.gp
@@ -55,26 +70,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Stdlib", "Stdlib", "{3F9FC5
 		grape\system\wavetarget_base.gp = grape\system\wavetarget_base.gp
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vestras.StarCraft2.Grape.Galaxy.Interop", "Vestras.StarCraft2.Grape.Galaxy.Interop\Vestras.StarCraft2.Grape.Galaxy.Interop.csproj", "{8E57B4EE-630C-438D-8DFC-A1137DC41EAC}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vestras.StarCraft2.Grape.CodeGeneration", "Vestras.StarCraft2.Grape.CodeGeneration\Vestras.StarCraft2.Grape.CodeGeneration.csproj", "{B7D42AC7-A1E7-45AC-AAAA-151BE8A3148E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vestras.StarCraft2.Grape.Compiler", "Vestras.StarCraft2.Grape.Compiler\Vestras.StarCraft2.Grape.Compiler.csproj", "{5025A97F-8810-4F9F-8F63-7CB0B4D4393A}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{7F2C1234-79C2-4ED1-AAE0-38F1F733768E}"
-	ProjectSection(SolutionItems) = preProject
-		grape\doc\grape-documentation.htm = grape\doc\grape-documentation.htm
-		grape\doc\grape-logo.png = grape\doc\grape-logo.png
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "collections", "collections", "{62EC5787-D4F9-4BED-83DF-F04F7B9CD1B4}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "collections", "collections", "{A0B1A4E9-D48C-4AE7-BB79-4AE4D29912CD}"
 	ProjectSection(SolutionItems) = preProject
 		grape\system\collections\abstract_enumerable.gp = grape\system\collections\abstract_enumerable.gp
 		grape\system\collections\abstract_enumerator.gp = grape\system\collections\abstract_enumerator.gp
 		grape\system\collections\list.gp = grape\system\collections\list.gp
 	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Grape2Test", "Grape2Test\Grape2Test.csproj", "{8352386D-30F1-4398-A75F-3AB1B31B6802}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -126,21 +127,11 @@ Global
 		{5025A97F-8810-4F9F-8F63-7CB0B4D4393A}.Release|Mixed Platforms.Build.0 = Release|x86
 		{5025A97F-8810-4F9F-8F63-7CB0B4D4393A}.Release|x86.ActiveCfg = Release|x86
 		{5025A97F-8810-4F9F-8F63-7CB0B4D4393A}.Release|x86.Build.0 = Release|x86
-		{8352386D-30F1-4398-A75F-3AB1B31B6802}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{8352386D-30F1-4398-A75F-3AB1B31B6802}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{8352386D-30F1-4398-A75F-3AB1B31B6802}.Debug|Mixed Platforms.Build.0 = Debug|x86
-		{8352386D-30F1-4398-A75F-3AB1B31B6802}.Debug|x86.ActiveCfg = Debug|x86
-		{8352386D-30F1-4398-A75F-3AB1B31B6802}.Debug|x86.Build.0 = Debug|x86
-		{8352386D-30F1-4398-A75F-3AB1B31B6802}.Release|Any CPU.ActiveCfg = Release|x86
-		{8352386D-30F1-4398-A75F-3AB1B31B6802}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{8352386D-30F1-4398-A75F-3AB1B31B6802}.Release|Mixed Platforms.Build.0 = Release|x86
-		{8352386D-30F1-4398-A75F-3AB1B31B6802}.Release|x86.ActiveCfg = Release|x86
-		{8352386D-30F1-4398-A75F-3AB1B31B6802}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{62EC5787-D4F9-4BED-83DF-F04F7B9CD1B4} = {3F9FC55D-08B1-4C0A-ACA2-D10D478B5B0F}
+		{A0B1A4E9-D48C-4AE7-BB79-4AE4D29912CD} = {B4E1A4AC-2902-487E-8298-713294E245B9}
 	EndGlobalSection
 EndGlobal

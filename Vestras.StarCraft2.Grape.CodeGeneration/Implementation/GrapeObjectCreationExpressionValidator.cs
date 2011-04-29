@@ -13,8 +13,6 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
         [Import]
         private GrapeErrorSink errorSink = null;
         [Import]
-        private GrapeAstUtilities astUtils = null;
-        [Import]
         private GrapeTypeCheckingUtilities typeCheckingUtils = null;
         [Import]
         private GrapeAccessExpressionValidator accessExpressionValidator = null;

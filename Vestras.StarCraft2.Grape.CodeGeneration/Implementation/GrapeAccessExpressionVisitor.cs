@@ -12,9 +12,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                 return new Type[] {
                     typeof(GrapeMemberExpression),
                     typeof(GrapeArrayExpression),
-                    typeof(GrapeCallExpression),
-                    typeof(GrapeSetExpression),
-                    typeof(GrapeObjectCreationExpression)
+                    typeof(GrapeCallExpression)
                 };
             }
         }

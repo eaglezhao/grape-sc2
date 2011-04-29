@@ -40,7 +40,14 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
 				if (errorEntity != null) {
 					message = string.Format("Syntax error: '{0}'", errorEntity.Error);
 				} else {
-					message = string.Format("Unexpected token: '{0}'", ((IToken)entity).Symbol.Name);
+                    IToken token = (IToken)entity;
+                    string tokenName = token.Symbol.Name;
+                    if (token.Symbol.Name == "IndentInc") {
+                        tokenName = "Indent increase token";
+                    } else if (token.Symbol.Name == "IndentDec") {
+                        tokenName = "Indent decrease token";
+                    }
+					message = string.Format("Unexpected token: '{0}'", tokenName);
 				}
 				errorSink.AddError(new GrapeErrorSink.Error {
 				                                            		Description = message,

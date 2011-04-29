@@ -5,9 +5,6 @@ using Vestras.StarCraft2.Grape.Core;
 namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
     [Export(typeof(IAstNodeVisitor)), Export]
     internal sealed class GrapeVariableVisitor : IAstNodeVisitor {
-        [Import]
-        private GrapeTypeCheckingUtilities typeCheckingUtils = null;
-
         public GrapeCodeGeneratorConfiguration Config { get; set; }
         public IAstNodeValidator Validator { get; set; }
         public Type[] NodeType {

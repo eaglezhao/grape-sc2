@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Grape stdlib - system package - contains base classes for interop with SC2
  * Copyright (c) 2011 Grape Team. All rights reserved.
  * 

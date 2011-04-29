@@ -13,8 +13,6 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
         [Import]
         private GrapeErrorSink errorSink = null;
         [Import]
-        private GrapeAstUtilities astUtils = null;
-        [Import]
         private GrapeTypeCheckingUtilities typeCheckingUtils = null;
 
         public GrapeCodeGeneratorConfiguration Config { get; set; }
@@ -31,7 +29,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                 GrapeSetExpression s = obj as GrapeSetExpression;
                 if (s != null) {
                     string errorMessage;
-                    GrapeEntity entityBeingSet = (new List<GrapeEntity>(typeCheckingUtils.GetEntitiesForAccessExpression(Config, s.MemberAccess, s, out errorMessage)))[0];
+                    GrapeEntity entityBeingSet = (new List<GrapeEntity>(typeCheckingUtils.GetEntitiesForAccessExpression(Config, s, s, out errorMessage)))[0];
                     if (entityBeingSet == null) {
                         errorSink.AddError(new GrapeErrorSink.Error { Description = "Cannot find object for expression '" + s.MemberAccess.GetAccessExpressionQualifiedId() + "'. " + errorMessage, FileName = s.FileName, Entity = s });
                         if (!Config.ContinueOnError) {

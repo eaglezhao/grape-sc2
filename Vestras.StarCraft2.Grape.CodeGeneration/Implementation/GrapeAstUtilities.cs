@@ -17,7 +17,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
         private void PopulatePackageFileNames(GrapeAst ast) {
             if (lastAst != ast) {
                 packageFileNames.Clear();
-                foreach (GrapePackageDeclaration packageDeclaration in GetEntitiesOfType(typeof(GrapePackageDeclaration))) {
+                foreach (GrapePackageDeclaration packageDeclaration in GetEntitiesOfType(ast, typeof(GrapePackageDeclaration))) {
                     if (!packageFileNames.ContainsKey(packageDeclaration.PackageName)) {
                         List<string> list = new List<string>();
                         list.Add(packageDeclaration.FileName);
@@ -31,20 +31,29 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
             }
         }
 
-        public IEnumerable<GrapeEntity> GetEntitiesOfType(Type type) {
-            if (GrapeSkeletonParser.allEntities.ContainsKey(type)) {
-                return GrapeSkeletonParser.allEntities[type];
+        private IEnumerable<GrapeEntity> GetChildrenRecursive(IEnumerable<GrapeEntity> children, Predicate<GrapeEntity> predicate) {
+            List<GrapeEntity> list = new List<GrapeEntity>();
+            foreach (GrapeEntity child in children) {
+                if (predicate(child)) {
+                    list.Add(child);
+                }
+
+                list.AddRange(GetChildrenRecursive(child.GetChildren(), predicate));
             }
 
-            return new List<GrapeEntity>();
+            return list;
         }
 
-        public IEnumerable<GrapeEntity> GetEntitiesOfTypeInFile(string fileName, Type type) {
-            if (GrapeSkeletonParser.allEntitiesWithFileFilter.ContainsKey(fileName) && GrapeSkeletonParser.allEntitiesWithFileFilter[fileName].ContainsKey(type)) {
-                return GrapeSkeletonParser.allEntitiesWithFileFilter[fileName][type];
-            }
+        public IEnumerable<GrapeEntity> GetEntitiesOfType(GrapeAst ast, Type type) {
+            return GetChildrenRecursive(ast.Children, delegate(GrapeEntity e) {
+                return e.GetType() == type;
+            });
+        }
 
-            return new List<GrapeEntity>();
+        public IEnumerable<GrapeEntity> GetEntitiesOfTypeInFile(GrapeAst ast, string fileName, Type type) {
+            return GetChildrenRecursive(ast.Children, delegate(GrapeEntity e) {
+                return e.GetType() == type && e.FileName == fileName;
+            });
         }
 
         public IEnumerable<string> GetOtherPackagesInPackageName(string name) {
@@ -75,7 +84,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
         public IEnumerable<GrapeMethod> GetMethodsWithNameFromImportedPackagesInFile(GrapeCodeGeneratorConfiguration config, string methodName, string fileName, GrapeClass c) {
             PopulatePackageFileNames(config.Ast);
             List<string> importedPackageFiles = new List<string>();
-            IEnumerable<GrapeEntity> importDeclarationsInFile = GetEntitiesOfTypeInFile(fileName, typeof(GrapeImportDeclaration));
+            IEnumerable<GrapeEntity> importDeclarationsInFile = GetEntitiesOfTypeInFile(config.Ast, fileName, typeof(GrapeImportDeclaration));
             foreach (GrapeImportDeclaration importDeclaration in importDeclarationsInFile) {
                 foreach (KeyValuePair<string, List<string>> pair in packageFileNames) {
                     if (pair.Key == importDeclaration.PackageName) {
@@ -96,7 +105,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
             actualQualifiedId = actualQualifiedId.Trim('.');
             if (actualQualifiedId == "this") {
                 List<GrapeMethod> l = new List<GrapeMethod>();
-                foreach (GrapeMethod m in GetEntitiesOfTypeInFile(fileName, typeof(GrapeMethod))) {
+                foreach (GrapeMethod m in GetEntitiesOfTypeInFile(config.Ast, fileName, typeof(GrapeMethod))) {
                     if (m.Name == actualFunctionName && m.GetLogicalParentOfEntityType<GrapeClass>() == c) {
                         l.Add(m);
                     }
@@ -105,7 +114,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                 return l;
             } else if (actualQualifiedId == "base") {
                 List<GrapeMethod> l = new List<GrapeMethod>();
-                foreach (GrapeMethod m in GetEntitiesOfTypeInFile(fileName, typeof(GrapeMethod))) {
+                foreach (GrapeMethod m in GetEntitiesOfTypeInFile(config.Ast, fileName, typeof(GrapeMethod))) {
                     if (m.Name == actualFunctionName && m.GetLogicalParentOfEntityType<GrapeClass>() == GetClassWithNameFromImportedPackagesInFile(config.Ast, typeCheckingUtils.GetTypeNameForTypeAccessExpression(config, c.Inherits), fileName)) {
                         l.Add(m);
                     }
@@ -114,7 +123,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                 return l;
             }
 
-            IEnumerable<GrapeEntity> packagesInFile = GetEntitiesOfTypeInFile(fileName, typeof(GrapePackageDeclaration));
+            IEnumerable<GrapeEntity> packagesInFile = GetEntitiesOfTypeInFile(config.Ast, fileName, typeof(GrapePackageDeclaration));
             foreach (GrapePackageDeclaration packageDeclaration in packagesInFile) {
                 foreach (KeyValuePair<string, List<string>> pair in packageFileNames) {
                     if (pair.Key == packageDeclaration.PackageName) {
@@ -134,7 +143,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
 
             List<GrapeMethod> list = new List<GrapeMethod>();
             foreach (string importedPackageFile in importedPackageFiles) {
-                IEnumerable<GrapeEntity> methods = GetEntitiesOfTypeInFile(importedPackageFile, typeof(GrapeMethod));
+                IEnumerable<GrapeEntity> methods = GetEntitiesOfTypeInFile(config.Ast, importedPackageFile, typeof(GrapeMethod));
                 foreach (GrapeMethod m in methods) {
                     if (m.Name == actualFunctionName && (m.GetLogicalParentOfEntityType<GrapeClass>() == c || c.IsClassInInheritanceTree(config, m.GetLogicalParentOfEntityType<GrapeClass>()))) {
                         list.Add(m);
@@ -142,8 +151,8 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                 }
             }
 
-            IEnumerable<GrapeEntity> packages = GetEntitiesOfType(typeof(GrapePackageDeclaration));
-            IEnumerable<GrapeEntity> allMethods = GetEntitiesOfType(typeof(GrapeMethod));
+            IEnumerable<GrapeEntity> packages = GetEntitiesOfType(config.Ast, typeof(GrapePackageDeclaration));
+            IEnumerable<GrapeEntity> allMethods = GetEntitiesOfType(config.Ast, typeof(GrapeMethod));
             foreach (GrapePackageDeclaration packageDeclaration in packages) {
                 if (packageDeclaration.PackageName == actualQualifiedId) {
                     foreach (GrapeMethod m in allMethods) {
@@ -179,7 +188,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
         public IEnumerable<GrapeVariable> GetVariablesWithNameFromImportedPackagesInFile(GrapeCodeGeneratorConfiguration config, string variableName, string fileName, GrapeEntity e) {
             PopulatePackageFileNames(config.Ast);
             List<string> importedPackageFiles = new List<string>();
-            IEnumerable<GrapeEntity> importDeclarationsInFile = GetEntitiesOfTypeInFile(fileName, typeof(GrapeImportDeclaration));
+            IEnumerable<GrapeEntity> importDeclarationsInFile = GetEntitiesOfTypeInFile(config.Ast, fileName, typeof(GrapeImportDeclaration));
             foreach (GrapeImportDeclaration importDeclaration in importDeclarationsInFile) {
                 foreach (KeyValuePair<string, List<string>> pair in packageFileNames) {
                     if (pair.Key == importDeclaration.PackageName) {
@@ -201,7 +210,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
             GrapeClass c = e as GrapeClass;
             if (actualQualifiedId == "this" && c != null) {
                 List<GrapeVariable> l = new List<GrapeVariable>();
-                foreach (GrapeVariable v in GetEntitiesOfTypeInFile(fileName, typeof(GrapeVariable))) {
+                foreach (GrapeVariable v in GetEntitiesOfTypeInFile(config.Ast, fileName, typeof(GrapeVariable))) {
                     if (v.Name == actualVariableName && v.GetActualParent() == e) {
                         l.Add(v);
                     }
@@ -210,7 +219,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                 return l;
             } else if (actualQualifiedId == "base" && c != null) {
                 List<GrapeVariable> l = new List<GrapeVariable>();
-                foreach (GrapeVariable v in GetEntitiesOfTypeInFile(fileName, typeof(GrapeVariable))) {
+                foreach (GrapeVariable v in GetEntitiesOfTypeInFile(config.Ast, fileName, typeof(GrapeVariable))) {
                     if (v.Name == actualVariableName && v.GetActualParent() == GetClassWithNameFromImportedPackagesInFile(config.Ast, typeCheckingUtils.GetTypeNameForTypeAccessExpression(config, c.Inherits), fileName)) {
                         l.Add(v);
                     }
@@ -219,7 +228,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                 return l;
             }
 
-            IEnumerable<GrapeEntity> packagesInFile = GetEntitiesOfTypeInFile(fileName, typeof(GrapePackageDeclaration));
+            IEnumerable<GrapeEntity> packagesInFile = GetEntitiesOfTypeInFile(config.Ast, fileName, typeof(GrapePackageDeclaration));
             foreach (GrapePackageDeclaration packageDeclaration in packagesInFile) {
                 foreach (KeyValuePair<string, List<string>> pair in packageFileNames) {
                     if (pair.Key == packageDeclaration.PackageName) {
@@ -239,7 +248,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
 
             List<GrapeVariable> list = new List<GrapeVariable>();
             foreach (string importedPackageFile in importedPackageFiles) {
-                IEnumerable<GrapeEntity> variables = GetEntitiesOfTypeInFile(importedPackageFile, typeof(GrapeVariable));
+                IEnumerable<GrapeEntity> variables = GetEntitiesOfTypeInFile(config.Ast, importedPackageFile, typeof(GrapeVariable));
                 foreach (GrapeVariable v in variables) {
                     if (v.Name == actualVariableName && (v.GetActualParent() == e || v.GetLogicalParentOfEntityType<GrapeMethod>() == e)) {
                         list.Add(v);
@@ -256,8 +265,8 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                 }
             }
 
-            IEnumerable<GrapeEntity> packages = GetEntitiesOfType(typeof(GrapePackageDeclaration));
-            IEnumerable<GrapeEntity> allVariables = GetEntitiesOfType(typeof(GrapeVariable));
+            IEnumerable<GrapeEntity> packages = GetEntitiesOfType(config.Ast, typeof(GrapePackageDeclaration));
+            IEnumerable<GrapeEntity> allVariables = GetEntitiesOfType(config.Ast, typeof(GrapeVariable));
             foreach (GrapePackageDeclaration packageDeclaration in packages) {
                 if (packageDeclaration.PackageName == actualQualifiedId) {
                     foreach (GrapeVariable v in allVariables) {
@@ -269,7 +278,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
             }
 
             foreach (string importedPackageFile in importedPackageFiles) {
-                IEnumerable<GrapeEntity> fields = GetEntitiesOfTypeInFile(importedPackageFile, typeof(GrapeField));
+                IEnumerable<GrapeEntity> fields = GetEntitiesOfTypeInFile(config.Ast, importedPackageFile, typeof(GrapeField));
                 foreach (GrapeField f in fields) {
                     if (f.Field.Name == variableName && f.GetActualParent() == e) {
                         list.Add(f.Field);
@@ -277,7 +286,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                 }
             }
 
-            IEnumerable<GrapeEntity> allFields = GetEntitiesOfType(typeof(GrapeField));
+            IEnumerable<GrapeEntity> allFields = GetEntitiesOfType(config.Ast, typeof(GrapeField));
             foreach (GrapePackageDeclaration packageDeclaration in packages) {
                 if (packageDeclaration.PackageName == actualQualifiedId) {
                     foreach (GrapeField f in allFields) {
@@ -294,7 +303,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
         public GrapeClass GetClassWithNameFromImportedPackagesInFile(GrapeAst ast, string className, string fileName) {
             PopulatePackageFileNames(ast);
             List<string> importedPackageFiles = new List<string>();
-            IEnumerable<GrapeEntity> importDeclarationsInFile = GetEntitiesOfTypeInFile(fileName, typeof(GrapeImportDeclaration));
+            IEnumerable<GrapeEntity> importDeclarationsInFile = GetEntitiesOfTypeInFile(ast, fileName, typeof(GrapeImportDeclaration));
             foreach (GrapeImportDeclaration importDeclaration in importDeclarationsInFile) {
                 foreach (KeyValuePair<string, List<string>> pair in packageFileNames) {
                     if (pair.Key == importDeclaration.PackageName) {
@@ -313,7 +322,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
             }
 
             actualPackageName = actualPackageName.Trim('.');
-            IEnumerable<GrapeEntity> packagesInFile = GetEntitiesOfTypeInFile(fileName, typeof(GrapePackageDeclaration));
+            IEnumerable<GrapeEntity> packagesInFile = GetEntitiesOfTypeInFile(ast, fileName, typeof(GrapePackageDeclaration));
             foreach (GrapePackageDeclaration packageDeclaration in packagesInFile) {
                 foreach (KeyValuePair<string, List<string>> pair in packageFileNames) {
                     if (pair.Key == packageDeclaration.PackageName) {
@@ -332,7 +341,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
             }
 
             foreach (string importedPackageFile in importedPackageFiles) {
-                IEnumerable<GrapeEntity> classes = GetEntitiesOfTypeInFile(importedPackageFile, typeof(GrapeClass));
+                IEnumerable<GrapeEntity> classes = GetEntitiesOfTypeInFile(ast, importedPackageFile, typeof(GrapeClass));
                 foreach (GrapeClass c in classes) {
                     if (c.Name == className) {
                         return c;
@@ -340,8 +349,8 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                 }
             }
 
-            IEnumerable<GrapeEntity> packages = GetEntitiesOfType(typeof(GrapePackageDeclaration));
-            IEnumerable<GrapeEntity> allClasses = GetEntitiesOfType(typeof(GrapeClass));
+            IEnumerable<GrapeEntity> packages = GetEntitiesOfType(ast, typeof(GrapePackageDeclaration));
+            IEnumerable<GrapeEntity> allClasses = GetEntitiesOfType(ast, typeof(GrapeClass));
             foreach (GrapePackageDeclaration packageDeclaration in packages) {
                 if (packageDeclaration.PackageName == actualPackageName) {
                     foreach (GrapeClass c in allClasses) {

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Grape stdlib - system package - contains base classes for interop with SC2
  * Copyright (c) 2011 Grape Team. All rights reserved.
  * 
@@ -124,7 +124,7 @@
 	end
 
 	// ==========================================================
-	// Game manipulating functions (restart, game over)
+	// Game manipulating methods (restart, game over)
 	// ==========================================================
 
 	void game_over(player p, int type, bool show_dialog, bool show_score)

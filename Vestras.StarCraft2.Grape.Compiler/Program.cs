@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.IO;
+using System.Text;
 using Vestras.StarCraft2.Grape.CodeGeneration;
 using Vestras.StarCraft2.Grape.Core;
 
@@ -80,6 +81,15 @@ namespace Vestras.StarCraft2.Grape.Compiler {
                         return;
                     }
 
+                    string fileContent = "";
+                    using (StreamReader reader = new StreamReader(argument.Value)) {
+                        fileContent = reader.ReadToEnd();
+                    }
+
+                    using (StreamWriter writer = new StreamWriter(new FileStream(argument.Value, FileMode.Open), Encoding.UTF8)) {
+                        writer.Write(fileContent);
+                    }
+
                     inputFiles.Add(argument.Value);
                 } else if (argument.Id == "d" || argument.Id == "dir") {
                     if (!Directory.Exists(argument.Value)) {
@@ -88,6 +98,15 @@ namespace Vestras.StarCraft2.Grape.Compiler {
                     }
 
                     foreach (FileInfo info in new DirectoryInfo(argument.Value).GetFiles("*.gp")) {
+                        string fileContent = "";
+                        using (StreamReader reader = new StreamReader(info.FullName)) {
+                            fileContent = reader.ReadToEnd();
+                        }
+
+                        using (StreamWriter writer = new StreamWriter(new FileStream(info.FullName, FileMode.Open), Encoding.UTF8)) {
+                            writer.Write(fileContent);
+                        }
+
                         inputFiles.Add(info.FullName);
                     }
                 } else if (argument.Id == "o" || argument.Id == "output") {
@@ -108,7 +127,6 @@ namespace Vestras.StarCraft2.Grape.Compiler {
                 return;
             }
 
-            GrapeAst.ClearAllEntities();
             DateTime startCompilationTime = DateTime.Now;
             GrapeAst ast = null;
             foreach (string inputFile in inputFiles) {

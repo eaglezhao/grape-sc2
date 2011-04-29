@@ -39,6 +39,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IGrapeCodeGenerator.cs" />
+    <Compile Include="Implementation\GrapeSetExpressionVisitor.cs" />
+    <Compile Include="Implementation\GrapeObjectCreationExpressionVisitor.cs" />
     <Compile Include="Implementation\DirectoryHelper.cs" />
     <Compile Include="Implementation\GrapeDeleteStatementVisitor.cs" />
     <Compile Include="Implementation\GrapeDeleteStatementValidator.cs" />

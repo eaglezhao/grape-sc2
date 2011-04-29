@@ -267,7 +267,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
             }
 
             if (foundMethods.Count == 0) {
-                errorMessage = "Cannot find function with signature '" + GetMethodSignatureString(config, name, returnType, parameters) + "'. " + parameterErrorMessage;
+                errorMessage = "Cannot find method with signature '" + GetMethodSignatureString(config, name, returnType, parameters) + "'. " + parameterErrorMessage;
             }
 
             return foundMethods;
@@ -312,18 +312,20 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
             }
 
             if (foundMethods.Count == 0) {
-                errorMessage = "Cannot find function with signature '" + GetMethodSignatureString(config, name, returnType, parameters) + "'. " + parameterErrorMessage;
+                errorMessage = "Cannot find method with signature '" + GetMethodSignatureString(config, name, returnType, parameters) + "'. " + parameterErrorMessage;
             }
 
             return foundMethods;
         }
 
         public IEnumerable<GrapeEntity> GetEntitiesForAccessExpression(GrapeCodeGeneratorConfiguration config, GrapeType type, GrapeEntity parent, out string errorMessage) { // left for compat
-            return GetEntitiesForAccessExpression(config, type.ToExpression() as GrapeAccessExpression, parent, out errorMessage);
+            errorMessage = "";
+            return GetClassesForExpression(config, type.ToString(), parent);
         }
 
         public IEnumerable<GrapeEntity> GetEntitiesForAccessExpression(GrapeCodeGeneratorConfiguration config, GrapeType type, GrapeEntity parent, out string errorMessage, bool detectMethodsUsedAsTypesOrVars) { // left for compat
-            return GetEntitiesForAccessExpression(config, type.ToExpression() as GrapeAccessExpression, parent, out errorMessage, detectMethodsUsedAsTypesOrVars);
+            errorMessage = "";
+            return GetClassesForExpression(config, type.ToString(), parent);
         }
 
         public IEnumerable<GrapeEntity> GetEntitiesForAccessExpression(GrapeCodeGeneratorConfiguration config, GrapeAccessExpression accessExpression, GrapeEntity parent, out string errorMessage) {
@@ -347,17 +349,17 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                 } else {
                     errorMessage = "";
                     GrapeModifier.GrapeModifierType modifiers = objectCreationExpression.GetLogicalParentOfEntityType<GrapeClass>().GetAppropriateModifiersForEntityAccess(config, constructors[0]);
-                    List<GrapeMethod> functionsWithSignature = GetMethodsWithSignature(config, constructors, modifiers, c.Name, new GrapeSimpleType(new GrapeList<GrapeIdentifier>(new GrapeIdentifier(c.Name))), new List<GrapeExpression>(objectCreationExpression.Parameters), ref errorMessage);
-                    if (functionsWithSignature.Count > 1) {
+                    List<GrapeMethod> methodsWithSignature = GetMethodsWithSignature(config, constructors, modifiers, c.Name, new GrapeSimpleType(new GrapeList<GrapeIdentifier>(new GrapeIdentifier(c.Name))), new List<GrapeExpression>(objectCreationExpression.Parameters), ref errorMessage);
+                    if (methodsWithSignature.Count > 1) {
                         errorMessage = "Multiple methods with signature '" + GetMethodSignatureString(config, c.Name, new GrapeSimpleType(new GrapeList<GrapeIdentifier>(new GrapeIdentifier(c.Name))), new List<GrapeExpression>(objectCreationExpression.Parameters)) + "' found.";
                         return new GrapeEntity[] { null };
                     }
 
-                    if (functionsWithSignature.Count == 0) {
+                    if (methodsWithSignature.Count == 0) {
                         return new GrapeEntity[] { null };
                     }
 
-                    return functionsWithSignature;
+                    return methodsWithSignature;
                 }
             }
 
@@ -392,7 +394,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                 }
 
                 return new GrapeEntity[] { null };
-            } else if (accessExpression is GrapeCallExpression || accessExpression is GrapeSetExpression) {
+            } else if (accessExpression is GrapeCallExpression) {
                 GrapeAccessExpression identifierExpression = accessExpression.GetAccessExpressionInAccessExpression();
                 GrapeEntity entity = null;
                 GrapeEntity lastParent = null;
@@ -403,39 +405,13 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                 bool shouldBeStatic = false;
                 bool staticnessMatters = false;
                 while (currentExpression != null) {
-                    GrapeAccessExpression expressionWithNext = currentExpression;
-                    GrapeAccessExpression lastExpressionWithoutNext = currentExpression;
-                    while (true) {
-                        if (expressionWithNext.Next != null) {
-                            break;
-                        }
-
-                        if (expressionWithNext.Member == null || !(expressionWithNext.Member is GrapeAccessExpression)) {
-                            break;
-                        }
-
-                        expressionWithNext = expressionWithNext.Member as GrapeAccessExpression;
-                    }
-
-                    if (expressionWithNext != null) {
-                        if (expressionWithNext.Member is GrapeIdentifierExpression) {
-                            lastExpressionWithoutNext = new GrapeAccessExpression { Member = expressionWithNext.Member };
-                        } else {
-                            lastExpressionWithoutNext = expressionWithNext.Member as GrapeAccessExpression;
-                        }
-                    }
-
-                    while (lastExpressionWithoutNext.Member != null && lastExpressionWithoutNext.Member is GrapeAccessExpression) {
-                        lastExpressionWithoutNext = lastExpressionWithoutNext.Member as GrapeAccessExpression;
-                    }
-
-                    lastParent = (new List<GrapeEntity>(GetEntitiesForAccessExpression(config, lastExpressionWithoutNext, lastParent == null ? accessExpression as GrapeEntity : lastParent.GetLogicalParentOfEntityType<GrapeClass>(), out errorMessage)))[0];
+                    lastParent = (new List<GrapeEntity>(GetEntitiesForAccessExpression(config, currentExpression, lastParent == null ? accessExpression as GrapeEntity : lastParent.GetLogicalParentOfEntityType<GrapeClass>(), out errorMessage)))[0];
                     if (lastParent == null) {
                         break;
                     }
 
                     if (lastParent is GrapeMethod && !(currentExpression is GrapeCallExpression) && !(accessExpression is GrapeCallExpression) && !(parent is GrapeCallExpression) && detectMethodsUsedAsTypesOrVars) {
-                        errorMessage = "Cannot use function '" + lastExpressionWithoutNext.GetAccessExpressionQualifiedId() + "' as a variable or type.";
+                        errorMessage = "Cannot use method '" + currentExpression.GetAccessExpressionQualifiedId() + "' as a variable or type.";
                         return new GrapeEntity[] { null };
                     }
 
@@ -491,8 +467,8 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         lastMemberAccess = lastLastParent;
                     }
 
-                    lastClassAccessWasThisOrBaseAccess = lastExpressionWithoutNext.GetAccessExpressionQualifiedId() == "this" || lastExpressionWithoutNext.GetAccessExpressionQualifiedId() == "base";
-                    currentExpression = expressionWithNext.Next;
+                    lastClassAccessWasThisOrBaseAccess = currentExpression.GetAccessExpressionQualifiedId() == "this" || currentExpression.GetAccessExpressionQualifiedId() == "base";
+                    currentExpression = currentExpression.Next;
                 }
 
                 entity = lastParent;
@@ -531,35 +507,9 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                 bool shouldBeStatic = false;
                 bool staticnessMatters = false;
                 while (currentExpression != null) {
-                    GrapeAccessExpression expressionWithNext = currentExpression;
-                    GrapeAccessExpression lastExpressionWithoutNext = currentExpression;
-                    while (true) {
-                        if (expressionWithNext.Next != null) {
-                            break;
-                        }
-
-                        if (expressionWithNext.Member == null || !(expressionWithNext.Member is GrapeAccessExpression)) {
-                            break;
-                        }
-
-                        expressionWithNext = expressionWithNext.Member as GrapeAccessExpression;
-                    }
-
-                    if (expressionWithNext != null) {
-                        if (expressionWithNext.Member is GrapeIdentifierExpression) {
-                            lastExpressionWithoutNext = new GrapeAccessExpression { Member = expressionWithNext.Member };
-                        } else {
-                            lastExpressionWithoutNext = expressionWithNext.Member as GrapeAccessExpression;
-                        }
-                    }
-
-                    while (lastExpressionWithoutNext.Member != null && lastExpressionWithoutNext.Member is GrapeAccessExpression) {
-                        lastExpressionWithoutNext = lastExpressionWithoutNext.Member as GrapeAccessExpression;
-                    }
-
-                    string expressionWithoutNextQualifiedId = lastExpressionWithoutNext.GetAccessExpressionQualifiedId();
-                    IList<GrapeEntity> currentMembers = new List<GrapeEntity>(GetMembersForExpression(config, expressionWithoutNextQualifiedId, lastParent == null ? parent : lastParent));
-                    IList<GrapeEntity> currentClasses = new List<GrapeEntity>(GetClassesForExpression(config, expressionWithoutNextQualifiedId, lastParent == null ? parent : lastParent));
+                    string qualifiedId = currentExpression.GetAccessExpressionQualifiedId();
+                    IList<GrapeEntity> currentMembers = new List<GrapeEntity>(GetMembersForExpression(config, qualifiedId, lastParent == null ? parent : lastParent));
+                    IList<GrapeEntity> currentClasses = new List<GrapeEntity>(GetClassesForExpression(config, qualifiedId, lastParent == null ? parent : lastParent));
                     lastParent = currentClasses.Count() == 1 && currentClasses[0] != null ? currentClasses[0] : currentMembers.Count() > 0 ? currentMembers[0] is GrapeVariable ? astUtils.GetClassWithNameFromImportedPackagesInFile(config.Ast, GetTypeNameForTypeAccessExpression(config, ((GrapeVariable)currentMembers[0]).Type), parent.FileName) : currentMembers[0] is GrapeMethod ? astUtils.GetClassWithNameFromImportedPackagesInFile(config.Ast, GetTypeNameForTypeAccessExpression(config, ((GrapeMethod)currentMembers[0]).ReturnType), parent.FileName) : null : null;
                     lastEntity = currentClasses.Count() == 1 && currentClasses[0] != null ? currentClasses[0] : currentMembers.Count() > 0 ? currentMembers[0] : null;
                     if (lastParent == null) {
@@ -569,7 +519,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                     }
 
                     if (lastEntity is GrapeMethod && !(currentExpression is GrapeCallExpression) && !(accessExpression is GrapeCallExpression) && !(parent is GrapeCallExpression) && detectMethodsUsedAsTypesOrVars) {
-                        errorMessage = "Cannot use method '" + expressionWithoutNextQualifiedId + "' as a variable or type.";
+                        errorMessage = "Cannot use method '" + qualifiedId + "' as a variable or type.";
                         return new GrapeEntity[] { null };
                     }
 
@@ -602,8 +552,8 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                             staticnessMatters = true;
                             lastMemberAccess = lastLastEntity as GrapeVariable;
                         } else if (lastLastEntity is GrapeMethod) {
-                            GrapeModifier.GrapeModifierType functionModifiers = ((GrapeMethod)lastLastEntity).Modifiers;
-                            shouldBeStatic = functionModifiers.Contains(GrapeModifier.GrapeModifierType.Static);
+                            GrapeModifier.GrapeModifierType methodModifiers = ((GrapeMethod)lastLastEntity).Modifiers;
+                            shouldBeStatic = methodModifiers.Contains(GrapeModifier.GrapeModifierType.Static);
                             staticnessMatters = true;
                             lastMemberAccess = lastLastEntity as GrapeMethod;
                         }
@@ -625,11 +575,10 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                         lastMemberAccess = lastLastEntity;
                     }
 
-                    lastClassAccessWasThisOrBaseAccess = lastExpressionWithoutNext.GetAccessExpressionQualifiedId() == "this" || lastExpressionWithoutNext.GetAccessExpressionQualifiedId() == "base";
-
+                    lastClassAccessWasThisOrBaseAccess = currentExpression.GetAccessExpressionQualifiedId() == "this" || currentExpression.GetAccessExpressionQualifiedId() == "base";
                     members = currentMembers;
                     classes = currentClasses;
-                    currentExpression = expressionWithNext.Next;
+                    currentExpression = currentExpression.Next;
                 }
 
                 foundEntity = lastParent;
@@ -692,6 +641,14 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
             }
 
             return new GrapeEntity[] { null };
+        }
+
+        public IEnumerable<GrapeEntity> GetEntitiesForAccessExpression(GrapeCodeGeneratorConfiguration config, GrapeSetExpression setExpression, GrapeEntity parent, out string errorMessage) {
+            return GetEntitiesForAccessExpression(config, setExpression, parent, out errorMessage, true);
+        }
+
+        public IEnumerable<GrapeEntity> GetEntitiesForAccessExpression(GrapeCodeGeneratorConfiguration config, GrapeSetExpression setExpression, GrapeEntity parent, out string errorMessage, bool detectMethodsUsedAsTypesOrVars) {
+            return GetEntitiesForAccessExpression(config, setExpression.MemberAccess, parent, out errorMessage, true);
         }
 
         public bool DoesExpressionResolveToType(GrapeCodeGeneratorConfiguration config, GrapeEntity parent, GrapeType expression, GrapeType type) { // left for compat
@@ -814,7 +771,7 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
             } else if (expression is GrapeNameofExpression) {
                 GrapeNameofExpression nameofExpression = expression as GrapeNameofExpression;
                 if (nameofExpression.Value.GetType() != typeof(GrapeMemberExpression)) {
-                    errorMessage = "Cannot resolve expression to type, field or function.";
+                    errorMessage = "Cannot resolve expression to type, field or method.";
                     if (!config.ContinueOnError) {
                         return false;
                     }
