@@ -7,7 +7,7 @@
 
 package system
 
-class sound_channel
+class sound_channel:
 	static sound_channel me = new sound_channel(c_soundCategoryME)
 	static sound_channel movie = new sound_channel(c_soundCategoryMovie)
 	static sound_channel tv = new sound_channel(c_soundCategoryTV)
@@ -35,7 +35,5 @@ class sound_channel
 
 	int index
 
-	ctor sound_channel(int index)
+	ctor sound_channel(int index):
 		this.index = index
-	end
-end

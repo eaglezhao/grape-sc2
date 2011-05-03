@@ -5,9 +5,7 @@
  * The Grape programming language and stdlib are released under the BSD license.
  */
 
- package system
+package system
 
- class trigger_base
-	private ctor trigger_base()
-	end
- end
+class trigger_base:
+	private ctor trigger_base():

@@ -8,7 +8,5 @@
 package system
 
 // summary: Specifies a return type for a method that does not return a value.
-class void_base
-	private ctor void_base()
-	end
-end
+class void_base:
+	private ctor void_base():

@@ -3,7 +3,6 @@
 using bsn.GoldParser.Semantic;
 
 namespace Vestras.StarCraft2.Grape.Core {
-	[Terminal("(Whitespace)")]
 	[Terminal("(EOF)")]
 	[Terminal("-")]
 	[Terminal("!")]
@@ -57,7 +56,6 @@ namespace Vestras.StarCraft2.Grape.Core {
 	[Terminal("init")]
 	[Terminal("nameof")]
 	[Terminal("new")]
-	[Terminal("NewLine")]
 	[Terminal("package")]
 	[Terminal("return")]
 	[Terminal("switch")]
@@ -66,8 +64,6 @@ namespace Vestras.StarCraft2.Grape.Core {
 	[Terminal("void")]
 	[Terminal("while")]
 	public class GrapeParsingEntity: GrapeEntity {
-		[Rule("<NL> ::= ~NewLine ~<NL>")]
-		[Rule("<NL Opt> ::=")]
 		public GrapeParsingEntity() {}
 	}
 }

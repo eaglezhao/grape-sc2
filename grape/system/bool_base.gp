@@ -5,46 +5,35 @@
  * The Grape programming language and stdlib are released under the BSD license.
  */
 
- package system
+package system
 
- // summary: Represents a value that is either true or false.
- class bool_base
-	bool and(bool b)
+// summary: Represents a value that is either true or false.
+class bool_base:
+	bool and(bool b):
 		return this && b
-	end
 
-	bool or(bool b)
+	bool or(bool b):
 		return this || b
-	end
 
-	bool negate()
+	bool negate():
 		return !this
-	end
 
-	bool xor(bool b)
+	bool xor(bool b):
 		return this ^ b
-	end
 
-	int to_int()
+	int to_int():
 		return BoolToInt(this)
-	end
 
-	override int get_hash_code()
+	override int get_hash_code():
 		return to_int().get_hash_code()
-	end
 
-	override bool equals(bool b)
+	override bool equals(bool b):
 		return this == b
-	end
 
-	override string to_string()
-		if this
+	override string to_string():
+		if this:
 			return "true"
-		end
 
 		return "false"
-	end
 
-	private ctor bool_base()
-	end
- end
+	private ctor bool_base():

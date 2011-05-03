@@ -5,9 +5,7 @@
  * The Grape programming language and stdlib are released under the BSD license.
  */
 
- package system
+package system
 
- class byte_base
-	private ctor byte_base()
-	end
- end
+class byte_base:
+	private ctor byte_base():

@@ -5,33 +5,25 @@
  * The Grape programming language and stdlib are released under the BSD license.
  */
 
- package system
+package system
 
- class unitref_base
-	static unitref create(unit u)
+class unitref_base:
+	static unitref create(unit u):
 		return UnitRefFromUnit(u)
-	end
 
-	static unitref create(string v)
+	static unitref create(string v):
 		return UnitRefFromVariable(v)
-	end
 
-	unit to_unit()
+	unit to_unit():
 		return UnitRefToUnit(this)
-	end
 
-	override bool equals(object other)
+	override bool equals(object other):
 		return this == other
-	end
 
-	override int get_hash_code()
+	override int get_hash_code():
 		return to_unit().get_hash_code()
-	end
 
-	override string to_string()
+	override string to_string():
 		return "unitref { to_unit() = " + to_unit().to_string() + " }"
-	end
 
-	private ctor unitref_base()
-	end
- end
+	private ctor unitref_base():

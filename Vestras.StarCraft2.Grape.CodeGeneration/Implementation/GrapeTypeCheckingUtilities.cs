@@ -405,7 +405,16 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                 bool shouldBeStatic = false;
                 bool staticnessMatters = false;
                 while (currentExpression != null) {
-                    lastParent = (new List<GrapeEntity>(GetEntitiesForAccessExpression(config, currentExpression, lastParent == null ? accessExpression as GrapeEntity : lastParent.GetLogicalParentOfEntityType<GrapeClass>(), out errorMessage)))[0];
+                    //lastParent = (new List<GrapeEntity>(GetEntitiesForAccessExpression(config, currentExpression, lastParent == null ? accessExpression as GrapeEntity : lastParent.GetLogicalParentOfEntityType<GrapeClass>(), out errorMessage)))[0];
+                    if (currentExpression is GrapeCallExpression) {
+                        List<GrapeEntity> list = (new List<GrapeEntity>(astUtils.GetMethodsWithNameFromImportedPackagesInFile(config, currentExpression.GetAccessExpressionQualifiedId(), currentExpression.FileName, currentExpression.GetLogicalParentOfEntityType<GrapeClass>())));
+                        if (list.Count > 0) {
+                            lastParent = list[0];
+                        }
+                    } else {
+                        lastParent = (new List<GrapeEntity>(GetEntitiesForAccessExpression(config, currentExpression, lastParent == null ? accessExpression as GrapeEntity : lastParent.GetLogicalParentOfEntityType<GrapeClass>(), out errorMessage)))[0];
+                    }
+
                     if (lastParent == null) {
                         break;
                     }

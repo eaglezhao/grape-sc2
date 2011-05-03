@@ -8,16 +8,12 @@
 package system.collections
 
 // summary: Supports a simple iteration over a generic collection.
-abstract class abstract_enumerator
+abstract class abstract_enumerator:
 	// summary: Gets the current item in the abstract_enumerator.
-	abstract object get_current()
-	end
+	abstract object get_current():
 
 	// summary: Moves to the next item in the abstract_enumerator.
-	abstract bool move_next()
-	end
+	abstract bool move_next():
 
 	// summary: Resets the abstract_enumerator.
-	abstract void reset()
-	end
-end
+	abstract void reset():

@@ -5,9 +5,7 @@
  * The Grape programming language and stdlib are released under the BSD license.
  */
 
- package system
+package system
 
- class wavetarget_base
-	private ctor wavetarget_base()
-	end
- end
+class wavetarget_base:
+	private ctor wavetarget_base():

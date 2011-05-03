@@ -5,9 +5,9 @@
  * The Grape programming language and stdlib are released under the BSD license.
  */
 
- package system
+package system
 
- class difficulty
+class difficulty:
 	static difficulty very_easy = new difficulty(0)
 	static difficulty easy      = new difficulty(1)
 	static difficulty medium    = new difficulty(2)
@@ -16,23 +16,17 @@
 
 	int index
 
-	text get_name()
+	text get_name():
 		return DifficultyName(index)
-	end
 
-	text get_campaign_name()
+	text get_campaign_name():
 		return DifficultyNameCampaign(index)
-	end
 
-	bool is_enabled()
+	bool is_enabled():
 		return DifficultyEnabled(index)
-	end
 
-	int get_apm()
+	int get_apm():
 		return DifficultyAPM(index)
-	end
 
-	ctor difficulty(int index)
+	ctor difficulty(int index):
 		this.index = index
-	end
- end

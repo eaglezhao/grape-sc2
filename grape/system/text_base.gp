@@ -5,7 +5,6 @@
  * The Grape programming language and stdlib are released under the BSD license.
  */
 
- package system
+package system
 
- class text_base
- end
+class text_base:

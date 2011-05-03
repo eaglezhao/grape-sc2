@@ -150,6 +150,7 @@
     <Compile Include="Implementation\GrapeSemanticActions.cs" />
     <Compile Include="Implementation\GrapeStaticModifier.cs" />
     <Compile Include="Implementation\GrapeTokenizer.cs" />
+    <Compile Include="Implementation\GrapeWhitespaceToken.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

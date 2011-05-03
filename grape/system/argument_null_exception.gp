@@ -7,16 +7,12 @@
 
  package system
 
- class argument_null_exception inherits argument_exception
-	ctor argument_null_exception(string message, string param_name)
+ class argument_null_exception inherits argument_exception:
+	ctor argument_null_exception(string message, string param_name):
 		init base(message, param_name)
-	end
 
-	ctor argument_null_exception(string message)
+	ctor argument_null_exception(string message):
 		init base(message)
-	end
 
-	ctor argument_null_exception(string message, string stack_trace, string param_name)
+	ctor argument_null_exception(string message, string stack_trace, string param_name):
 		init base(message, stack_trace, param_name)
-	end
- end

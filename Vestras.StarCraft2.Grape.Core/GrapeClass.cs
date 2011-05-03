@@ -26,6 +26,10 @@ namespace Vestras.StarCraft2.Grape.Core {
 
 		public GrapeSimpleType Inherits {
 			get {
+                if (inherits == null) {
+                    return new GrapeSimpleType(new GrapeList<GrapeIdentifier>(new GrapeIdentifier("")));
+                }
+
 				return inherits;
 			}
 		}

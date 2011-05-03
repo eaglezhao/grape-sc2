@@ -5,9 +5,7 @@
  * The Grape programming language and stdlib are released under the BSD license.
  */
 
- package system
+package system
 
- class aifilter_base
-	private ctor aifilter_base()
-	end
- end
+class aifilter_base:
+	private ctor aifilter_base():
