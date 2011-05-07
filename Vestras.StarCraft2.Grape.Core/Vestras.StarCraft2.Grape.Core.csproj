@@ -78,6 +78,7 @@
     <Compile Include="Ast\GrapeNotUnaryExpression.cs" />
     <Compile Include="Ast\GrapeNullLiteralExpression.cs" />
     <Compile Include="Ast\GrapeObject.cs" />
+    <Compile Include="Ast\GrapePassStatement.cs" />
     <Compile Include="Ast\GrapeRealLiteralExpression.cs" />
     <Compile Include="Ast\GrapeExpressionStatement.cs" />
     <Compile Include="Ast\GrapeShiftLeftExpression.cs" />

@@ -46,9 +46,9 @@ StringLiteral  = '"' {String Chars}* '"'
 ! Comments
 ! -------------------------------------------------
 
-Comment Line = '//'
+Comment Line  = '//'
 Comment Start = '/*'
-Comment End = '*/'
+Comment End   = '*/'
 
 ! -------------------------------------------------
 ! Rules
@@ -247,6 +247,7 @@ Comment End = '*/'
      |  try ':' <Stm Block> <Catch Clause List Opt> <Finally Clause Opt>
      |  break <NL>
      |  continue <NL>
+     |  pass <NL>
      |  return <NL>
      |  return <Expression> <NL>
      |  throw <NL>

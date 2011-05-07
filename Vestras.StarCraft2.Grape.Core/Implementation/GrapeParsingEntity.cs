@@ -57,6 +57,7 @@ namespace Vestras.StarCraft2.Grape.Core {
 	[Terminal("nameof")]
 	[Terminal("new")]
 	[Terminal("package")]
+    [Terminal("pass")]
 	[Terminal("return")]
 	[Terminal("switch")]
 	[Terminal("throw")]

@@ -12,6 +12,7 @@ abstract class mod_base:
 	private string args
 
 	abstract void main():
+		pass
 
 	private void initialize():
 		string main_func_name = nameof(main)

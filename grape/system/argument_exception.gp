@@ -5,9 +5,9 @@
  * The Grape programming language and stdlib are released under the BSD license.
  */
 
- package system
+package system
 
- class argument_exception inherits exception:
+class argument_exception inherits exception:
 	private string param_name
 
 	override string get_message():

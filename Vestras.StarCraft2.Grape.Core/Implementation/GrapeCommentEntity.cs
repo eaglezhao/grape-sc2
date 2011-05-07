@@ -3,7 +3,6 @@
 using bsn.GoldParser.Semantic;
 
 namespace Vestras.StarCraft2.Grape.Core.Implementation {
-	[Terminal("(Comment)")]
 	[Terminal("(Comment End)")]
 	[Terminal("(Comment Line)")]
 	[Terminal("(Comment Start)")]

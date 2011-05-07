@@ -5,9 +5,9 @@
  * The Grape programming language and stdlib are released under the BSD license.
  */
 
- package system
+package system
 
- class bank_base:
+class bank_base:
 	static int type_fixed = c_bankTypeFixed
 	static int type_bool = c_bankTypeFlag
 	static int type_int = c_bankTypeInt

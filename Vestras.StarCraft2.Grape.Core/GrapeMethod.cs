@@ -52,7 +52,7 @@ namespace Vestras.StarCraft2.Grape.Core {
 
 		public GrapeType ReturnType {
 			get {
-				return returnType;
+				return Type == GrapeMethodType.Procedure ? new GrapeSimpleType(new GrapeList<GrapeIdentifier>(new GrapeIdentifier("void_base"))) : returnType; // left for compat
 			}
 		}
 

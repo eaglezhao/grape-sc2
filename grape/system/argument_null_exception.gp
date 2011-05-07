@@ -5,9 +5,9 @@
  * The Grape programming language and stdlib are released under the BSD license.
  */
 
- package system
+package system
 
- class argument_null_exception inherits argument_exception:
+class argument_null_exception inherits argument_exception:
 	ctor argument_null_exception(string message, string param_name):
 		init base(message, param_name)
 
