@@ -17,15 +17,28 @@ namespace Vestras.StarCraft2.Grape.Core {
             return GetChildren<GrapeEntity>();
         }
 
+        Hashtable typeProperties = new Hashtable();
+        private PropertyInfo[] GetPropertiesForType(Type type) {
+            if (!typeProperties.ContainsKey(type)) {
+                PropertyInfo[] properties = GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
+                typeProperties[type] = properties;
+                return properties;
+            }
+
+            return typeProperties[type] as PropertyInfo[];
+        }
+
         public IEnumerable<T> GetChildren<T>() where T : GrapeEntity {
-            foreach (PropertyInfo property in GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
+            PropertyInfo[] properties = GetPropertiesForType(GetType());
+            foreach (PropertyInfo property in properties) {
                 if (!property.Name.Equals("Parent", StringComparison.Ordinal)) {
                     foreach (GrapeEntity child in EnumerateEntitiesOfProperty(property)) {
                         T childAsT = child as T;
                         if (childAsT != null) {
                             yield return childAsT;
                         }
-                        foreach (T childOfChild in child.GetChildren<T>()) {
+                        IEnumerable<T> children = child.GetChildren<T>();
+                        foreach (T childOfChild in children) {
                             yield return childOfChild;
                         }
                     }

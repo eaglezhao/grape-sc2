@@ -37,6 +37,10 @@ namespace Vestras.StarCraft2.Grape.Core.Ast {
 			this.value = (T)((IConvertible)ValueAsString).ToType(typeof(T), CultureInfo.InvariantCulture);
 		}
 
+        protected GrapeLiteralExpression(string stringValue, T parsedValue): base(stringValue) {
+            this.value = parsedValue;
+        }
+
 		public T Value {
 			get {
 				return value;

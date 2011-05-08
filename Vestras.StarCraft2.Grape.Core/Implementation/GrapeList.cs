@@ -44,6 +44,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
         [Rule("<Switch Section List> ::= <Switch Default>", typeof(GrapeSwitchCase))]
         [Rule("<Arg List> ::= <Argument>", typeof(GrapeExpression))]
         [Rule("<Class Item List> ::= <Class Item>", typeof(GrapeClassItem))]
+        [Rule("<Formal Param List> ::= <Formal Param>", typeof(GrapeParameter))]
         [Rule("<Variable Initializer List> ::= <Variable Initializer>", typeof(GrapeInitializer))]
         public GrapeList(T item) : this(item, null) { }
 
@@ -57,7 +58,7 @@ namespace Vestras.StarCraft2.Grape.Core.Implementation {
         [Rule("<Arg List> ::= <Argument> ~',' <Arg List>", typeof(GrapeExpression))]
         [Rule("<Modifier List Opt> ::= <Modifier> <Modifier List Opt>", typeof(GrapeModifier))]
         [Rule("<Class Item List> ::= <Class Item> <Class Item List>", typeof(GrapeClassItem))]
-        [Rule("<Formal Param List Opt> ::= <Formal Param> ~',' <Formal Param List Opt>", typeof(GrapeParameter))]
+        [Rule("<Formal Param List> ::= <Formal Param> ~',' <Formal Param List>", typeof(GrapeParameter))]
         [Rule("<Variable Initializer List> ::= <Variable Initializer> ~',' <Variable Initializer List>", typeof(GrapeInitializer))]
         public GrapeList(T item, GrapeList<T> next) {
             this.item = item;

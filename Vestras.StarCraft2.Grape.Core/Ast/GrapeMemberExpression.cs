@@ -18,7 +18,7 @@ namespace Vestras.StarCraft2.Grape.Core.Ast {
 		private readonly GrapeIdentifier identifier;
 		private readonly GrapeAccessExpressionType type;
 
-		[Rule("<Value> ::= <Object>")]
+		[Rule("<Value> ::= this")]
 		public GrapeMemberExpression(GrapeObject identifier): this(GrapeAccessExpressionType.Root, identifier, null) {}
 
 		protected GrapeMemberExpression(GrapeAccessExpressionType type, GrapeIdentifier identifier, GrapeAccessExpression next): base(next) {

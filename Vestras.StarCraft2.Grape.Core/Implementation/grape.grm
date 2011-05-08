@@ -207,7 +207,7 @@ Comment End   = '*/'
      |  <Literal>
      |  <Method Call>
      |  <Member Access>
-     |  <Object>
+     |  this
      |  nameof '(' <Simple Type> ')'
      |  new <Simple Type> '(' <Arg List Opt> ')'
 
@@ -363,8 +363,12 @@ Comment End   = '*/'
      |  <Modifier List Opt> void Identifier '(' <Formal Param List Opt> ')' ':' <Stm Block>
 
 <Formal Param List Opt>
-    ::= <Formal Param> ',' <Formal Param List Opt>
+    ::= <Formal Param List>
      |  
+
+<Formal Param List>
+    ::= <Formal Param> ',' <Formal Param List>
+     |  <Formal Param>
 
 <Formal Param>
     ::= <Type> Identifier
