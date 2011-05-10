@@ -205,6 +205,10 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
 
         public static TEntity GetLogicalParentOfEntityType<TEntity>(this GrapeEntity entity)
             where TEntity : GrapeEntity {
+            if (entity == null) {
+                return default(TEntity);
+            }
+
             if (entity is TEntity) {
                 return (TEntity)entity;
             } else if (entity.Parent is TEntity) {

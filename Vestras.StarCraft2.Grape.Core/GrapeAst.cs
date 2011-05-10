@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Vestras.StarCraft2.Grape.Core {
 	public sealed class GrapeAst {
@@ -8,6 +9,14 @@ namespace Vestras.StarCraft2.Grape.Core {
 		public GrapeAst() {
 			children = new List<GrapeEntity>();
 		}
+
+        private readonly List<GrapeEntity> childrenRecursive = new List<GrapeEntity>();
+        public List<GrapeEntity> GetChildrenRecursive() {
+            if (childrenRecursive.Count == 0) {
+                childrenRecursive.AddRange(children.SelectMany(e => e.GetChildren()));
+            }
+            return childrenRecursive;
+        }
 
 		public List<GrapeEntity> Children {
 			get {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Linq;
 using Vestras.StarCraft2.Grape.Core;
 using Vestras.StarCraft2.Grape.Core.Ast;
 using Vestras.StarCraft2.Grape.Core.Implementation;
@@ -31,27 +32,14 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
             }
         }
 
-        private IEnumerable<GrapeEntity> GetChildrenRecursive(IEnumerable<GrapeEntity> children, Predicate<GrapeEntity> predicate) {
-            List<GrapeEntity> list = new List<GrapeEntity>();
-            foreach (GrapeEntity child in children) {
-                if (predicate(child)) {
-                    list.Add(child);
-                }
-
-                list.AddRange(GetChildrenRecursive(child.GetChildren(), predicate));
-            }
-
-            return list;
-        }
-
         public IEnumerable<GrapeEntity> GetEntitiesOfType(GrapeAst ast, Type type) {
-            return GetChildrenRecursive(ast.Children, delegate(GrapeEntity e) {
+            return ast.GetChildrenRecursive().Where(delegate(GrapeEntity e) {
                 return e.GetType() == type;
             });
         }
 
         public IEnumerable<GrapeEntity> GetEntitiesOfTypeInFile(GrapeAst ast, string fileName, Type type) {
-            return GetChildrenRecursive(ast.Children, delegate(GrapeEntity e) {
+            return ast.GetChildrenRecursive().Where(delegate(GrapeEntity e) {
                 return e.GetType() == type && e.FileName == fileName;
             });
         }

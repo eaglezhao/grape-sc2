@@ -20,12 +20,12 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
 
         public bool IsTypeInClassInheritanceTree(GrapeCodeGeneratorConfiguration config, string typeName, GrapeClass c) {
             typeName = GetCorrectNativeTypeName(typeName);
-            if (typeName == c.Name) {
-                return true;
-            }
-
             if (c == null) {
                 return false;
+            }
+
+            if (typeName == c.Name) {
+                return true;
             }
 
             if (c.Inherits != null) {
@@ -76,6 +76,10 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
         }
 
         public string GetTypeNameForTypeAccessExpression(GrapeCodeGeneratorConfiguration config, GrapeType type, ref string errorMessage) { // left for compat
+            if (type == null) {
+                return "void_base";
+            }
+
             return type.ToString();
         }
 
@@ -161,6 +165,10 @@ namespace Vestras.StarCraft2.Grape.CodeGeneration.Implementation {
                 parent = parent.GetLogicalParentOfEntityType<GrapeMethod>();
                 if (parent == null) {
                     parent = oldParent.GetLogicalParentOfEntityType<GrapeClass>();
+                }
+
+                if (parent == null) {
+                    parent = oldParent;
                 }
             }
 

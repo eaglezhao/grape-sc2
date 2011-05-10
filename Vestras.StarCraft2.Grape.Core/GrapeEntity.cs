@@ -141,7 +141,10 @@ namespace Vestras.StarCraft2.Grape.Core {
             if (template == null) {
                 throw new ArgumentNullException("template");
             }
-            Initialize(((IToken)template).Symbol, ((IToken)template).Position);
+            if (((IToken)template).Symbol != null) {
+                Initialize(((IToken)template).Symbol, ((IToken)template).Position);
+            }
+
             Parent = template.Parent;
             Length = template.Length;
             EndColumn = template.EndColumn;
