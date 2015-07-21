@@ -1,0 +1,1 @@
+A verbal programming language for StarCraft 2
